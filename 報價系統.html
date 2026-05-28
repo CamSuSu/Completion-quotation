@@ -17,7 +17,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
@@ -47,7 +47,7 @@
 
         /* Cards & Inputs */
         .card { background: #FFFFFF; border-radius: var(--radius-xl); padding: 28px; margin-bottom: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); }
-        .card-title { margin-top: 0; margin-bottom: 24px; font-size: 1.4rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .card-title { margin-top: 0; margin-bottom: 24px; font-size: 1.4rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .card-title i { color: var(--primary); font-size: 1.6rem; }
         .form-group label { display: block; font-size: 1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
         input[type="text"], input[type="number"], select { width: 100%; padding: 16px; font-size: 1.15rem; border: 1.5px solid var(--border-light); border-radius: var(--radius-md); background: #FAFAFC; color: var(--text-main); font-weight: 600; transition: all 0.2s ease; }
@@ -88,12 +88,13 @@
         .delete-btn { background: rgba(255, 59, 48, 0.1); color: var(--danger); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; }
 
+        /* 模態視窗通用樣式 */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: white; border-radius: var(--radius-xl); width: 90%; max-width: 650px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: var(--shadow-float); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-header { padding: 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: #F9F9FB; border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
-        .modal-header h3 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        .modal-header h3 { margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
         .close-modal { cursor: pointer; color: var(--text-main); font-size: 1.5rem; border: none; background: transparent; padding: 5px; }
         .modal-body { padding: 20px; overflow-y: auto; flex: 1; background: #F5F5F7; }
         .selectable-item { padding: 20px; background: #FFFFFF; border: 1.5px solid var(--border-light); border-radius: var(--radius-lg); margin-bottom: 12px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
@@ -110,6 +111,15 @@
         .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap: 16px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border-light); }
         .admin-category-header { background: #1D1D1F; color: white; padding: 12px 20px; border-radius: var(--radius-md) var(--radius-md) 0 0; font-weight: 700; margin-top: 24px; font-size: 1.2rem; display: flex; justify-content: space-between; }
         .admin-category-body { border: 1px solid var(--border-light); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 0 20px; background: white; margin-bottom: 24px; }
+
+        /* 歷史紀錄卡片樣式 */
+        .history-card { background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .history-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #F0F0F5; padding-bottom: 15px; margin-bottom: 15px; }
+        .history-client { font-weight: 900; font-size: 1.3rem; color: var(--text-main); }
+        .history-time { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+        .history-total { font-weight: 900; font-size: 1.6rem; color: var(--danger); letter-spacing: -0.5px; }
+        .history-item-row { display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 600; color: var(--text-main); padding: 6px 0; border-bottom: 1px dashed rgba(0,0,0,0.05); }
+        .history-item-row:last-child { border-bottom: none; }
 
         @media (max-width: 900px) {
             .header { padding: 24px; }
@@ -167,9 +177,14 @@
                 <div style="display:flex; align-items:center; gap:10px;">
                     <i class="fas fa-list-check"></i> 完工報價明細清單
                 </div>
-                <button onclick="clearAllQuotes()" class="btn" style="background: rgba(255, 59, 48, 0.1); color: var(--danger); font-size: 0.95rem; padding: 10px 18px; box-shadow: none;">
-                    <i class="fas fa-trash-alt"></i> 一鍵清空清單
-                </button>
+                <div style="display:flex; gap:10px; flex-wrap: wrap; justify-content: flex-end;">
+                    <button onclick="openModal('history-modal')" class="btn" style="background: rgba(0, 122, 255, 0.1); color: var(--primary); font-size: 0.95rem; padding: 10px 18px; box-shadow: none;">
+                        <i class="fas fa-history"></i> 歷史報價
+                    </button>
+                    <button onclick="clearAllQuotes()" class="btn" style="background: rgba(255, 59, 48, 0.1); color: var(--danger); font-size: 0.95rem; padding: 10px 18px; box-shadow: none;">
+                        <i class="fas fa-trash-alt"></i> 一鍵清空
+                    </button>
+                </div>
             </div>
             <div>
                 <div class="quote-table">
@@ -192,30 +207,25 @@
             <div style="background: #F9F9FB; padding: 24px; border-radius: 16px; margin-bottom: 30px;">
                 <h4 style="margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; color: var(--text-main);">➕ 新增常備工程項目</h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                    <div>
-                        <label style="display:block; margin-bottom:8px; font-weight:600; color:var(--text-muted);">項目類型</label>
-                        <input type="text" id="new-item-category" placeholder="例：泥作工程" list="category-list">
-                        <datalist id="category-list"></datalist>
-                    </div>
-                    <div>
-                        <label style="display:block; margin-bottom:8px; font-weight:600; color:var(--text-muted);">工程項目名稱</label>
-                        <input type="text" id="new-item-name" placeholder="輸入名稱...">
-                    </div>
-                    <div>
-                        <label style="display:block; margin-bottom:8px; font-weight:600; color:var(--text-muted);">預設單位</label>
-                        <input type="text" id="new-item-unit" value="式" placeholder="例：式、坪、個">
-                    </div>
+                    <div><label style="display:block; margin-bottom:8px; font-weight:600; color:var(--text-muted);">項目類型</label><input type="text" id="new-item-category" placeholder="例：泥作工程" list="category-list"><datalist id="category-list"></datalist></div>
+                    <div><label style="display:block; margin-bottom:8px; font-weight:600; color:var(--text-muted);">工程項目名稱</label><input type="text" id="new-item-name" placeholder="輸入名稱..."></div>
+                    <div><label style="display:block; margin-bottom:8px; font-weight:600; color:var(--text-muted);">預設單位</label><input type="text" id="new-item-unit" value="式" placeholder="例：式、坪、個"></div>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
-                    <label style="display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.1rem; cursor:pointer;">
-                        <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用「天數」選項
-                    </label>
-                    <button class="btn" onclick="addNewItem()" style="padding: 12px 30px; background: #1D1D1F;">
-                        <i class="fas fa-cloud-upload-alt"></i> 儲存至雲端資料庫
-                    </button>
+                    <label style="display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.1rem; cursor:pointer;"><input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用「天數」選項</label>
+                    <button class="btn" onclick="addNewItem()" style="padding: 12px 30px; background: #1D1D1F;"><i class="fas fa-cloud-upload-alt"></i> 儲存至雲端資料庫</button>
                 </div>
             </div>
             <div id="admin-items-container"></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title"><i class="fas fa-history"></i> 報價歷史紀錄管理</div>
+            <div style="display:flex; gap:10px; margin-bottom:20px; max-width: 500px;">
+                <select id="admin-history-year" onchange="renderAdminHistoryList()" style="flex:1;"></select>
+                <select id="admin-history-month" onchange="renderAdminHistoryList()" style="flex:1;"></select>
+            </div>
+            <div id="admin-history-list-container"></div>
         </div>
     </div>
 </div>
@@ -226,8 +236,8 @@
         <span class="amount">$ <span id="grand-total-display">0</span></span>
     </div>
     <div class="action-buttons">
-        <button class="btn" onclick="exportToPDF()" style="background: #007AFF;">
-            <i class="fas fa-file-pdf"></i> 產出 PDF
+        <button class="btn" onclick="exportToPNG()" style="background: #007AFF;">
+            <i class="fas fa-image"></i> 產出 PNG 截圖
         </button>
         <button class="btn" onclick="exportToExcelFormatted()" style="background: #34C759;">
             <i class="fas fa-file-excel"></i> 產出 Excel
@@ -239,31 +249,45 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modal-category-title">選擇項目</h3>
-            <button class="close-modal" onclick="closeModal()"><i class="fas fa-times-circle"></i></button>
+            <button class="close-modal" onclick="closeModal('item-modal')"><i class="fas fa-times-circle"></i></button>
         </div>
         <div class="modal-body" id="modal-items-list"></div>
     </div>
 </div>
 
+<div class="modal-overlay" id="history-modal">
+    <div class="modal-content" style="max-width: 800px; height: 85vh;">
+        <div class="modal-header">
+            <h3><i class="fas fa-history" style="color: var(--primary);"></i> 歷史報價紀錄</h3>
+            <button class="close-modal" onclick="closeModal('history-modal')"><i class="fas fa-times-circle"></i></button>
+        </div>
+        <div class="modal-body">
+            <div style="display:flex; gap:10px; margin-bottom:20px; max-width: 500px;">
+                <select id="history-year" onchange="renderHistoryList()" style="flex:1;"></select>
+                <select id="history-month" onchange="renderHistoryList()" style="flex:1;"></select>
+            </div>
+            <div id="history-list-container"></div>
+        </div>
+    </div>
+</div>
+
 <script type="module">
-    // 引入 Firebase v10+ SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // ⛔⛔⛔ 這裡請替換成您自己的 Firebase Config ⛔⛔⛔
     const firebaseConfig = {
-        apiKey: "您的_API_KEY",
-        authDomain: "您的_PROJECT_ID.firebaseapp.com",
-        projectId: "您的_PROJECT_ID",
-        storageBucket: "您的_PROJECT_ID.appspot.com",
-        messagingSenderId: "您的_SENDER_ID",
-        appId: "您的_APP_ID"
+        apiKey: "AIzaSyC5x3GHu5DRid8Pq1SwMGlOlrbCGe6F-8w",
+    	authDomain: "completion-quotation-841d6.firebaseapp.com",
+    	projectId: "completion-quotation-841d6",
+    	storageBucket: "completion-quotation-841d6.firebasestorage.app",
+    	messagingSenderId: "236586692639",
+    	appId: "1:236586692639:web:0f4c244c9d2f340d65652a",
+    	measurementId: "G-SH8J4L0YS2"
     };
 
-    // 初始化 Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // 指向資料庫中的特定文件：集合名稱 "liu_engineering"，文件名稱 "database"
     const dbRef = doc(db, "liu_engineering", "database");
 
     const CAT_COLORS = [
@@ -278,10 +302,7 @@
         const c = CAT_COLORS[index % CAT_COLORS.length];
         return {
             bg: `hsl(${c.h}, ${c.s}%, ${c.l}%)`,
-            rowEven: `#FFFFFF`, 
-            rowOdd: `hsla(${c.h}, ${c.s}%, 93%, 1)`, 
-            border: `hsla(${c.h}, ${c.s}%, 75%, 1)`,
-            icon: c.icon
+            rowEven: `#FFFFFF`, rowOdd: `hsla(${c.h}, ${c.s}%, 93%, 1)`, border: `hsla(${c.h}, ${c.s}%, 75%, 1)`, icon: c.icon
         };
     }
 
@@ -294,53 +315,186 @@
         { id: 6, category: "拆除工程", name: "室內隔間拆除", unit: "坪", hasDays: true }
     ];
 
-    // 全域狀態
     let engineeringDB = [];
+    let quoteHistory = []; // 歷史紀錄陣列
     let quoteList = [];
     let currentGrandTotal = 0;
+    let currentQuoteSavedFlag = false; // 防呆標記，避免連續按產出導致重複存檔
 
-    // 顯示連線狀態
     const statusEl = document.getElementById('db-status');
     statusEl.style.display = 'block';
 
-    // 監聽 Firebase 資料變化 (即時同步)
     onSnapshot(dbRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
             engineeringDB = data.items || [];
+            quoteHistory = data.history || []; // 雲端同步讀取歷史紀錄
             statusEl.style.display = 'none';
         } else {
-            // 如果雲端尚未建立此文件，寫入預設值
             engineeringDB = defaultDB;
+            quoteHistory = [];
             saveDBToFirebase();
         }
         updateCategoryUI();
         renderFrontView();
+        updateHistoryFilters('history-year', 'history-month');
+        updateHistoryFilters('admin-history-year', 'admin-history-month');
+        renderHistoryList();
+        renderAdminHistoryList();
+        
         if (!document.getElementById('view-back').classList.contains('hidden')) {
             renderAdminView();
         }
     }, (error) => {
         console.error("Firebase 監聽失敗：", error);
-        statusEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:red;"></i> 資料庫連線異常，請檢查網路或金鑰設定。';
-        // 若斷線，嘗試讀取本地歷史 (選用)
+        statusEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:red;"></i> 資料庫連線異常，請檢查設定。';
         if(engineeringDB.length === 0) engineeringDB = defaultDB; 
         updateCategoryUI();
     });
 
-    // 將寫入功能封裝成 Promise
     async function saveDBToFirebase() {
         try {
-            await setDoc(dbRef, { items: engineeringDB });
-            console.log("資料庫已同步至 Firebase");
+            await setDoc(dbRef, { items: engineeringDB, history: quoteHistory }, { merge: true });
         } catch (e) {
             console.error("寫入 Firebase 失敗: ", e);
-            alert("雲端同步失敗，請確認 Firebase 資料庫存取權限。");
+            alert("雲端同步失敗，請確認 Firebase 權限。");
         }
     }
 
+    function getFormattedDateString2(d) {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // 將報價儲存至歷史紀錄
+    window.recordQuoteHistory = async function() {
+        if (currentQuoteSavedFlag) return; // 已經存過就不再存
+        const clientName = document.getElementById('client-name-input').value.trim();
+        if (!clientName || quoteList.length === 0) return;
+        
+        const d = new Date();
+        const record = {
+            id: 'R_' + Date.now(),
+            date: getFormattedDateString2(d),
+            time: d.toLocaleTimeString('zh-TW', { hour12: false }),
+            client: clientName,
+            total: currentGrandTotal,
+            items: quoteList.map(q => {
+                const dbItem = engineeringDB.find(db => db.id === q.dbId);
+                return {
+                    cat: dbItem ? dbItem.category : '',
+                    name: dbItem ? dbItem.name : '未知',
+                    price: q.price,
+                    qty: q.qty,
+                    unit: dbItem ? dbItem.unit : '',
+                    days: dbItem && dbItem.hasDays ? q.days : null,
+                    discount: q.discount
+                };
+            })
+        };
+        
+        quoteHistory.unshift(record);
+        if (quoteHistory.length > 300) quoteHistory = quoteHistory.slice(0, 300); // 限制 300 筆
+        
+        currentQuoteSavedFlag = true;
+        await saveDBToFirebase();
+        
+        // 渲染更新介面
+        updateHistoryFilters('history-year', 'history-month');
+        updateHistoryFilters('admin-history-year', 'admin-history-month');
+        renderHistoryList();
+        renderAdminHistoryList();
+    };
+
+    // 歷史紀錄篩選下拉選單動態更新
+    window.updateHistoryFilters = function(yearId, monthId) {
+        const yearSel = document.getElementById(yearId);
+        const monthSel = document.getElementById(monthId);
+        if(!yearSel || !monthSel) return;
+        
+        const currentY = yearSel.value || 'all';
+        const currentM = monthSel.value || 'all';
+        
+        const years = new Set(); const months = new Set();
+        quoteHistory.forEach(r => {
+            const parts = r.date.split('-');
+            if(parts[0]) years.add(parts[0]);
+            if(parts[1]) months.add(parts[1]);
+        });
+        
+        yearSel.innerHTML = '<option value="all">全部年份</option>' + Array.from(years).sort().reverse().map(y => `<option value="${y}" ${currentY===y?'selected':''}>${y}年</option>`).join('');
+        monthSel.innerHTML = '<option value="all">全部月份</option>' + Array.from(months).sort().map(m => `<option value="${m}" ${currentM===m?'selected':''}>${m}月</option>`).join('');
+    };
+
+    window.filterHistoryData = function(yearId, monthId) {
+        const y = document.getElementById(yearId).value;
+        const m = document.getElementById(monthId).value;
+        return quoteHistory.filter(r => {
+            const parts = r.date.split('-');
+            if(y !== 'all' && parts[0] !== y) return false;
+            if(m !== 'all' && parts[1] !== m) return false;
+            return true;
+        });
+    };
+
+    window.buildHistoryHTML = function(records, isAdmin) {
+        if(records.length === 0) return '<div style="text-align:center; color:#888; padding:40px; font-weight:bold; font-size:1.1rem; border:2px dashed var(--border-light); border-radius:var(--radius-lg);">目前尚無符合的紀錄</div>';
+        
+        return records.map(r => {
+            let itemsHtml = r.items.map(i => {
+                let sub = Math.max(0, (i.price * i.qty * (i.days || 1)) - i.discount);
+                let optText = [];
+                if(i.days) optText.push(`${i.days}天`);
+                if(i.discount > 0) optText.push(`-$${i.discount}`);
+                let optTag = optText.length > 0 ? `<span style="color:var(--text-muted); font-size:0.85rem; margin-left:8px;">(${optText.join(', ')})</span>` : '';
+                return `
+                <div class="history-item-row">
+                    <span style="flex:1;">${i.name} <span style="color:var(--primary); margin-left:5px;">x${i.qty}${i.unit}</span> ${optTag}</span>
+                    <span>$${sub.toLocaleString()}</span>
+                </div>`;
+            }).join('');
+
+            let delBtn = isAdmin ? `<button onclick="deleteHistoryRecord('${r.id}')" style="background:#FF3B30; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:bold; transition:all 0.2s;"><i class="fas fa-trash"></i> 刪除紀錄</button>` : '';
+
+            return `
+            <div class="history-card">
+                <div class="history-card-header">
+                    <div>
+                        <div class="history-client"><i class="fas fa-user-circle" style="color:var(--primary); margin-right:5px;"></i>${r.client}</div>
+                        <div class="history-time">${r.date} ${r.time}</div>
+                    </div>
+                    <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+                        <div class="history-total">$${r.total.toLocaleString()}</div>
+                        ${delBtn}
+                    </div>
+                </div>
+                <div>${itemsHtml}</div>
+            </div>`;
+        }).join('');
+    };
+
+    window.renderHistoryList = function() {
+        const container = document.getElementById('history-list-container');
+        if(container) container.innerHTML = buildHistoryHTML(filterHistoryData('history-year', 'history-month'), false);
+    };
+
+    window.renderAdminHistoryList = function() {
+        const container = document.getElementById('admin-history-list-container');
+        if(container) container.innerHTML = buildHistoryHTML(filterHistoryData('admin-history-year', 'admin-history-month'), true);
+    };
+
+    window.deleteHistoryRecord = async function(id) {
+        if(!confirm('確定要永久刪除此筆報價紀錄？')) return;
+        quoteHistory = quoteHistory.filter(r => r.id !== id);
+        await saveDBToFirebase();
+        renderHistoryList();
+        renderAdminHistoryList();
+    };
+
     function getUniqueCategories() { return [...new Set(engineeringDB.map(item => item.category))].sort(); }
     
-    // 將函數掛載到 window 上，讓 HTML 可以直接呼叫 (因 type="module" 隔離了作用域)
     window.switchView = function(view) {
         const isBack = view === 'back';
         document.getElementById('view-front').classList.toggle('hidden', isBack);
@@ -365,6 +519,9 @@
         }
     };
 
+    window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+    window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
+
     window.openModalCategory = function(category) {
         document.getElementById('modal-category-title').innerText = `選擇 ${category} 項目`;
         let filteredDB = engineeringDB.filter(item => item.category === category).sort((a,b) => a.name.localeCompare(b.name));
@@ -380,16 +537,16 @@
                 </div>
                 <button class="btn" style="padding: 10px 24px; font-size:1.1rem; border-radius:12px; background:var(--text-main);"><i class="fas fa-plus"></i> 加入</button>
             `;
-            div.onclick = () => { addItemToQuote(item.id); closeModal(); };
+            div.onclick = () => { addItemToQuote(item.id); closeModal('item-modal'); };
             listContainer.appendChild(div);
         });
-        document.getElementById('item-modal').classList.add('active');
+        openModal('item-modal');
     };
-    window.closeModal = function() { document.getElementById('item-modal').classList.remove('active'); };
 
     window.addItemToQuote = function(dbId) {
         if (quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
         quoteList.push({ id: 'q_' + Date.now(), dbId: dbId, price: 0, qty: 1, days: 1, discount: 0 });
+        currentQuoteSavedFlag = false; // 內容變更，重設儲存防呆
         renderFrontView();
         setTimeout(() => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 150);
     };
@@ -399,6 +556,7 @@
         const target = quoteList.find(q => q.id === qId);
         if (target) {
             target[field] = val;
+            currentQuoteSavedFlag = false; // 內容變更
             updateSubtotalAndTotal(qId);
         }
     };
@@ -414,6 +572,7 @@
             const inputEl = document.getElementById(`input-${field}-${qId}`);
             if(inputEl) inputEl.value = newVal;
             
+            currentQuoteSavedFlag = false; // 內容變更
             updateSubtotalAndTotal(qId);
         }
     };
@@ -429,11 +588,19 @@
         calculateTotal();
     }
 
-    window.removeQuoteItem = function(qId) { quoteList = quoteList.filter(q => q.id !== qId); renderFrontView(); };
+    window.removeQuoteItem = function(qId) { 
+        quoteList = quoteList.filter(q => q.id !== qId); 
+        currentQuoteSavedFlag = false; 
+        renderFrontView(); 
+    };
 
     window.clearAllQuotes = function() {
         if(quoteList.length === 0) return;
-        if(confirm('確定要刪除所有當下內容？')) { quoteList = []; renderFrontView(); }
+        if(confirm('確定要刪除所有當下內容？')) { 
+            quoteList = []; 
+            currentQuoteSavedFlag = false; 
+            renderFrontView(); 
+        }
     };
 
     function calculateTotal() {
@@ -552,11 +719,156 @@
         alert(`已新增「${nameValue}」至雲端資料庫`);
     };
 
+    // PNG 截圖產出功能 (全新彈出視窗設計)
+    window.exportToPNG = async function() {
+        const clientName = document.getElementById('client-name-input').value.trim();
+        if (!clientName) { alert('請輸入「客戶名稱」！'); document.getElementById('client-name-input').focus(); return; }
+        if (quoteList.length === 0) return alert('請加入工程項目！');
+
+        // 自動儲存歷史紀錄
+        await recordQuoteHistory();
+
+        const newWin = window.open('', '_blank');
+        if (!newWin) return alert('⚠️ 彈出視窗被瀏覽器封鎖，請允許開啟新分頁！');
+
+        const d = new Date();
+        const dateStr = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        let tbody = '';
+        let isEvenRow = true;
+        const sortedQuoteList = [...quoteList].sort((a, b) => {
+            const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
+            if(!dbA || !dbB) return 0;
+            return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
+        });
+
+        let currentCat = '';
+        sortedQuoteList.forEach(qItem => {
+            const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
+            let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - qItem.discount);
+            const displayCat = dbItem.category !== currentCat ? dbItem.category : ''; currentCat = dbItem.category;
+            const bg = isEvenRow ? '#FFFFFF' : '#F5F5F7';
+            isEvenRow = !isEvenRow;
+            
+            tbody += `<tr style="background-color: ${bg}; border-bottom: 1px solid #ddd;">
+                <td style="padding:12px; font-weight:bold; color:#007AFF;">${displayCat}</td>
+                <td style="padding:12px; text-align:left; font-weight:bold;">${dbItem.name}</td>
+                <td style="padding:12px;">${qItem.price.toLocaleString()}</td>
+                <td style="padding:12px;">${qItem.qty} ${dbItem.unit}</td>
+                <td style="padding:12px;">${dbItem.hasDays ? qItem.days + ' 天' : '-'}</td>
+                <td style="padding:12px; color:#FF3B30;">${qItem.discount > 0 ? '-$' + qItem.discount : '-'}</td>
+                <td style="padding:12px; font-weight:bold;">${subtotal.toLocaleString()}</td>
+            </tr>`;
+        });
+
+        newWin.document.write(`<!DOCTYPE html>
+        <html lang="zh-TW">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>產出完工報價單</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+            <style>
+                * { box-sizing: border-box; font-family: -apple-system, "微軟正黑體", sans-serif; }
+                body { background: #f5f5f7; margin: 0; padding: 0; }
+                #action-center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 16px; padding: 20px; }
+                .btn { width: 100%; max-width: 340px; padding: 18px; border-radius: 20px; font-weight: 900; font-size: 18px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                #loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); color: white; flex-direction: column; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; z-index: 50; }
+                .spinner { border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid #007AFF; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                
+                #result-area { display: none; padding: 20px; text-align: center; flex-direction: column; align-items: center; gap: 15px; }
+                #result-img { max-width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+                .hint { background: rgba(0, 122, 255, 0.1); border: 1px solid rgba(0, 122, 255, 0.3); color: #007AFF; padding: 12px 16px; border-radius: 12px; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
+                
+                /* 排版隱藏區 (截圖用) */
+                #receipt-wrap { position: absolute; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; }
+                .r-header { text-align: center; margin-bottom: 25px; }
+                .r-header h1 { font-size: 32px; margin: 0 0 10px 0; color: #1d1d1f; font-weight: 900; }
+                .r-info { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; border-bottom: 2px solid #1d1d1f; padding-bottom: 15px; }
+                table { width: 100%; border-collapse: collapse; text-align: center; font-size: 15px; border: 1px solid #1d1d1f; }
+                th { background: #007AFF; color: white; padding: 14px; border: 1px solid #1d1d1f; font-size: 16px; }
+                td { border: 1px solid #1d1d1f; }
+                .r-total { text-align: right; font-size: 28px; font-weight: 900; color: #FF3B30; margin-top: 30px; letter-spacing: -1px; }
+            </style>
+        </head>
+        <body>
+            <div id="action-center">
+                <button class="btn" id="btn-capture" style="background:#007AFF; color:white;"><i class="fa-solid fa-image"></i> 產出並儲存圖片</button>
+                <button class="btn" onclick="window.close()" style="background:white; color:#333;"><i class="fa-solid fa-xmark"></i> 關閉</button>
+            </div>
+            
+            <div id="loading">
+                <div class="spinner"></div>
+                <div>正在產生高畫質圖片...</div>
+            </div>
+            
+            <div id="result-area">
+                <div class="hint">${isIOS ? '📲 圖片已產生！請<strong>長按下方圖片</strong>並選擇「加入照片」儲存' : '💾 圖片已產生！請點擊下載按鈕或長按圖片儲存'}</div>
+                <img id="result-img" />
+                ${!isIOS ? '<button class="btn" id="btn-download" style="background:#007AFF; color:white; margin-top:10px;"><i class="fa-solid fa-download"></i> 下載圖片</button>' : ''}
+                <button class="btn" onclick="window.close()" style="background:white; color:#333;"><i class="fa-solid fa-arrow-left"></i> 返回報價系統</button>
+            </div>
+            
+            <div id="receipt-wrap">
+                <div class="r-header">
+                    <h1>劉氏工程行 — 完工報價單</h1>
+                </div>
+                <div class="r-info">
+                    <div>客戶名稱：${clientName}</div>
+                    <div>報價日期：${dateStr}</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工程類別</th><th style="text-align:left;">工程項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>優惠折抵</th><th>項目小計</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tbody}</tbody>
+                </table>
+                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
+            </div>
+            
+            <script>
+                document.getElementById('btn-capture').addEventListener('click', function() {
+                    const target = document.getElementById('receipt-wrap');
+                    document.getElementById('loading').style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                            const imgData = canvas.toDataURL('image/png');
+                            document.getElementById('loading').style.display = 'none';
+                            document.getElementById('action-center').style.display = 'none';
+                            document.getElementById('result-area').style.display = 'flex';
+                            document.getElementById('result-img').src = imgData;
+                            
+                            const dlBtn = document.getElementById('btn-download');
+                            if(dlBtn) {
+                                dlBtn.onclick = () => {
+                                    const a = document.createElement('a');
+                                    a.href = imgData;
+                                    a.download = '${clientName}_${dateStr.replace(/\//g, '')}.png';
+                                    a.click();
+                                };
+                            }
+                        });
+                    }, 600);
+                });
+            <\/script>
+        </body></html>`);
+        newWin.document.close();
+    };
+
     // Excel 產出
     window.exportToExcelFormatted = async function() {
         const clientName = document.getElementById('client-name-input').value.trim();
         if (!clientName) { alert('請輸入「客戶名稱」！'); document.getElementById('client-name-input').focus(); return; }
         if (quoteList.length === 0) return alert('請加入工程項目！');
+
+        // 自動儲存歷史紀錄
+        await recordQuoteHistory();
 
         const workbook = new ExcelJS.Workbook();
         const ws = workbook.addWorksheet('報價單');
@@ -621,90 +933,6 @@
 
         const buf = await workbook.xlsx.writeBuffer();
         saveAs(new Blob([buf]), `${clientName}_${dateStr}.xlsx`);
-    };
-
-    // 完美修正 PDF 匯出 (附著於實體 DOM 避免白屏與字體問題)
-    window.exportToPDF = function() {
-        const clientName = document.getElementById('client-name-input').value.trim();
-        if (!clientName) { alert('請輸入「客戶名稱」！'); document.getElementById('client-name-input').focus(); return; }
-        if (quoteList.length === 0) return alert('請加入工程項目！');
-
-        // 建立實體 Div 但放在畫面外，確保字體渲染與跳色正常
-        const printDiv = document.createElement('div');
-        printDiv.style.position = 'absolute';
-        printDiv.style.left = '-9999px';
-        printDiv.style.top = '0';
-        printDiv.style.width = '800px'; // 固定寬度確保表格比例不跑位
-        printDiv.style.padding = '30px'; 
-        printDiv.style.fontFamily = '"微軟正黑體", "Microsoft JhengHei", sans-serif'; 
-        printDiv.style.color = '#000'; 
-        printDiv.style.background = '#fff';
-        
-        document.body.appendChild(printDiv); // 加入實體 DOM 讓 html2canvas 抓取
-
-        const d = new Date();
-        const dateStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-
-        let html = `
-            <h1 style="text-align:center; font-size:26px; margin-bottom:20px; font-weight:bold;">劉氏工程行 — 完工報價單</h1>
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:16px; font-weight:bold;">
-                <div>客戶名稱：${clientName}</div>
-                <div>報價日期：${d.toLocaleDateString('zh-TW')}</div>
-            </div>
-            <table style="width:100%; border-collapse:collapse; text-align:center; font-size:14px; border: 1px solid #333;">
-                <thead>
-                    <tr style="background-color:#007AFF; color:#FFF;">
-                        <th style="border:1px solid #333; padding:12px;">工程類別</th><th style="border:1px solid #333; padding:12px; text-align:left;">工程項目明細</th>
-                        <th style="border:1px solid #333; padding:12px;">單價</th><th style="border:1px solid #333; padding:12px;">數量</th>
-                        <th style="border:1px solid #333; padding:12px;">天數</th><th style="border:1px solid #333; padding:12px;">優惠折抵</th>
-                        <th style="border:1px solid #333; padding:12px;">項目小計</th>
-                    </tr>
-                </thead><tbody>`;
-
-        const sortedQuoteList = [...quoteList].sort((a, b) => {
-            const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
-            if(!dbA || !dbB) return 0;
-            return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
-        });
-
-        let currentCat = '';
-        let isEvenPDF = true;
-
-        sortedQuoteList.forEach(qItem => {
-            const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
-            let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - qItem.discount);
-            const displayCat = dbItem.category !== currentCat ? dbItem.category : ''; currentCat = dbItem.category;
-            
-            const bgPDF = isEvenPDF ? '#FFFFFF' : '#F2F6FA';
-            isEvenPDF = !isEvenPDF;
-
-            html += `<tr style="background-color: ${bgPDF};">
-                <td style="border:1px solid #333; padding:10px; font-weight:bold; color:#007AFF;">${displayCat}</td>
-                <td style="border:1px solid #333; padding:10px; text-align:left; font-weight:bold;">${dbItem.name}</td>
-                <td style="border:1px solid #333; padding:10px;">${qItem.price.toLocaleString()}</td>
-                <td style="border:1px solid #333; padding:10px;">${qItem.qty} ${dbItem.unit}</td>
-                <td style="border:1px solid #333; padding:10px;">${dbItem.hasDays ? qItem.days + ' 天' : '-'}</td>
-                <td style="border:1px solid #333; padding:10px; color:#FF3B30;">${qItem.discount > 0 ? '-$' + qItem.discount : '-'}</td>
-                <td style="border:1px solid #333; padding:10px; font-weight:bold;">${subtotal.toLocaleString()}</td>
-            </tr>`;
-        });
-        
-        html += `</tbody></table>
-            <div style="text-align:right; font-size:22px; font-weight:bold; margin-top:20px; color:#FF3B30;">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>`;
-        printDiv.innerHTML = html;
-
-        const opt = {
-            margin:       10, 
-            filename:     `${clientName}_${dateStr}.pdf`, 
-            image:        { type: 'jpeg', quality: 1 }, 
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, 
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-        };
-
-        html2pdf().set(opt).from(printDiv).save().then(() => {
-            // 匯出完成後，將 DOM 節點移除以保持乾淨
-            document.body.removeChild(printDiv);
-        });
     };
 
     // 觸發後台
