@@ -1069,9 +1069,22 @@
 
     window.addItemToQuote = function(dbId) {
         if (quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
-        quoteList.push({ id: 'q_' + Date.now(), dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: false });
+        const newId = 'q_' + Date.now();
+        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: false });
         renderFrontView();
-        setTimeout(() => { document.getElementById('main-scroll-container').scrollTo({ top: document.getElementById('main-scroll-container').scrollHeight, behavior: 'smooth' }); }, 150);
+        
+        setTimeout(() => { 
+            const newRowEl = document.getElementById(`quote-row-${newId}`);
+            if (newRowEl) {
+                newRowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const originalBg = newRowEl.style.backgroundColor;
+                newRowEl.style.transition = 'background-color 0.5s ease';
+                newRowEl.style.backgroundColor = 'rgba(10, 122, 255, 0.15)';
+                setTimeout(() => { newRowEl.style.backgroundColor = originalBg; }, 800);
+            } else {
+                document.getElementById('main-scroll-container').scrollTo({ top: document.getElementById('main-scroll-container').scrollHeight, behavior: 'smooth' }); 
+            }
+        }, 150);
     };
 
     window.toggleUnit = function(qId) {
@@ -1190,6 +1203,7 @@
                 
                 const row = document.createElement('div');
                 row.className = 'quote-item-row';
+                row.id = `quote-row-${q.id}`; 
                 // 偶數行為白底，奇數行為稍微調亮的主題底漆色彩
                 row.style.background = isEven ? style.rowEven : style.rowOdd;
                 row.style.borderLeft = `8px solid ${style.border}`; 
@@ -1333,8 +1347,9 @@
         if (!catValue) return alert("請先新增或選擇分類！");
         if (!nameValue) return alert("請輸入項目名稱！");
         
+        const newId = 'id_' + Date.now() + Math.random().toString(36).substr(2, 5);
         engineeringDB.push({ 
-            id: 'id_' + Date.now() + Math.random().toString(36).substr(2, 5), 
+            id: newId, 
             category: catValue, 
             name: nameValue, 
             unit: document.getElementById('new-item-unit').value.trim() || '式', 
@@ -1345,6 +1360,23 @@
         document.getElementById('new-item-name').value = '';
         alert(`✅ 已新增「${nameValue}」至雲端資料庫`);
         renderAdminView();
+        
+        setTimeout(() => {
+            const catIndex = systemCategories.indexOf(catValue);
+            if (catIndex !== -1) {
+                const body = document.getElementById(`cat-body-${catIndex}`);
+                const icon = document.getElementById(`cat-icon-${catIndex}`);
+                if (body && body.classList.contains('collapsed-body')) {
+                    body.classList.remove('collapsed-body');
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            }
+            const newRow = document.getElementById(`edit-name-${newId}`);
+            if (newRow) {
+                newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                newRow.focus();
+            }
+        }, 150);
     };
 
     window.exportDBToExcel = async function() {
@@ -1495,11 +1527,13 @@
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
-        let currentCat = '';
+        // 移除類別名稱留空的邏輯，讓每一行都完整顯示該項目類別
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
             let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
-            const displayCat = dbItem.category !== currentCat ? dbItem.category : ''; currentCat = dbItem.category;
+            
+            const displayCat = dbItem.category; // 每一項都顯示完整類別
+            
             const bg = isEvenRow ? '#FFFFFF' : '#F2F2F7'; isEvenRow = !isEvenRow;
             
             const unitDisplay = qItem.hideUnit ? '' : ` ${dbItem.unit}`;
@@ -1670,7 +1704,8 @@
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
-        let isEvenRow = true, currentCat = '';
+        let isEvenRow = true;
+        // 移除類別名稱留空的邏輯，讓 Excel 匯出每一行也都顯示完整類別
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
             let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
@@ -1682,8 +1717,8 @@
                 itemNameText += `\n(優惠折抵: -$${qItem.discount.toLocaleString()})`;
             }
             
-            const row = ws.addRow([ dbItem.category !== currentCat ? dbItem.category : '', itemNameText, qItem.price, unitStr, dbItem.hasDays ? `${qItem.days} 天` : '-', subtotal ]);
-            currentCat = dbItem.category; 
+            const row = ws.addRow([ dbItem.category, itemNameText, qItem.price, unitStr, dbItem.hasDays ? `${qItem.days} 天` : '-', subtotal ]);
+            
             row.height = (qItem.discount && qItem.discount > 0) ? 48 : 36;
             const bg = isEvenRow ? 'FFFFFFFF' : 'FFF2F2F7'; isEvenRow = !isEvenRow;
 
