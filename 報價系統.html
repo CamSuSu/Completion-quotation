@@ -172,7 +172,7 @@
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.05); }
 
         .bottom-bar-fixed {
-            position: absolute; bottom: 0; left: 0; right: 0; width: 100%;
+            position: fixed; bottom: 0; left: 0; right: 0; width: 100%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.92), rgba(245,245,248,0.98));
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-top: 1.5px solid rgba(255,255,255,0.8); z-index: 1500;
@@ -321,7 +321,8 @@
             .bottom-total-amount .currency { font-size: 1.2rem; }
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.2rem; border-width: 2px; }
             
-            #scrollTopBtn { bottom: 110px; right: 16px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
+            /* 手機版：回頂部按鈕極度貼右且變小 */
+            #scrollTopBtn { bottom: 110px; right: 8px; width: 38px; height: 38px; font-size: 1.1rem; border-radius: 19px; }
             
             .modal-content { width: 95%; max-height: 90vh; }
             .modal-header { padding: 20px; }
@@ -511,7 +512,7 @@
     const db = getFirestore(app);
     const dbRef = doc(db, "liu_engineering", "database");
 
-    // ===== 滾動偵測與回頂部按鈕邏輯 (已修復滾動監聽 Bug 與靜止半透明化) =====
+    // ===== 滾動偵測與回頂部按鈕邏輯 =====
     let scrollIdleTimer;
     const scrollContainerElement = document.getElementById('main-scroll-container');
     const topBtn = document.getElementById('scrollTopBtn');
@@ -519,11 +520,11 @@
     scrollContainerElement.addEventListener('scroll', () => {
         if (scrollContainerElement.scrollTop > 300) {
             topBtn.classList.add('visible');
-            topBtn.classList.remove('idle'); // 滾動時取消半透明
+            topBtn.classList.remove('idle'); 
             
             clearTimeout(scrollIdleTimer);
             scrollIdleTimer = setTimeout(() => {
-                topBtn.classList.add('idle'); // 靜止超過 1.5 秒自動半透明
+                topBtn.classList.add('idle'); 
             }, 1500);
         } else {
             topBtn.classList.remove('visible');
@@ -532,24 +533,26 @@
         }
     });
 
+    // ===== 豐富化擴展圖示與顏色對應庫 =====
     const CATEGORY_MAP = [
+        { keywords: ['保', '護', '防護', '包覆', '鋪設'], icon: 'fa-shield-halved', h: 45, s: 75, l: 50 },
         { keywords: ['泥', '磚', '水泥', '填縫', '砌'], icon: 'fa-trowel-bricks', h: 215, s: 85, l: 45 },
-        { keywords: ['水', '電', '管', '線', '照明', '燈'], icon: 'fa-bolt', h: 35, s: 95, l: 50 },
-        { keywords: ['拆', '打', '廢棄', '搬運'], icon: 'fa-hammer', h: 5, s: 80, l: 55 },
-        { keywords: ['木', '裝潢', '天花板', '隔間'], icon: 'fa-tree', h: 140, s: 65, l: 42 },
-        { keywords: ['漆', '粉刷', '塗', '油漆'], icon: 'fa-paint-roller', h: 335, s: 80, l: 60 },
+        { keywords: ['水', '電', '管', '線', '照明', '燈', '弱電'], icon: 'fa-bolt', h: 35, s: 95, l: 50 },
+        { keywords: ['拆', '打', '廢棄', '搬運', '清運'], icon: 'fa-hammer', h: 5, s: 80, l: 55 },
+        { keywords: ['木', '裝潢', '天花板', '隔間', '木作'], icon: 'fa-tree', h: 140, s: 65, l: 42 },
+        { keywords: ['漆', '粉刷', '塗', '油漆', '烤漆'], icon: 'fa-paint-roller', h: 335, s: 80, l: 60 },
         { keywords: ['鐵', '鋼', '金屬', '焊', '防盜窗'], icon: 'fa-screwdriver-wrench', h: 200, s: 55, l: 48 },
-        { keywords: ['鋁', '門', '窗', '玻璃', '氣密'], icon: 'fa-border-all', h: 185, s: 45, l: 52 },
+        { keywords: ['鋁', '門', '窗', '氣密', '淋浴拉門'], icon: 'fa-border-all', h: 185, s: 45, l: 52 },
         { keywords: ['櫃', '系統', '傢俱', '廚具'], icon: 'fa-couch', h: 28, s: 65, l: 48 },
-        { keywords: ['清', '掃', '垃圾', '粗清', '細清'], icon: 'fa-broom', h: 195, s: 90, l: 48 },
-        { keywords: ['空調', '冷氣', '通風', '排氣'], icon: 'fa-wind', h: 225, s: 90, l: 65 },
+        { keywords: ['清', '掃', '垃圾', '粗清', '細清', '清潔'], icon: 'fa-broom', h: 195, s: 90, l: 48 },
+        { keywords: ['空調', '冷氣', '通風', '排氣', '冷媒'], icon: 'fa-wind', h: 225, s: 90, l: 65 },
         { keywords: ['防', '漏', '膠', '防水', 'PU'], icon: 'fa-droplet', h: 205, s: 90, l: 58 },
         { keywords: ['消', '火', '警', '避難', '滅火'], icon: 'fa-fire-extinguisher', h: 10, s: 95, l: 48 },
         { keywords: ['土', '地', '基礎', '整地'], icon: 'fa-mound', h: 45, s: 75, l: 40 },
         { keywords: ['景', '園', '樹', '草', '植栽'], icon: 'fa-leaf', h: 125, s: 75, l: 42 },
         { keywords: ['弱', '網', '監', '視', '通訊'], icon: 'fa-network-wired', h: 275, s: 70, l: 58 },
         { keywords: ['石', '大理石', '花崗', '人造石'], icon: 'fa-gem', h: 0, s: 0, l: 48 },
-        { keywords: ['保', '溫', '隔', '熱', '音'], icon: 'fa-temperature-half', h: 18, s: 85, l: 55 }
+        { keywords: ['玻', '璃', '鏡'], icon: 'fa-chess-board', h: 190, s: 30, l: 75 }
     ];
 
     function getCatStyle(catName) {
@@ -568,12 +571,41 @@
         };
     }
 
+    // ===== 擴充多達 30 餘項的預設豐富工程資料庫 =====
     const defaultDB = [
-        { id: 'def_1', category: "泥作工程", name: "室內地磚鋪設 (80x80)", unit: "坪", hasDays: false },
-        { id: 'def_2', category: "泥作工程", name: "牆面粉刷與壁癌處理", unit: "式", hasDays: true },
-        { id: 'def_3', category: "泥作工程", name: "浴室防水重作(含試水)", unit: "間", hasDays: true },
-        { id: 'def_4', category: "水電工程", name: "冷熱水管重拉(含打石)", unit: "式", hasDays: true },
-        { id: 'def_5', category: "水電工程", name: "新增/移位 電源插座", unit: "口", hasDays: false }
+        { id: 'def_p1', category: "保護工程", name: "室內地板防護 (防潮布+瓦楞板+木夾板)", unit: "坪", hasDays: false },
+        { id: 'def_p2', category: "保護工程", name: "電梯及公共走道防護", unit: "式", hasDays: false },
+        { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true },
+        { id: 'def_d2', category: "拆除工程", name: "浴室磁磚剔除至見底", unit: "間", hasDays: true },
+        { id: 'def_d3', category: "拆除工程", name: "廢棄物清運 (3.5噸)", unit: "車", hasDays: false },
+        { id: 'def_m1', category: "泥作工程", name: "磚牆砌磚 (1/2B)", unit: "坪", hasDays: false },
+        { id: 'def_m2', category: "泥作工程", name: "牆面粗底粉光處理", unit: "坪", hasDays: true },
+        { id: 'def_m3', category: "泥作工程", name: "浴室防水塗佈 (彈性水泥塗刷至頂)", unit: "間", hasDays: true },
+        { id: 'def_m4', category: "泥作工程", name: "室內地磚鋪設 (60x60/80x80)", unit: "坪", hasDays: false },
+        { id: 'def_e1', category: "水電工程", name: "冷熱水管重新配置 (含打石與管材)", unit: "式", hasDays: true },
+        { id: 'def_e2', category: "水電工程", name: "專用電源迴路配置 (含無熔絲開關)", unit: "迴", hasDays: false },
+        { id: 'def_e3', category: "水電工程", name: "燈具/插座/開關 面板更換", unit: "口", hasDays: false },
+        { id: 'def_e4', category: "水電工程", name: "總開關箱整理與無熔絲開關更換", unit: "式", hasDays: false },
+        { id: 'def_a1', category: "空調工程", name: "分離式冷氣安裝 (含基本安裝)", unit: "台", hasDays: false },
+        { id: 'def_a2', category: "空調工程", name: "冷媒管線佈設與包覆", unit: "米", hasDays: false },
+        { id: 'def_w1', category: "木作工程", name: "平釘天花板 (日本矽酸鈣板)", unit: "坪", hasDays: false },
+        { id: 'def_w2', category: "木作工程", name: "木作造型天花板/間接照明", unit: "坪", hasDays: false },
+        { id: 'def_w3', category: "木作工程", name: "木作隱藏門/造型門 (含五金)", unit: "樘", hasDays: false },
+        { id: 'def_w4', category: "木作工程", name: "木作高櫃/衣櫃", unit: "尺", hasDays: false },
+        { id: 'def_pt1', category: "油漆工程", name: "全室水泥漆 (含兩批兩刷及打磨)", unit: "坪", hasDays: false },
+        { id: 'def_pt2', category: "油漆工程", name: "乳膠漆升級與跳色處理", unit: "式", hasDays: false },
+        { id: 'def_pt3', category: "油漆工程", name: "木作櫃體/門片 烤漆處理", unit: "尺", hasDays: false },
+        { id: 'def_i1', category: "鐵工工程", name: "不鏽鋼防盜窗安裝", unit: "才", hasDays: false },
+        { id: 'def_i2', category: "鐵工工程", name: "採光罩/雨遮搭建", unit: "坪", hasDays: false },
+        { id: 'def_al1', category: "鋁門窗工程", name: "隔音氣密窗安裝 (5mm+5mm膠合)", unit: "才", hasDays: false },
+        { id: 'def_al2', category: "鋁門窗工程", name: "三合一通風門", unit: "樘", hasDays: false },
+        { id: 'def_al3', category: "鋁門窗工程", name: "浴室乾濕分離 (一字型淋浴拉門)", unit: "組", hasDays: false },
+        { id: 'def_c1', category: "系統櫃工程", name: "系統衣櫃 (高240cm內 E1 V313板材)", unit: "尺", hasDays: false },
+        { id: 'def_c2', category: "系統櫃工程", name: "廚具上下櫃 (含人造石檯面)", unit: "公分", hasDays: false },
+        { id: 'def_g1', category: "玻璃工程", name: "廚房烤漆玻璃 (含洗孔與光邊)", unit: "才", hasDays: false },
+        { id: 'def_g2', category: "玻璃工程", name: "明鏡/茶鏡/灰鏡 安裝", unit: "才", hasDays: false },
+        { id: 'def_cl1', category: "清潔工程", name: "裝潢後全室細清", unit: "坪", hasDays: true },
+        { id: 'def_cl2', category: "清潔工程", name: "施工期間階段性粗清", unit: "趟", hasDays: false }
     ];
 
     let engineeringDB = [];
@@ -616,27 +648,40 @@
         updateCategoryUI();
     });
 
-    window.saveDBToFirebase = async function() {
-        if (saveTimeout) clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(async () => {
-            if (isSaving) return;
-            isSaving = true;
-            try {
-                const cleanItems = JSON.parse(JSON.stringify(engineeringDB, (k, v) => v === undefined ? null : v));
-                const cleanHistory = JSON.parse(JSON.stringify(quoteHistory, (k, v) => v === undefined ? null : v));
-                const payload = { items: cleanItems, history: cleanHistory };
-                
-                const currentStr = JSON.stringify(payload);
-                if (currentStr === lastSavedDataStr) { isSaving = false; return; }
-                
-                await setDoc(dbRef, payload, { merge: true });
-                lastSavedDataStr = currentStr;
-            } catch (e) {
-                console.error("Firebase 寫入雲端失敗：", e);
-            } finally {
-                isSaving = false;
+    // ===== 修復：強制同步儲存機制，確保報價紀錄不漏單 =====
+    window.saveDBToFirebase = function(immediate = false) {
+        return new Promise((resolve, reject) => {
+            const executeSave = async () => {
+                if (isSaving) return resolve();
+                isSaving = true;
+                try {
+                    const cleanItems = JSON.parse(JSON.stringify(engineeringDB, (k, v) => v === undefined ? null : v));
+                    const cleanHistory = JSON.parse(JSON.stringify(quoteHistory, (k, v) => v === undefined ? null : v));
+                    const payload = { items: cleanItems, history: cleanHistory };
+                    
+                    const currentStr = JSON.stringify(payload);
+                    if (currentStr === lastSavedDataStr) { isSaving = false; return resolve(); }
+                    
+                    await setDoc(dbRef, payload, { merge: true });
+                    lastSavedDataStr = currentStr;
+                    resolve();
+                } catch (e) {
+                    console.error("Firebase 寫入雲端失敗：", e);
+                    reject(e);
+                } finally {
+                    isSaving = false;
+                }
+            };
+
+            if (immediate) {
+                if (saveTimeout) clearTimeout(saveTimeout);
+                executeSave();
+            } else {
+                if (saveTimeout) clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(executeSave, 800);
+                resolve();
             }
-        }, 800);
+        });
     }
 
     function getFormattedDateString2(d) {
@@ -665,6 +710,7 @@
             };
         });
         
+        // 檢查是否已存在相同紀錄
         if (quoteHistory.length > 0) {
             const lastRecord = quoteHistory[0];
             if (lastRecord.client === clientName && lastRecord.total === currentGrandTotal && JSON.stringify(lastRecord.items) === JSON.stringify(mappedItems)) {
@@ -693,7 +739,8 @@
         quoteHistory.unshift(record);
         if (quoteHistory.length > 300) quoteHistory = quoteHistory.slice(0, 300); 
         
-        await window.saveDBToFirebase();
+        // 修復核心：使用 `true` 參數強制要求等待 Firebase 網路寫入完畢才繼續往下走
+        await window.saveDBToFirebase(true);
         
         updateHistoryFilters('history-year', 'history-month');
         updateHistoryFilters('admin-history-year', 'admin-history-month');
@@ -774,7 +821,7 @@
         if(!confirm('【二次確認】刪除後將無法還原，請最後確認是否執行刪除？')) return;
         
         quoteHistory = quoteHistory.filter(r => r.id !== id);
-        await window.saveDBToFirebase();
+        await window.saveDBToFirebase(true); // 強制同步儲存
         renderHistoryList();
         renderAdminHistoryList();
     };
@@ -1061,7 +1108,7 @@
             hasDays: document.getElementById('new-item-has-days').checked 
         });
         
-        await window.saveDBToFirebase(); 
+        await window.saveDBToFirebase(true); // 新增完也同步儲存
         document.getElementById('new-item-name').value = '';
         alert(`✅ 已新增「${nameValue}」至雲端資料庫`);
         renderAdminView();
@@ -1120,7 +1167,7 @@
 
                 if (newDB.length > 0) {
                     engineeringDB = newDB;
-                    await window.saveDBToFirebase();
+                    await window.saveDBToFirebase(true); // 匯入後強力儲存
                     window.renderAdminView();
                     alert(`✅ 成功匯入並覆蓋 ${newDB.length} 筆資料！`);
                 }
@@ -1147,7 +1194,7 @@
         if (saveResult.status === 'duplicate') {
             alert('系統提示：此筆報價明細已成功儲存過，將直接為您匯出圖片！\n(單號：' + saveResult.quoteNo + ')');
         } else {
-            alert('報價紀錄已成功產生單號並儲存至雲端資料庫！');
+            alert('報價紀錄已成功產生單號並同步儲存至雲端資料庫！');
         }
         
         const currentQuoteNo = saveResult.quoteNo;
@@ -1288,7 +1335,7 @@
         if (saveResult.status === 'duplicate') {
             alert('系統提示：此筆報價明細已成功儲存過，將直接為您匯出檔案！\n(單號：' + saveResult.quoteNo + ')');
         } else {
-            alert('報價紀錄已成功產生單號並儲存至雲端資料庫！');
+            alert('報價紀錄已成功產生單號並同步儲存至雲端資料庫！');
         }
 
         const currentQuoteNo = saveResult.quoteNo;
