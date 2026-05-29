@@ -137,11 +137,12 @@
         input[type="text"]:focus, select:focus { outline: none; border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 5px rgba(10, 122, 255, 0.15); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 18px; margin-bottom: 20px; }
-        .cat-btn { background: #FFFFFF; border: 3px solid var(--border-light); border-radius: var(--radius-lg); padding: 26px 10px; text-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; overflow: hidden; }
+        /* 優化：縮小按鈕節省空間 */
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .cat-btn { background: #FFFFFF; border: 3px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px 10px; text-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
         .cat-btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%); pointer-events: none; }
-        .cat-btn i { font-size: 2.8rem; transition: transform 0.2s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-        .cat-btn span { font-size: 1.25rem; font-weight: 900; }
+        .cat-btn i { font-size: 2.4rem; transition: transform 0.2s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .cat-btn span { font-size: 1.15rem; font-weight: 900; }
         .cat-btn:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 32px rgba(0,0,0,0.12); border-color: transparent !important; }
         .cat-btn:active { transform: translateY(0) scale(0.98); }
 
@@ -191,7 +192,7 @@
         .delete-btn { flex-shrink: 0; background: rgba(255, 59, 48, 0.1); color: var(--danger); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.7rem; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.05); }
 
-        /* 修正底部總計列：單行縮小並完美貼齊底部 */
+        /* 底部導覽列優化：緊密貼底，減少無意義留白 */
         .bottom-bar-fixed {
             position: fixed; bottom: 0; left: 0; right: 0; width: 100%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(245,245,248,1));
@@ -203,7 +204,6 @@
         }
         
         .bottom-left { display: flex; justify-content: flex-start; gap: 12px; align-items: center; }
-        /* 讓總計並排不佔高度 */
         .bottom-center { flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: baseline; gap: 16px; }
 
         .bottom-total-label { font-size: 1.2rem; color: #636366; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
@@ -235,7 +235,6 @@
         .btn-excel { background: #34C759; color: white; border: 2px solid rgba(52,199,89,0.3); }
         .btn-excel:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(52,199,89,0.3); }
 
-        /* 回頂部按鈕：提高位置防遮擋 */
         #scrollTopBtn {
             position: fixed; bottom: 120px; right: 28px;
             width: 50px; height: 50px; border-radius: 25px;
@@ -265,7 +264,6 @@
         .btn-text:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .btn-text:active { transform: scale(0.95); }
 
-        /* 後台編輯列表樣式 (電腦版 Grid) */
         .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end; padding: 20px 0; border-bottom: 2px solid rgba(0,0,0,0.05); }
         .admin-col label { display: block; font-size: 1.1rem; font-weight: 900; color: var(--text-muted); margin-bottom: 8px; }
         .admin-col input[type="text"] { width: 100%; padding: 14px; font-size: 1.2rem; border: 2px solid #E5E5EA; border-radius: 10px; background: #F9F9FB; font-weight: 900; }
@@ -275,7 +273,6 @@
         .admin-category-header { background: #1C1C1E; color: white; padding: 22px 32px; border-radius: var(--radius-md); font-weight: 900; margin-top: 36px; font-size: 1.7rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 1px; cursor: pointer; transition: background 0.2s; }
         .admin-category-header:hover { filter: brightness(1.1); }
         .admin-category-body { border: 2px solid rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 0 32px; background: white; margin-bottom: 36px; margin-top: -10px; padding-top: 10px; }
-        /* 隱藏展開用的 CSS 類別 */
         .collapsed-body { display: none !important; }
         .toggle-icon { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
@@ -288,7 +285,6 @@
         .history-item-row { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; color: var(--text-main); padding: 12px 0; border-bottom: 2px dashed rgba(0,0,0,0.08); }
         .history-item-row:last-child { border-bottom: none; }
 
-        /* 手機版完美適配 RWD */
         @media (max-width: 900px) {
             .hide-mobile { display: none !important; }
             .container { padding: 16px 12px; padding-bottom: 100px; } 
@@ -297,14 +293,17 @@
             .header h1 { font-size: 1.8rem; }
             .brand-icon { width: 64px; height: 64px; font-size: 2.2rem; }
             
-            #floating-cart { top: 15px; right: 15px; width: 46px; height: 46px; font-size: 1.3rem; }
+            /* 購物車圖示下移，避免點不到 */
+            #floating-cart { top: max(85px, calc(15px + env(safe-area-inset-top))); right: 15px; width: 44px; height: 44px; font-size: 1.2rem; }
 
             .top-action-btn { padding: 8px 14px; font-size: 0.95rem; }
             input[type="text"], input[type="number"]:not(.qty-input-center), select { padding: 16px; font-size: 1.2rem; }
-            .category-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 12px; }
-            .cat-btn { padding: 16px 8px; }
-            .cat-btn i { font-size: 2.2rem; }
-            .cat-btn span { font-size: 1.1rem; }
+            
+            /* 分類按鈕縮小節省空間 */
+            .category-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; }
+            .cat-btn { padding: 12px 6px; }
+            .cat-btn i { font-size: 1.8rem; }
+            .cat-btn span { font-size: 1rem; }
             
             .global-header-row { display: none !important; }
             .table-responsive-wrapper { overflow-x: visible; }
@@ -324,16 +323,13 @@
             .subtotal-display { width: 100%; text-align: right; padding-top: 16px; margin-top: 8px; border-top: 2px dashed rgba(0,0,0,0.08); font-size: 1.6rem; color: var(--danger); }
             .delete-btn { width: 100%; height: 50px; border-radius: 12px; margin-top: 8px; font-size: 1.4rem; }
 
-            /* 後台精簡與格狀佈局 */
             .admin-db-actions { flex-wrap: nowrap !important; width: 100%; gap: 12px !important; }
             .admin-db-actions button { flex: 1; justify-content: center; padding: 12px !important; font-size: 1.1rem !important; }
             #btn-add-item { padding: 14px 20px !important; font-size: 1.2rem !important; }
 
-            /* 手機版：一行兩個標籤 */
             #admin-category-tags { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; }
             #admin-category-tags > div { width: 100%; box-sizing: border-box; padding: 8px 10px; font-size: 1rem; justify-content: space-between; }
 
-            /* 後台列表卡片化轉換 */
             .admin-category-header { font-size: 1.2rem; padding: 16px; flex-direction: column; align-items: stretch; gap: 12px; }
             .admin-category-header > div { display: flex; justify-content: space-between; align-items: center; width: 100%; }
             .admin-category-body { padding: 16px; background: transparent; border: none; margin-top: 0; }
@@ -344,13 +340,14 @@
             .admin-actions { flex-direction: row; gap: 10px; }
             .admin-actions button { flex: 1; }
             
-            .bottom-bar-fixed { padding: 8px 16px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-            .bottom-total-label { font-size: 1.1rem; }
+            /* 底部導覽列：貼齊底部減少空間 */
+            .bottom-bar-fixed { padding: 6px 16px; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
+            .bottom-total-label { font-size: 1rem; }
             .bottom-total-amount { font-size: 2.2rem; gap: 4px; }
             .bottom-total-amount .currency { font-size: 1.2rem; }
             .action-circle-btn { width: 40px; height: 40px; font-size: 1.2rem; }
             
-            /* 手機版：回頂部按鈕極度貼右且往上移 */
+            /* 回頂部按鈕：稍微往上修正防遮擋 */
             #scrollTopBtn { bottom: 100px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
             .modal-content { width: 95%; max-height: 90vh; }
@@ -426,9 +423,9 @@
                     </div>
                 </div>
                 
-                <div id="empty-quote-msg" style="text-align: center; padding: 120px 20px; color: var(--text-muted); font-size: 1.8rem; font-weight: 900;">
-                    <i class="fas fa-clipboard-list" style="font-size: 7rem; opacity: 0.15; margin-bottom: 32px; display: block;"></i>
-                    請點擊上方【工程類型】按鈕<br>選擇需要的項目加入明細
+                <div id="empty-quote-msg" style="text-align: center; padding: 120px 20px; color: var(--text-muted); font-size: 1.6rem; font-weight: 900;">
+                    <i class="fas fa-clipboard-list" style="font-size: 5rem; opacity: 0.15; margin-bottom: 24px; display: block;"></i>
+                    請選擇工程項目加入明細
                 </div>
             </div>
         </div>
@@ -477,7 +474,7 @@
                     </div>
                     <div class="add-new-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px;">
                         <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.3rem; cursor:pointer; flex: 1; margin-bottom: 0;">
-                            <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用天數選項
+                            <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用天數
                         </label>
                         <button id="btn-add-item" class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 16px 36px; font-size: 1.4rem;">
                             <i class="fas fa-cloud-upload-alt"></i> <span>儲存<span class="hide-mobile">至雲端</span></span>
@@ -718,7 +715,6 @@
         });
     }
 
-    // 後台項目獨立儲存與刪除
     window.updateItem = async function(id) {
         const index = engineeringDB.findIndex(db => db.id === id);
         if(index === -1) return;
@@ -842,7 +838,7 @@
     };
 
     window.buildHistoryHTML = function(records, isAdmin) {
-        if(records.length === 0) return '<div style="text-align:center; color:#8E8E93; padding:60px; font-weight:900; font-size:1.6rem; border:3px dashed var(--border-light); border-radius:var(--radius-lg);">目前尚無符合的紀錄</div>';
+        if(records.length === 0) return '<div style="text-align:center; color:#8E8E93; padding:60px; font-weight:900; font-size:1.6rem; border:3px dashed var(--border-light); border-radius:var(--radius-lg);">目前尚無紀錄</div>';
         
         return records.map(r => {
             let itemsHtml = r.items.map(i => {
@@ -969,7 +965,6 @@
     window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
     window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
 
-    // 前台彈出分類選擇視窗
     window.openModalCategory = function(category) {
         document.getElementById('modal-category-title').innerText = `選擇 ${category} 項目`;
         let filteredDB = engineeringDB.filter(item => item.category === category).sort((a,b) => a.name.localeCompare(b.name));
@@ -996,7 +991,6 @@
         openModal('item-modal');
     };
 
-    // 前台購物車 (清單) 彈窗
     window.openCartModal = function() {
         const listContainer = document.getElementById('cart-items-list');
         if (quoteList.length === 0) {
@@ -1098,7 +1092,6 @@
             box.classList.add('updated');
         }
         
-        // 更新前台購物車圖示徽章
         const cartBadge = document.getElementById('cart-badge');
         const cartIcon = document.getElementById('floating-cart');
         if (cartBadge && cartIcon) {
@@ -1212,7 +1205,6 @@
         calculateTotal();
     };
 
-    // 後台類別折疊功能
     window.toggleCategory = function(index) {
         const body = document.getElementById(`cat-body-${index}`);
         const icon = document.getElementById(`cat-icon-${index}`);
@@ -1237,7 +1229,6 @@
             catHeader.className = 'admin-category-header';
             catHeader.style.borderBottom = `5px solid ${style.bg}`; 
             
-            // 加入點擊展開功能與右側控制列
             catHeader.innerHTML = `
                 <div style="display:flex; align-items:center; gap:12px; flex:1;" onclick="toggleCategory(${index})">
                     <i class="fas ${style.icon}" style="color:${style.bg};"></i> 
@@ -1254,7 +1245,7 @@
             container.appendChild(catHeader);
 
             const catBody = document.createElement('div');
-            catBody.className = 'admin-category-body collapsed-body'; // 預設折疊
+            catBody.className = 'admin-category-body collapsed-body'; 
             catBody.id = `cat-body-${index}`;
             
             if(itemsInCat.length === 0) {
@@ -1268,7 +1259,7 @@
                     row.innerHTML = `
                         <div class="admin-col"><label>項目名稱</label><input type="text" id="edit-name-${item.id}" value="${item.name}"></div>
                         <div class="admin-col"><label>單位</label><input type="text" id="edit-unit-${item.id}" value="${item.unit}"></div>
-                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0;"><input type="checkbox" id="edit-days-${item.id}" style="width:24px; height:24px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''}> 啟用天數選項</label></div>
+                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0;"><input type="checkbox" id="edit-days-${item.id}" style="width:24px; height:24px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''}> 啟用天數</label></div>
                         <div class="admin-col admin-actions">
                             <button class="btn-text" style="background:var(--primary); color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="updateItem('${item.id}')"><i class="fas fa-save"></i> 儲存</button>
                             <button class="btn-text" style="background:#FF3B30; color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="deleteItem('${item.id}')"><i class="fas fa-trash"></i> 刪除</button>
@@ -1599,7 +1590,7 @@
         titleCell.font = { name: '微軟正黑體', size: 26, bold: true, color: { argb: 'FF1C1C1E' } };
         titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
 
-        ws.addRow([]); ws.mergeCells('A4:D4'); ws.mergeCells('E4:F4');
+        ws.addRow([]); ws.mergeCells('A4:D4'); ws.mergeCells('E4:G4');
         ws.getCell('A4').value = `客戶名稱：${clientName}`; ws.getCell('A4').font = { name: '微軟正黑體', size: 15, bold: true };
         
         const d = new Date();
@@ -1650,7 +1641,6 @@
             });
         });
 
-        // 徹底修正：總計金額合併儲存格邏輯 (讓其有足夠空間)
         ws.addRow([]); 
         const tRow = ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal]); 
         tRow.height = 50;
