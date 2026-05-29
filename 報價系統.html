@@ -47,7 +47,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 10px; }
         
-        /* 縮減底部留白空間 */
         .container { max-width: 1350px; margin: 0 auto; padding: 24px 16px; padding-bottom: 120px; overflow-x: hidden; } 
         
         .header { 
@@ -189,17 +188,16 @@
 
         .bottom-total-label { font-size: 1.15rem; color: #636366; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
         
-        /* 修正總計動畫，去除原本刺眼泛光，改用藍轉紅的質感閃爍 */
         .bottom-total-amount { 
             font-size: 4rem; font-weight: 900; color: #FF3B30; 
             letter-spacing: -1px; font-family: "Arial", sans-serif; 
             display: flex; align-items: baseline; gap: 10px; line-height: 1; 
             transition: transform 0.2s;
         }
-        .bottom-total-amount.updated { animation: popInTotal 0.4s ease-out; }
+        .bottom-total-amount.updated { animation: popInTotal 0.45s ease-out; }
         @keyframes popInTotal { 
             0% { transform: scale(1); color: #FF3B30; } 
-            30% { transform: scale(1.06); color: #0A7AFF; } /* 科技藍高亮 */
+            30% { transform: scale(1.08); color: #0A7AFF; }
             100% { transform: scale(1); color: #FF3B30; } 
         }
 
@@ -217,9 +215,9 @@
         .btn-excel { background: #34C759; color: white; border: 3px solid rgba(52,199,89,0.3); }
         .btn-excel:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 30px rgba(52,199,89,0.3); }
 
-        /* 回頂部按鈕微調 */
+        /* 回頂部按鈕：電腦版往左往上移避免被裁掉 */
         #scrollTopBtn {
-            position: fixed; bottom: 110px; right: 28px;
+            position: fixed; bottom: 140px; right: 40px;
             width: 56px; height: 56px; border-radius: 28px;
             background: rgba(10, 122, 255, 0.85); color: white; border: 1px solid rgba(255,255,255,0.4);
             font-size: 1.5rem; display: flex; align-items: center; justify-content: center; z-index: 1400;
@@ -247,9 +245,13 @@
         .btn-text:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .btn-text:active { transform: scale(0.95); }
 
-        .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap: 20px; align-items: center; padding: 28px 0; border-bottom: 2.5px solid rgba(0,0,0,0.05); }
+        .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end; padding: 20px 0; border-bottom: 2px solid rgba(0,0,0,0.05); }
+        .admin-col label { display: block; font-size: 1.1rem; font-weight: 900; color: var(--text-muted); margin-bottom: 8px; }
+        .admin-col input[type="text"] { width: 100%; padding: 14px; font-size: 1.2rem; border: 2px solid #E5E5EA; border-radius: 10px; background: #F9F9FB; font-weight: 900; }
+        .admin-col input[type="text"]:focus { border-color: var(--primary); background: #FFFFFF; outline: none; }
+        
         .admin-category-header { background: #1C1C1E; color: white; padding: 22px 32px; border-radius: var(--radius-md) var(--radius-md) 0 0; font-weight: 900; margin-top: 36px; font-size: 1.7rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 1px; }
-        .admin-category-body { border: 2.5px solid rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 0 32px; background: white; margin-bottom: 36px; }
+        .admin-category-body { border: 2px solid rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 0 32px; background: white; margin-bottom: 36px; }
 
         .history-card { background: white; border: 3px solid rgba(0,0,0,0.04); border-radius: var(--radius-lg); padding: 32px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .history-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
@@ -298,11 +300,17 @@
             .subtotal-display { width: 100%; text-align: right; padding-top: 16px; margin-top: 8px; border-top: 2px dashed rgba(0,0,0,0.08); font-size: 1.6rem; color: var(--danger); }
             .delete-btn { width: 100%; height: 50px; border-radius: 12px; margin-top: 8px; font-size: 1.4rem; }
 
-            .admin-category-header { font-size: 1.4rem; padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
-            .admin-category-body { padding: 0 16px; }
-            .admin-row { display: flex; flex-direction: column; align-items: stretch; gap: 14px; padding: 24px 0; }
-            .admin-row > div { align-self: stretch !important; padding-bottom: 0 !important; width: 100%; }
-            .admin-row > div:last-child button { width: 100%; height: 50px; }
+            .admin-category-header { font-size: 1.3rem; padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
+            .admin-category-body { padding: 16px; background: transparent; border: none; }
+            .admin-row { 
+                display: flex; flex-direction: column; align-items: stretch; background: white; 
+                padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+                margin-bottom: 16px; border: 2px solid rgba(0,0,0,0.05); 
+            }
+            .admin-col { margin-bottom: 14px; }
+            .admin-col:last-child { margin-bottom: 0; }
+            .checkbox-col { display: flex; align-items: center; height: 48px; border-top: 2px dashed rgba(0,0,0,0.05); border-bottom: 2px dashed rgba(0,0,0,0.05); padding: 10px 0; margin-bottom: 14px !important; }
+            .admin-col button { height: 50px; width: 100%; }
             
             .bottom-bar-fixed { 
                 flex-direction: row; 
@@ -320,7 +328,7 @@
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.2rem; border-width: 2px; }
             
             /* 手機版：回頂部按鈕極度貼右、縮小並再往下移 */
-            #scrollTopBtn { bottom: 85px; right: 8px; width: 38px; height: 38px; font-size: 1.1rem; border-radius: 19px; }
+            #scrollTopBtn { bottom: 95px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
             .modal-content { width: 95%; max-height: 90vh; }
             .modal-header { padding: 20px; }
@@ -413,15 +421,36 @@
                         <input type="file" id="importDBInput" class="hidden" accept=".xlsx" onchange="importDBFromExcel(event)" style="display: none;">
                     </div>
                 </div>
+
+                <div style="background: #F2F2F7; padding: 30px; border-radius: var(--radius-lg); margin-bottom: 30px; border: 3px solid rgba(0,0,0,0.03);">
+                    <h4 style="margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; color: var(--text-main); font-weight: 900;"><i class="fas fa-tags" style="color:var(--primary);"></i> 系統分類管理</h4>
+                    <div id="admin-category-tags" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;"></div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="new-sys-category" placeholder="輸入新分類名稱..." style="flex: 1; padding: 16px; border-radius: 12px; border: 2px solid #E5E5EA; font-weight:900;">
+                        <button onclick="addSystemCategory()" class="btn-text" style="background: var(--primary); color: white; border-radius: 12px; padding: 16px 24px;"><i class="fas fa-plus"></i> 新增</button>
+                    </div>
+                </div>
+
                 <div style="background: #F2F2F7; padding: 40px; border-radius: var(--radius-lg); margin-bottom: 40px; border: 3px solid rgba(0,0,0,0.03);">
                     <h4 style="margin-top: 0; margin-bottom: 28px; font-size: 1.7rem; color: var(--text-main); font-weight: 900;">➕ 新增常備工程項目</h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px;">
-                        <div><label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">項目類型</label><input type="text" id="new-item-category" placeholder="例：泥作工程" list="category-list"><datalist id="category-list"></datalist></div>
-                        <div><label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">工程項目名稱</label><input type="text" id="new-item-name" placeholder="輸入名稱..."></div>
-                        <div><label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">預設單位</label><input type="text" id="new-item-unit" value="式" placeholder="例：式、坪、個"></div>
+                        <div>
+                            <label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">項目類型</label>
+                            <select id="new-item-category" style="padding:16px; font-weight:900; border-radius:12px; cursor:pointer; width:100%; border: 2px solid #E5E5EA; background: #F9F9FB;"></select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">工程項目名稱</label>
+                            <input type="text" id="new-item-name" placeholder="輸入名稱..." style="padding:16px; border-radius:12px; width:100%; border: 2px solid #E5E5EA;">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">預設單位</label>
+                            <input type="text" id="new-item-unit" value="式" placeholder="例：式、坪、個" style="padding:16px; border-radius:12px; width:100%; border: 2px solid #E5E5EA;">
+                        </div>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px;">
-                        <label style="display:flex; align-items:center; gap:14px; font-weight:900; font-size:1.5rem; cursor:pointer;"><input type="checkbox" id="new-item-has-days" style="width: 32px; height: 32px; accent-color: var(--primary);"> 啟用「天數」選項</label>
+                        <label style="display:flex; align-items:center; gap:14px; font-weight:900; font-size:1.5rem; cursor:pointer;">
+                            <input type="checkbox" id="new-item-has-days" style="width: 32px; height: 32px; accent-color: var(--primary);"> 啟用「天數」選項
+                        </label>
                         <button class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 18px 36px; font-size: 1.4rem;">
                             <i class="fas fa-cloud-upload-alt"></i> <span style="display:inline;">儲存至雲端</span>
                         </button>
@@ -508,7 +537,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const dbRef = doc(db, "liu_engineering", "database");
+    // [重點修復]：對齊 Firebase 規則，指向允許讀寫的正確資料庫路徑！
+    const dbRef = doc(db, "su_system", "current_db");
 
     let scrollIdleTimer;
     const scrollContainerElement = document.getElementById('main-scroll-container');
@@ -603,6 +633,7 @@
         { id: 'def_cl2', category: "清潔工程", name: "施工期間階段性粗清", unit: "趟", hasDays: false }
     ];
 
+    let systemCategories = [];
     let engineeringDB = [];
     let quoteHistory = []; 
     let quoteList = [];
@@ -620,10 +651,12 @@
 
             engineeringDB = data.items || [];
             quoteHistory = data.history || [];
+            systemCategories = data.categories || Array.from(new Set(engineeringDB.map(item => item.category)));
         } else {
             engineeringDB = defaultDB;
             quoteHistory = [];
-            window.saveDBToFirebase();
+            systemCategories = Array.from(new Set(defaultDB.map(item => item.category)));
+            window.saveDBToFirebase(true);
         }
         
         updateCategoryUI();
@@ -638,8 +671,12 @@
             if (quoteList.length === 0) renderFrontView();
         }
     }, (error) => {
-        console.warn("系統目前為離線模式，已切換至本機緩存操作", error);
-        if(engineeringDB.length === 0) engineeringDB = defaultDB; 
+        console.error("Firebase 讀取失敗，可能是權限或網路問題:", error);
+        alert("⚠️ 雲端資料庫連線異常：\n" + error.message + "\n\n目前系統已切換為「本機離線模式」，資料將不會上傳至雲端。");
+        if(engineeringDB.length === 0) {
+            engineeringDB = defaultDB;
+            systemCategories = Array.from(new Set(defaultDB.map(item => item.category)));
+        }
         updateCategoryUI();
     });
 
@@ -651,7 +688,9 @@
                 try {
                     const cleanItems = JSON.parse(JSON.stringify(engineeringDB, (k, v) => v === undefined ? null : v));
                     const cleanHistory = JSON.parse(JSON.stringify(quoteHistory, (k, v) => v === undefined ? null : v));
-                    const payload = { items: cleanItems, history: cleanHistory };
+                    const cleanCategories = JSON.parse(JSON.stringify(systemCategories));
+                    
+                    const payload = { items: cleanItems, history: cleanHistory, categories: cleanCategories };
                     
                     const currentStr = JSON.stringify(payload);
                     if (currentStr === lastSavedDataStr) { isSaving = false; return resolve(); }
@@ -661,6 +700,7 @@
                     resolve();
                 } catch (e) {
                     console.error("Firebase 寫入雲端失敗：", e);
+                    alert("⚠️ 儲存至雲端失敗！\n錯誤原因：" + e.message + "\n請確認 Firebase 規則與網路連線。");
                     reject(e);
                 } finally {
                     isSaving = false;
@@ -732,7 +772,7 @@
         quoteHistory.unshift(record);
         if (quoteHistory.length > 300) quoteHistory = quoteHistory.slice(0, 300); 
         
-        await window.saveDBToFirebase(true); // 強制同步
+        await window.saveDBToFirebase(true); 
         
         updateHistoryFilters('history-year', 'history-month');
         updateHistoryFilters('admin-history-year', 'admin-history-month');
@@ -818,21 +858,31 @@
         renderAdminHistoryList();
     };
 
-    // 新增：整組刪除工程類別功能
-    window.deleteCategory = async function(catName) {
-        if (confirm(`確定要刪除整個【${catName}】類別及其所有項目嗎？\n\n⚠️ 警告：此動作將無法復原！`)) {
-            engineeringDB = engineeringDB.filter(item => item.category !== catName);
-            // 同時清理掉已在報價單中但被刪除的項目
-            quoteList = quoteList.filter(q => engineeringDB.some(db => db.id === q.dbId));
-            
-            await window.saveDBToFirebase(true); // 強制即時儲存
-            renderAdminView();
-            updateCategoryUI();
-            renderFrontView(); // 刷新前台避免遺留
-        }
+    window.addSystemCategory = async function() {
+        const input = document.getElementById('new-sys-category');
+        const catName = input.value.trim();
+        if(!catName) return alert("請輸入分類名稱！");
+        if(systemCategories.includes(catName)) return alert("此分類已存在！");
+        
+        systemCategories.push(catName);
+        input.value = '';
+        await window.saveDBToFirebase(true);
+        updateCategoryUI();
+        renderAdminView();
     };
 
-    function getUniqueCategories() { return [...new Set(engineeringDB.map(item => item.category))].sort(); }
+    window.deleteCategory = async function(catName) {
+        if (confirm(`確定要刪除整個【${catName}】類別及其所有項目嗎？\n\n⚠️ 警告：此動作將無法復原！`)) {
+            systemCategories = systemCategories.filter(c => c !== catName);
+            engineeringDB = engineeringDB.filter(item => item.category !== catName);
+            quoteList = quoteList.filter(q => engineeringDB.some(db => db.id === q.dbId));
+            
+            await window.saveDBToFirebase(true); 
+            renderAdminView();
+            updateCategoryUI();
+            renderFrontView(); 
+        }
+    };
     
     window.switchView = function(view) {
         const isBack = view === 'back';
@@ -851,15 +901,30 @@
     };
     
     window.updateCategoryUI = function() {
-        const categories = getUniqueCategories();
-        const dataList = document.getElementById('category-list');
-        if(dataList) dataList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
-        
         const btnContainer = document.getElementById('category-buttons-container');
         if(btnContainer) {
-            btnContainer.innerHTML = categories.map((cat) => {
+            btnContainer.innerHTML = systemCategories.map((cat) => {
                 const style = getCatStyle(cat); 
                 return `<div class="cat-btn" onclick="openModalCategory('${cat}')" style="border-color: ${style.border}; color: ${style.bg};"><i class="fas ${style.icon}"></i><span>${cat}</span></div>`;
+            }).join('');
+        }
+        
+        const selectContainer = document.getElementById('new-item-category');
+        if(selectContainer) {
+            selectContainer.innerHTML = systemCategories.map((cat) => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        const tagsContainer = document.getElementById('admin-category-tags');
+        if(tagsContainer) {
+            tagsContainer.innerHTML = systemCategories.map((cat) => {
+                const style = getCatStyle(cat); 
+                return `
+                <div style="display:flex; align-items:center; gap:8px; padding:10px 18px; border-radius:12px; font-weight:900; font-size:1.1rem; background:${style.bg}; color:white; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                    <i class="fas ${style.icon}"></i>
+                    <span>${cat}</span>
+                    <i class="fas fa-times-circle" style="margin-left:8px; cursor:pointer; opacity:0.7;" onclick="deleteCategory('${cat}')" title="刪除此分類"></i>
+                </div>
+                `;
             }).join('');
         }
     };
@@ -979,14 +1044,13 @@
         
         emptyMsg.style.display = 'none'; globalHeader.style.display = 'grid';
 
-        const categories = getUniqueCategories();
         const groupedList = {};
         quoteList.forEach(q => {
             const db = engineeringDB.find(d => d.id === q.dbId);
             if (db) { const cat = db.category || '未分類'; if(!groupedList[cat]) groupedList[cat] = []; groupedList[cat].push({ q, db }); }
         });
 
-        categories.forEach((cat) => {
+        systemCategories.forEach((cat) => {
             if(!groupedList[cat]) return;
             const style = getCatStyle(cat);
             
@@ -1072,50 +1136,54 @@
     window.renderAdminView = function() {
         const container = document.getElementById('admin-items-container');
         container.innerHTML = '';
-        const categories = getUniqueCategories();
 
-        categories.forEach((cat) => {
+        systemCategories.forEach((cat) => {
             const itemsInCat = engineeringDB.filter(item => item.category === cat);
             const style = getCatStyle(cat);
             const catHeader = document.createElement('div');
             catHeader.className = 'admin-category-header';
             catHeader.style.borderBottom = `5px solid ${style.bg}`; 
-            // 新增整組刪除類別功能按鈕
+            
             catHeader.innerHTML = `
                 <div style="display:flex; align-items:center; gap:12px;">
                     <i class="fas ${style.icon}" style="color:${style.bg};"></i> 
                     <span>${cat}</span> 
                     <span style="font-size:1.1rem; opacity:0.8; font-weight:normal;">(共 ${itemsInCat.length} 項)</span>
                 </div>
-                <button class="btn-text" style="background:#FF3B30; color:white; padding:8px 16px; font-size:1.1rem; border-radius:10px;" onclick="deleteCategory('${cat}')">
-                    <i class="fas fa-trash-alt"></i> 刪除類別
-                </button>
             `;
             container.appendChild(catHeader);
 
             const catBody = document.createElement('div');
             catBody.className = 'admin-category-body';
-            itemsInCat.forEach(item => {
-                const dbIndex = engineeringDB.findIndex(db => db.id === item.id);
-                const row = document.createElement('div');
-                row.className = 'admin-row';
-                
-                row.innerHTML = `
-                    <div><label style="font-size:1.2rem; color:var(--text-muted); font-weight:900; margin-bottom:8px; display:block;">項目名稱</label><input type="text" value="${item.name}" onchange="engineeringDB[${dbIndex}].name = this.value; saveDBToFirebase();"></div>
-                    <div><label style="font-size:1.2rem; color:var(--text-muted); font-weight:900; margin-bottom:8px; display:block;">單位</label><input type="text" value="${item.unit}" onchange="engineeringDB[${dbIndex}].unit = this.value; saveDBToFirebase();"></div>
-                    <div style="align-self:end; padding-bottom:16px;"><label style="font-weight:900; font-size:1.4rem; cursor:pointer; display:flex; gap:14px;"><input type="checkbox" style="width:32px; height:32px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''} onchange="engineeringDB[${dbIndex}].hasDays = this.checked; saveDBToFirebase();"> 天數</label></div>
-                    <div style="align-self:end; padding-bottom:16px;"><button class="btn-text" style="background:#FF3B30; color:white; border-radius:14px; font-size:1.2rem; padding: 16px 24px;" onclick="if(confirm('確定刪除此項目?')){ engineeringDB.splice(${dbIndex}, 1); quoteList = quoteList.filter(q => q.dbId !== ${item.id}); saveDBToFirebase(true); renderAdminView(); }"><i class="fas fa-trash"></i> 刪除</button></div>
-                `;
-                catBody.appendChild(row);
-            });
+            
+            if(itemsInCat.length === 0) {
+                 catBody.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:1.2rem; font-weight:900;">此分類目前無項目</div>`;
+            } else {
+                itemsInCat.forEach(item => {
+                    const dbIndex = engineeringDB.findIndex(db => db.id === item.id);
+                    const row = document.createElement('div');
+                    row.className = 'admin-row';
+                    
+                    row.innerHTML = `
+                        <div class="admin-col"><label>項目名稱</label><input type="text" value="${item.name}" onchange="engineeringDB[${dbIndex}].name = this.value; saveDBToFirebase();"></div>
+                        <div class="admin-col"><label>單位</label><input type="text" value="${item.unit}" onchange="engineeringDB[${dbIndex}].unit = this.value; saveDBToFirebase();"></div>
+                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px;"><input type="checkbox" style="width:28px; height:28px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''} onchange="engineeringDB[${dbIndex}].hasDays = this.checked; saveDBToFirebase();"> 啟用天數</label></div>
+                        <div class="admin-col"><button class="btn-text" style="width:100%; background:#FF3B30; color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="if(confirm('確定刪除此項目?')){ engineeringDB.splice(${dbIndex}, 1); quoteList = quoteList.filter(q => q.dbId !== ${item.id}); saveDBToFirebase(true); renderAdminView(); }"><i class="fas fa-trash"></i> 刪除</button></div>
+                    `;
+                    catBody.appendChild(row);
+                });
+            }
             container.appendChild(catBody);
         });
     };
 
     window.addNewItem = async function() {
-        const catValue = document.getElementById('new-item-category').value.trim() || '未分類';
+        const catSelect = document.getElementById('new-item-category');
+        const catValue = catSelect.value.trim();
         const nameValue = document.getElementById('new-item-name').value.trim();
+        if (!catValue) return alert("請先新增或選擇分類！");
         if (!nameValue) return alert("請輸入項目名稱！");
+        
         engineeringDB.push({ 
             id: 'id_' + Date.now() + Math.random().toString(36).substr(2, 5), 
             category: catValue, 
@@ -1124,16 +1192,16 @@
             hasDays: document.getElementById('new-item-has-days').checked 
         });
         
-        await window.saveDBToFirebase(true); // 新增完也同步儲存
+        await window.saveDBToFirebase(true); 
         document.getElementById('new-item-name').value = '';
         alert(`✅ 已新增「${nameValue}」至雲端資料庫`);
         renderAdminView();
     };
 
-    // 簡化匯出格式，去除 ID 欄位
     window.exportDBToExcel = async function() {
         const workbook = new ExcelJS.Workbook();
-        const ws = workbook.addWorksheet('資料庫設定');
+        
+        const ws = workbook.addWorksheet('工程資料庫');
         ws.columns = [
             { header: '工程類型', key: 'category', width: 25 },
             { header: '工程項目名稱', key: 'name', width: 50 },
@@ -1149,49 +1217,98 @@
         engineeringDB.forEach(item => {
             ws.addRow({ category: item.category, name: item.name, unit: item.unit, hasDays: item.hasDays ? 'TRUE' : 'FALSE' });
         });
+
+        const ws2 = workbook.addWorksheet('系統分類管理');
+        ws2.columns = [{ header: '系統現有分類名稱', key: 'cat', width: 30 }];
+        ws2.getRow(1).eachCell(cell => {
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF34C759' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+        systemCategories.forEach(c => {
+            const row = ws2.addRow({cat: c});
+            row.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+        });
+
         const buf = await workbook.xlsx.writeBuffer();
         const d = new Date();
         const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
         saveAs(new Blob([buf]), `劉氏工程資料庫匯出_${dateStr}.xlsx`);
     };
 
-    // 更新匯入邏輯：自動產生 ID，並對應簡化後的 4 欄位
     window.importDBFromExcel = function(event) {
         const file = event.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = async (e) => {
             try {
-                const data = new Uint8Array(e.target.result);
                 const workbook = new ExcelJS.Workbook();
-                await workbook.xlsx.load(data);
-                const ws = workbook.getWorksheet('資料庫設定');
-                if(!ws) return alert('⚠️ 找不到「資料庫設定」工作表，請確定這是系統匯出的 Excel 檔案。');
+                await workbook.xlsx.load(e.target.result); 
+                
+                const ws = workbook.getWorksheet('工程資料庫') || workbook.getWorksheet('資料庫設定');
+                if(!ws) return alert('⚠️ 找不到資料工作表，請確定這是系統匯出的 Excel 檔案。');
 
                 let newDB = [];
+                let hasOldIdColumn = String(ws.getCell('A1').value || '').includes('識別碼');
+
+                const getVal = (row, idx) => {
+                    let cell = row.getCell(idx).value;
+                    if (cell !== null && typeof cell === 'object') {
+                        if (cell.richText) return cell.richText.map(t => t.text).join('').trim();
+                        if (cell.formula) return String(cell.result || '').trim();
+                        if (cell.text) return String(cell.text).trim();
+                    }
+                    return cell !== null && cell !== undefined ? String(cell).trim() : '';
+                };
+
                 ws.eachRow((row, rowNumber) => {
                     if (rowNumber === 1) return; 
-                    const catCell = row.getCell(1).text;
-                    if (!catCell) return; // 跳過空行
-                    
-                    // 系統自動產生專屬識別碼，並自動根據名稱配對顏色與圖示
+
+                    let catCell, nameCell, unitCell, hasDaysCell;
+                    if (hasOldIdColumn) {
+                        catCell = getVal(row, 2); nameCell = getVal(row, 3); unitCell = getVal(row, 4); hasDaysCell = getVal(row, 5);
+                    } else {
+                        catCell = getVal(row, 1); nameCell = getVal(row, 2); unitCell = getVal(row, 3); hasDaysCell = getVal(row, 4);
+                    }
+
+                    if (!catCell && !nameCell) return;
+
                     newDB.push({
                         id: 'id_' + Date.now() + Math.random().toString(36).substr(2, 5),
                         category: catCell || '未分類',
-                        name: row.getCell(2).text || '未命名',
-                        unit: row.getCell(3).text || '式',
-                        hasDays: String(row.getCell(4).value).toUpperCase() === 'TRUE'
+                        name: nameCell || '未命名',
+                        unit: unitCell || '式',
+                        hasDays: String(hasDaysCell).toUpperCase() === 'TRUE' || hasDaysCell === '1' || hasDaysCell === '是'
                     });
                 });
 
+                let newCats = [];
+                const ws2 = workbook.getWorksheet('系統分類管理');
+                if (ws2) {
+                    ws2.eachRow((row, rowNumber) => {
+                        if (rowNumber === 1) return;
+                        let c = getVal(row, 1);
+                        if (c) newCats.push(c);
+                    });
+                }
+                
+                if (newCats.length === 0) {
+                    newDB.forEach(item => { if(!newCats.includes(item.category)) newCats.push(item.category); });
+                }
+
                 if (newDB.length > 0) {
                     engineeringDB = newDB;
-                    await window.saveDBToFirebase(true); // 匯入後強制即時儲存
+                    if(newCats.length > 0) systemCategories = newCats;
+                    
+                    await window.saveDBToFirebase(true); 
+                    window.updateCategoryUI();
                     window.renderAdminView();
-                    alert(`✅ 成功匯入並覆蓋 ${newDB.length} 筆資料！\n系統已自動完成 ID 與圖示配對設定。`);
+                    alert(`✅ 成功匯入並覆蓋 ${newDB.length} 筆資料！`);
+                } else {
+                    alert('⚠️ 匯入失敗，未讀取到任何有效資料。');
                 }
             } catch(error) {
-                console.error("Excel匯入失敗", error);
+                console.error("Excel匯入失敗詳細錯誤:", error);
                 alert("❌ 匯入失敗，請確認檔案格式是否正確。");
             } finally {
                 document.getElementById('importDBInput').value = ''; 
