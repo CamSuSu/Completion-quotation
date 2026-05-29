@@ -47,15 +47,19 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 10px; }
         
-        .container { max-width: 1350px; margin: 0 auto; padding: 24px 16px; padding-bottom: 100px; overflow-x: hidden; } 
+        .container { max-width: 1350px; margin: 0 auto; padding: 24px 16px; padding-bottom: 95px; overflow-x: hidden; } 
         
+        /* 新增：置頂導覽列外框 */
+        .top-nav-wrapper {
+            display: flex; justify-content: center; margin-bottom: 20px;
+            margin-top: env(safe-area-inset-top); position: relative; z-index: 20;
+        }
+
         .header { 
             background: linear-gradient(135deg, #0f172a, #1e293b, #020617);
             border: 1px solid rgba(255,255,255,0.1); 
             border-radius: var(--radius-xl); 
-            padding: 36px 32px; 
-            margin-top: env(safe-area-inset-top);
-            padding-top: calc(36px + env(safe-area-inset-top));
+            padding: 30px 32px; 
             margin-bottom: 32px; 
             box-shadow: 0 16px 40px rgba(0,0,0,0.2); 
             display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; gap: 18px; 
@@ -85,9 +89,9 @@
         @keyframes pulseGlow { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.15); opacity: 0; } }
         .brand-icon:active { transform: scale(0.9); }
         
-        .nav-tabs { display: none; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 18px; width: 100%; max-width: 480px; margin-top: 10px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); z-index: 10; position: relative; }
-        .tab-btn { background: transparent; border: none; padding: 14px 28px; font-size: 1.3rem; font-weight: 900; color: rgba(255,255,255,0.6); border-radius: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex: 1; text-align: center; letter-spacing: 1px; }
-        .tab-btn.active { background: #FFFFFF; box-shadow: 0 4px 16px rgba(0,0,0,0.2); color: #0f172a; }
+        .nav-tabs { display: none; background: rgba(0,0,0,0.05); padding: 6px; border-radius: 50px; width: 100%; max-width: 320px; backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .tab-btn { background: transparent; border: none; padding: 12px 24px; font-size: 1.2rem; font-weight: 900; color: var(--text-muted); border-radius: 40px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex: 1; text-align: center; letter-spacing: 1px; }
+        .tab-btn.active { background: #FFFFFF; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: var(--primary); }
         .hidden { display: none !important; }
 
         .animate-card { animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
@@ -95,7 +99,6 @@
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
 
-        /* 購物車圖示 (前台快捷清單) */
         #floating-cart {
             position: fixed; top: max(20px, env(safe-area-inset-top)); right: 20px;
             background: var(--text-main); color: white;
@@ -137,7 +140,6 @@
         input[type="text"]:focus, select:focus { outline: none; border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 5px rgba(10, 122, 255, 0.15); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* 優化：縮小按鈕節省空間 */
         .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; margin-bottom: 20px; }
         .cat-btn { background: #FFFFFF; border: 3px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px 10px; text-align: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
         .cat-btn::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%); pointer-events: none; }
@@ -206,7 +208,8 @@
         .bottom-left { display: flex; justify-content: flex-start; gap: 12px; align-items: center; }
         .bottom-center { flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: baseline; gap: 16px; }
 
-        .bottom-total-label { font-size: 1.2rem; color: #636366; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+        /* 放大的標籤字體 */
+        .bottom-total-label { font-size: 1.4rem; color: #636366; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
         
         .bottom-total-amount { 
             font-size: 2.8rem; font-weight: 900; color: #FF3B30; 
@@ -270,7 +273,7 @@
         .admin-col input[type="text"]:focus { border-color: var(--primary); background: #FFFFFF; outline: none; }
         .admin-actions { display: flex; gap: 8px; width: 100%; }
         
-        .admin-category-header { background: #1C1C1E; color: white; padding: 22px 32px; border-radius: var(--radius-md); font-weight: 900; margin-top: 36px; font-size: 1.7rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 1px; cursor: pointer; transition: background 0.2s; }
+        .admin-category-header { color: white; padding: 22px 32px; border-radius: var(--radius-md); font-weight: 900; margin-top: 36px; font-size: 1.7rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 1px; cursor: pointer; transition: filter 0.2s; }
         .admin-category-header:hover { filter: brightness(1.1); }
         .admin-category-body { border: 2px solid rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 0 32px; background: white; margin-bottom: 36px; margin-top: -10px; padding-top: 10px; }
         .collapsed-body { display: none !important; }
@@ -287,19 +290,18 @@
 
         @media (max-width: 900px) {
             .hide-mobile { display: none !important; }
-            .container { padding: 16px 12px; padding-bottom: 100px; } 
+            /* 縮小下方安全留白 */
+            .container { padding: 16px 12px; padding-bottom: 75px; } 
             .card { padding: 24px 16px; margin-bottom: 20px; }
-            .header { padding: 20px 16px; padding-top: calc(20px + env(safe-area-inset-top)); }
+            .header { padding: 20px 16px; }
             .header h1 { font-size: 1.8rem; }
             .brand-icon { width: 64px; height: 64px; font-size: 2.2rem; }
             
-            /* 購物車圖示下移，避免點不到 */
             #floating-cart { top: max(85px, calc(15px + env(safe-area-inset-top))); right: 15px; width: 44px; height: 44px; font-size: 1.2rem; }
 
             .top-action-btn { padding: 8px 14px; font-size: 0.95rem; }
             input[type="text"], input[type="number"]:not(.qty-input-center), select { padding: 16px; font-size: 1.2rem; }
             
-            /* 分類按鈕縮小節省空間 */
             .category-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; }
             .cat-btn { padding: 12px 6px; }
             .cat-btn i { font-size: 1.8rem; }
@@ -340,15 +342,14 @@
             .admin-actions { flex-direction: row; gap: 10px; }
             .admin-actions button { flex: 1; }
             
-            /* 底部導覽列：貼齊底部減少空間 */
-            .bottom-bar-fixed { padding: 6px 16px; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
-            .bottom-total-label { font-size: 1rem; }
+            /* 底部導覽列：減少 padding 及貼底距離 */
+            .bottom-bar-fixed { padding: 8px 16px; padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+            .bottom-total-label { font-size: 1.2rem; }
             .bottom-total-amount { font-size: 2.2rem; gap: 4px; }
             .bottom-total-amount .currency { font-size: 1.2rem; }
             .action-circle-btn { width: 40px; height: 40px; font-size: 1.2rem; }
             
-            /* 回頂部按鈕：稍微往上修正防遮擋 */
-            #scrollTopBtn { bottom: 100px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
+            #scrollTopBtn { bottom: 90px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
             .modal-content { width: 95%; max-height: 90vh; }
             .modal-header { padding: 20px; }
@@ -371,14 +372,17 @@
 
 <div id="main-scroll-container">
     <div class="container">
+        <div class="top-nav-wrapper">
+            <div class="nav-tabs" id="nav-tabs">
+                <button id="tab-front" class="tab-btn active" onclick="switchView('front')">前台報價</button>
+                <button id="tab-back" class="tab-btn" onclick="switchView('back')">後台管理</button>
+            </div>
+        </div>
+
         <div class="header">
             <div class="brand-section">
                 <div class="brand-icon" id="secret-trigger"><i class="fas fa-hard-hat"></i></div>
                 <h1>劉氏工程 完工報價系統</h1>
-            </div>
-            <div class="nav-tabs" id="nav-tabs">
-                <button id="tab-front" class="tab-btn active" onclick="switchView('front')">前台報價</button>
-                <button id="tab-back" class="tab-btn" onclick="switchView('back')">後台管理</button>
             </div>
         </div>
 
@@ -394,10 +398,19 @@
 
             <div class="card animate-card delay-1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                 <div class="card-title" style="justify-content: center;"><i class="fas fa-file-signature"></i> 基本報價資訊</div>
-                <div style="width: 100%; max-width: 550px; text-align: center;">
-                    <div class="form-group" style="text-align: center;">
-                        <label style="text-align: center;">客戶名稱 (必填)</label>
-                        <input type="text" id="client-name-input" placeholder="例如：蘇先生" style="text-align: center;">
+                <div style="width: 100%; max-width: 550px;">
+                    <div class="form-group" style="text-align: left; margin-bottom: 20px;">
+                        <label style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>報價單抬頭設定</span>
+                            <label style="font-size:1.1rem; color:var(--text-main); display:flex; align-items:center; gap:8px; margin:0; cursor:pointer;">
+                                <input type="checkbox" id="show-title-cb" checked style="width:18px; height:18px; accent-color:var(--primary);"> 顯示抬頭
+                            </label>
+                        </label>
+                        <input type="text" id="quote-title-input" value="劉氏工程 — 完工報價單" placeholder="例如：劉氏工程 — 完工報價單" style="text-align: left;">
+                    </div>
+                    <div class="form-group" style="text-align: left;">
+                        <label>客戶名稱 (必填)</label>
+                        <input type="text" id="client-name-input" placeholder="例如：蘇先生" style="text-align: left;">
                     </div>
                 </div>
             </div>
@@ -507,7 +520,7 @@
     </div>
     
     <div class="bottom-center">
-        <div class="bottom-total-label">完工總計</div>
+        <div class="bottom-total-label">工程完工總計</div>
         <div class="bottom-total-amount" id="animated-total-box">
             <span class="currency">NT$</span>
             <span id="grand-total-display">0</span>
@@ -619,8 +632,9 @@
         }
         return { 
             bg: `hsl(${match.h}, ${match.s}%, ${match.l}%)`, 
-            rowEven: `#FFFFFF`, 
-            rowOdd: `hsla(${match.h}, ${match.s}%, 96%, 1)`, 
+            /* 優化前台清單的斑馬紋對比度 */
+            rowEven: `hsla(${match.h}, ${match.s}%, 97%, 1)`, 
+            rowOdd: `hsla(${match.h}, ${match.s}%, 91%, 1)`, 
             border: `hsla(${match.h}, ${match.s}%, 75%, 1)`, 
             icon: match.icon 
         };
@@ -1227,11 +1241,12 @@
             
             const catHeader = document.createElement('div');
             catHeader.className = 'admin-category-header';
-            catHeader.style.borderBottom = `5px solid ${style.bg}`; 
+            /* 新增：為後台分類套用對應底色 */
+            catHeader.style.background = style.bg; 
             
             catHeader.innerHTML = `
                 <div style="display:flex; align-items:center; gap:12px; flex:1;" onclick="toggleCategory(${index})">
-                    <i class="fas ${style.icon}" style="color:${style.bg};"></i> 
+                    <i class="fas ${style.icon}" style="color:white;"></i> 
                     <span>${cat}</span> 
                     <span style="font-size:1.1rem; opacity:0.8; font-weight:normal;">(共 ${itemsInCat.length} 項)</span>
                 </div>
@@ -1419,6 +1434,12 @@
 
         if (!confirm('確認要送出該完工報價單並產出圖片嗎？')) return;
 
+        /* 讀取使用者設定的報價單抬頭資訊 */
+        const showTitle = document.getElementById('show-title-cb').checked;
+        const customTitleInput = document.getElementById('quote-title-input').value.trim();
+        const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
+        const headerHtml = showTitle ? `<div class="r-header"><h1>${displayTitle}</h1></div>` : '';
+
         const saveResult = await window.recordQuoteHistory();
         if (saveResult.status === 'error') return;
         
@@ -1511,9 +1532,7 @@
             </div>
             
             <div id="receipt-wrap">
-                <div class="r-header">
-                    <h1>劉氏工程 — 完工報價單</h1>
-                </div>
+                ${headerHtml}
                 <div class="r-info">
                     <div>客戶名稱：${clientName}</div>
                     <div style="text-align: right;">報價單號：${currentQuoteNo}<br>報價日期：${dateStr}</div>
@@ -1560,6 +1579,11 @@
 
         if (!confirm('確認要送出該完工報價單並產出 Excel 嗎？')) return;
 
+        /* 讀取使用者設定的報價單抬頭資訊 */
+        const showTitle = document.getElementById('show-title-cb').checked;
+        const customTitleInput = document.getElementById('quote-title-input').value.trim();
+        const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
+
         const saveResult = await window.recordQuoteHistory();
         if (saveResult.status === 'error') return;
         
@@ -1584,13 +1608,17 @@
             { width: 30 }  
         ];
 
+        /* 套用動態自訂抬頭邏輯 */
         ws.mergeCells('A1:F2');
-        const titleCell = ws.getCell('A1');
-        titleCell.value = '劉氏工程 — 完工報價單';
-        titleCell.font = { name: '微軟正黑體', size: 26, bold: true, color: { argb: 'FF1C1C1E' } };
-        titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
-
-        ws.addRow([]); ws.mergeCells('A4:D4'); ws.mergeCells('E4:G4');
+        if (showTitle) {
+            const titleCell = ws.getCell('A1');
+            titleCell.value = displayTitle;
+            titleCell.font = { name: '微軟正黑體', size: 26, bold: true, color: { argb: 'FF1C1C1E' } };
+            titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        }
+        
+        ws.addRow([]); 
+        ws.mergeCells('A4:D4'); ws.mergeCells('E4:G4');
         ws.getCell('A4').value = `客戶名稱：${clientName}`; ws.getCell('A4').font = { name: '微軟正黑體', size: 15, bold: true };
         
         const d = new Date();
