@@ -139,7 +139,7 @@
         input[type="text"]:focus, select:focus { outline: none; border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 5px rgba(10, 122, 255, 0.15); }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-        /* 開關設定樣式，加入 flex-shrink: 0 避免被擠壓 */
+        /* 開關設定樣式 */
         .switch { position: relative; display: inline-block; width: 52px; height: 30px; min-width: 52px; min-height: 30px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #D1D1D6; transition: .3s; border-radius: 34px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
@@ -974,6 +974,10 @@
         if (!isBack) {
             document.getElementById('tab-back').classList.remove('active');
             document.getElementById('tab-front').classList.add('active');
+            
+            // 進入前台時，自動隱藏導覽列，須再次點擊安全帽三次才可進入後台
+            document.getElementById('nav-tabs').style.display = 'none';
+            
             if(quoteList.length > 0) document.getElementById('floating-cart').style.display = 'flex';
         } else {
             document.getElementById('tab-front').classList.remove('active');
@@ -1027,7 +1031,7 @@
             const isEven = displayIndex % 2 === 0;
             const div = document.createElement('div');
             div.className = 'selectable-item';
-            div.style.background = isEven ? '#FFFFFF' : '#F6F6FA';
+            div.style.background = isEven ? '#FFFFFF' : '#E5E5EA'; // 將奇數行底色改為深灰加深對比
             div.innerHTML = `
                 <div>
                     <div style="font-weight:900; font-size:1.8rem; color: var(--text-main);">${item.name}</div>
@@ -1527,12 +1531,12 @@
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
-        // 移除類別名稱留空的邏輯，讓每一行都完整顯示該項目類別
+        // 每一行都顯示完整的工程類別
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
             let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
             
-            const displayCat = dbItem.category; // 每一項都顯示完整類別
+            const displayCat = dbItem.category; 
             
             const bg = isEvenRow ? '#FFFFFF' : '#F2F2F7'; isEvenRow = !isEvenRow;
             
@@ -1576,9 +1580,11 @@
                 .r-header { text-align: center; margin-bottom: 40px; border-bottom: 6px solid #1C1C1E; padding-bottom: 25px; }
                 .r-header h1 { font-size: 46px; margin: 0 0 14px 0; color: #1C1C1E; font-weight: 900; letter-spacing: 4px; }
                 .r-info { display: flex; justify-content: space-between; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 35px; }
-                table { width: 100%; border-collapse: collapse; text-align: center; font-size: 18px; border: 4px solid #1C1C1E; }
-                th { background: #1C1C1E; color: white; padding: 20px; border: 4px solid #1C1C1E; font-size: 22px; font-weight: 900; }
+                table { width: 100%; border-collapse: collapse; text-align: center; font-size: 18px; border: 4px solid #1C1C1E; table-layout: auto; }
+                /* 加入 white-space: nowrap 防止移動裝置在欄位名稱換行 */
+                th { background: #1C1C1E; color: white; padding: 20px; border: 4px solid #1C1C1E; font-size: 22px; font-weight: 900; white-space: nowrap; }
                 td { border: 2.5px solid #C7C7CC; }
+                td:nth-child(1), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6) { white-space: nowrap; }
                 .r-total { text-align: right; font-size: 42px; font-weight: 900; color: #FF3B30; margin-top: 45px; letter-spacing: -1px; font-family: Arial, sans-serif; }
             </style>
         </head>
@@ -1705,7 +1711,7 @@
         });
 
         let isEvenRow = true;
-        // 移除類別名稱留空的邏輯，讓 Excel 匯出每一行也都顯示完整類別
+        // 每一行都顯示完整的工程類別
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
             let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
