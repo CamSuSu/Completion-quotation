@@ -47,7 +47,8 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 10px; }
         
-        .container { max-width: 1350px; margin: 0 auto; padding: 24px 16px; padding-bottom: 220px; overflow-x: hidden; } 
+        /* 縮減底部留白空間 */
+        .container { max-width: 1350px; margin: 0 auto; padding: 24px 16px; padding-bottom: 120px; overflow-x: hidden; } 
         
         .header { 
             background: linear-gradient(135deg, #0f172a, #1e293b, #020617);
@@ -171,12 +172,13 @@
         .delete-btn { flex-shrink: 0; background: rgba(255, 59, 48, 0.1); color: var(--danger); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.7rem; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.05); }
 
+        /* 縮減底部欄高度 */
         .bottom-bar-fixed {
             position: fixed; bottom: 0; left: 0; right: 0; width: 100%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.92), rgba(245,245,248,0.98));
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-top: 1.5px solid rgba(255,255,255,0.8); z-index: 1500;
-            padding: 20px 48px; padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            padding: 16px 48px; padding-bottom: calc(16px + env(safe-area-inset-bottom));
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 -12px 50px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,1); transition: all 0.3s;
         }
@@ -187,14 +189,19 @@
 
         .bottom-total-label { font-size: 1.15rem; color: #636366; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 4px; }
         
+        /* 修正總計動畫，去除原本刺眼泛光，改用藍轉紅的質感閃爍 */
         .bottom-total-amount { 
             font-size: 4rem; font-weight: 900; color: #FF3B30; 
             letter-spacing: -1px; font-family: "Arial", sans-serif; 
             display: flex; align-items: baseline; gap: 10px; line-height: 1; 
-            text-shadow: 0 4px 16px rgba(255, 59, 48, 0.2); transition: transform 0.2s;
+            transition: transform 0.2s;
         }
-        .bottom-total-amount.updated { animation: popInTotal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popInTotal { 0% { transform: scale(1); } 50% { transform: scale(1.08); color: #FF2D55; text-shadow: 0 8px 24px rgba(255,59,48,0.6); } 100% { transform: scale(1); } }
+        .bottom-total-amount.updated { animation: popInTotal 0.4s ease-out; }
+        @keyframes popInTotal { 
+            0% { transform: scale(1); color: #FF3B30; } 
+            30% { transform: scale(1.06); color: #0A7AFF; } /* 科技藍高亮 */
+            100% { transform: scale(1); color: #FF3B30; } 
+        }
 
         .bottom-total-amount .currency { font-size: 1.8rem; color: #8E8E93; font-weight: 900; filter: none; letter-spacing: 0; }
         
@@ -210,28 +217,19 @@
         .btn-excel { background: #34C759; color: white; border: 3px solid rgba(52,199,89,0.3); }
         .btn-excel:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 30px rgba(52,199,89,0.3); }
 
-        /* 回頂部按鈕：質感動態與靜止半透明化 */
+        /* 回頂部按鈕微調 */
         #scrollTopBtn {
-            position: fixed; bottom: 150px; right: 28px;
+            position: fixed; bottom: 110px; right: 28px;
             width: 56px; height: 56px; border-radius: 28px;
             background: rgba(10, 122, 255, 0.85); color: white; border: 1px solid rgba(255,255,255,0.4);
             font-size: 1.5rem; display: flex; align-items: center; justify-content: center; z-index: 1400;
             opacity: 0; pointer-events: none; transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* 微彈性過渡 */
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 6px 16px rgba(0,0,0,0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); cursor: pointer;
         }
-        #scrollTopBtn.visible { 
-            opacity: 0.9; pointer-events: auto; transform: translateY(0); 
-        }
-        #scrollTopBtn.visible.idle {
-            opacity: 0.35; /* 靜止時呈現半透明 */
-            box-shadow: none;
-        }
-        #scrollTopBtn.visible:hover { 
-            opacity: 1; transform: translateY(-4px) scale(1.05); 
-            background: rgba(10, 122, 255, 1); 
-            box-shadow: 0 10px 24px rgba(10,122,255,0.3); 
-        }
+        #scrollTopBtn.visible { opacity: 0.9; pointer-events: auto; transform: translateY(0); }
+        #scrollTopBtn.visible.idle { opacity: 0.35; box-shadow: none; }
+        #scrollTopBtn.visible:hover { opacity: 1; transform: translateY(-4px) scale(1.05); background: rgba(10, 122, 255, 1); box-shadow: 0 10px 24px rgba(10,122,255,0.3); }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(12px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
@@ -263,7 +261,7 @@
         .history-item-row:last-child { border-bottom: none; }
 
         @media (max-width: 900px) {
-            .container { padding: 16px 12px; padding-bottom: 180px; } 
+            .container { padding: 16px 12px; padding-bottom: 90px; } 
             .card { padding: 24px 16px; margin-bottom: 20px; }
             .header { padding: 20px 16px; padding-top: calc(20px + env(safe-area-inset-top)); }
             .header h1 { font-size: 1.8rem; }
@@ -300,7 +298,7 @@
             .subtotal-display { width: 100%; text-align: right; padding-top: 16px; margin-top: 8px; border-top: 2px dashed rgba(0,0,0,0.08); font-size: 1.6rem; color: var(--danger); }
             .delete-btn { width: 100%; height: 50px; border-radius: 12px; margin-top: 8px; font-size: 1.4rem; }
 
-            .admin-category-header { font-size: 1.4rem; padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 8px; }
+            .admin-category-header { font-size: 1.4rem; padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
             .admin-category-body { padding: 0 16px; }
             .admin-row { display: flex; flex-direction: column; align-items: stretch; gap: 14px; padding: 24px 0; }
             .admin-row > div { align-self: stretch !important; padding-bottom: 0 !important; width: 100%; }
@@ -308,8 +306,8 @@
             
             .bottom-bar-fixed { 
                 flex-direction: row; 
-                padding: 12px 16px; 
-                padding-bottom: calc(12px + env(safe-area-inset-bottom)); 
+                padding: 10px 16px; 
+                padding-bottom: max(10px, env(safe-area-inset-bottom)); 
                 gap: 12px; justify-content: space-between; align-items: center; height: auto;
             }
             .bottom-left { flex: unset; gap: 10px; }
@@ -321,8 +319,8 @@
             .bottom-total-amount .currency { font-size: 1.2rem; }
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.2rem; border-width: 2px; }
             
-            /* 手機版：回頂部按鈕極度貼右且變小 */
-            #scrollTopBtn { bottom: 110px; right: 8px; width: 38px; height: 38px; font-size: 1.1rem; border-radius: 19px; }
+            /* 手機版：回頂部按鈕極度貼右、縮小並再往下移 */
+            #scrollTopBtn { bottom: 85px; right: 8px; width: 38px; height: 38px; font-size: 1.1rem; border-radius: 19px; }
             
             .modal-content { width: 95%; max-height: 90vh; }
             .modal-header { padding: 20px; }
@@ -512,7 +510,6 @@
     const db = getFirestore(app);
     const dbRef = doc(db, "liu_engineering", "database");
 
-    // ===== 滾動偵測與回頂部按鈕邏輯 =====
     let scrollIdleTimer;
     const scrollContainerElement = document.getElementById('main-scroll-container');
     const topBtn = document.getElementById('scrollTopBtn');
@@ -533,7 +530,6 @@
         }
     });
 
-    // ===== 豐富化擴展圖示與顏色對應庫 =====
     const CATEGORY_MAP = [
         { keywords: ['保', '護', '防護', '包覆', '鋪設'], icon: 'fa-shield-halved', h: 45, s: 75, l: 50 },
         { keywords: ['泥', '磚', '水泥', '填縫', '砌'], icon: 'fa-trowel-bricks', h: 215, s: 85, l: 45 },
@@ -571,7 +567,6 @@
         };
     }
 
-    // ===== 擴充多達 30 餘項的預設豐富工程資料庫 =====
     const defaultDB = [
         { id: 'def_p1', category: "保護工程", name: "室內地板防護 (防潮布+瓦楞板+木夾板)", unit: "坪", hasDays: false },
         { id: 'def_p2', category: "保護工程", name: "電梯及公共走道防護", unit: "式", hasDays: false },
@@ -648,7 +643,6 @@
         updateCategoryUI();
     });
 
-    // ===== 修復：強制同步儲存機制，確保報價紀錄不漏單 =====
     window.saveDBToFirebase = function(immediate = false) {
         return new Promise((resolve, reject) => {
             const executeSave = async () => {
@@ -710,7 +704,6 @@
             };
         });
         
-        // 檢查是否已存在相同紀錄
         if (quoteHistory.length > 0) {
             const lastRecord = quoteHistory[0];
             if (lastRecord.client === clientName && lastRecord.total === currentGrandTotal && JSON.stringify(lastRecord.items) === JSON.stringify(mappedItems)) {
@@ -739,8 +732,7 @@
         quoteHistory.unshift(record);
         if (quoteHistory.length > 300) quoteHistory = quoteHistory.slice(0, 300); 
         
-        // 修復核心：使用 `true` 參數強制要求等待 Firebase 網路寫入完畢才繼續往下走
-        await window.saveDBToFirebase(true);
+        await window.saveDBToFirebase(true); // 強制同步
         
         updateHistoryFilters('history-year', 'history-month');
         updateHistoryFilters('admin-history-year', 'admin-history-month');
@@ -821,9 +813,23 @@
         if(!confirm('【二次確認】刪除後將無法還原，請最後確認是否執行刪除？')) return;
         
         quoteHistory = quoteHistory.filter(r => r.id !== id);
-        await window.saveDBToFirebase(true); // 強制同步儲存
+        await window.saveDBToFirebase(true);
         renderHistoryList();
         renderAdminHistoryList();
+    };
+
+    // 新增：整組刪除工程類別功能
+    window.deleteCategory = async function(catName) {
+        if (confirm(`確定要刪除整個【${catName}】類別及其所有項目嗎？\n\n⚠️ 警告：此動作將無法復原！`)) {
+            engineeringDB = engineeringDB.filter(item => item.category !== catName);
+            // 同時清理掉已在報價單中但被刪除的項目
+            quoteList = quoteList.filter(q => engineeringDB.some(db => db.id === q.dbId));
+            
+            await window.saveDBToFirebase(true); // 強制即時儲存
+            renderAdminView();
+            updateCategoryUI();
+            renderFrontView(); // 刷新前台避免遺留
+        }
     };
 
     function getUniqueCategories() { return [...new Set(engineeringDB.map(item => item.category))].sort(); }
@@ -1074,7 +1080,17 @@
             const catHeader = document.createElement('div');
             catHeader.className = 'admin-category-header';
             catHeader.style.borderBottom = `5px solid ${style.bg}`; 
-            catHeader.innerHTML = `<span><i class="fas ${style.icon}" style="color:${style.bg}; margin-right:12px;"></i> ${cat}</span> <span>共 ${itemsInCat.length} 項</span>`;
+            // 新增整組刪除類別功能按鈕
+            catHeader.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fas ${style.icon}" style="color:${style.bg};"></i> 
+                    <span>${cat}</span> 
+                    <span style="font-size:1.1rem; opacity:0.8; font-weight:normal;">(共 ${itemsInCat.length} 項)</span>
+                </div>
+                <button class="btn-text" style="background:#FF3B30; color:white; padding:8px 16px; font-size:1.1rem; border-radius:10px;" onclick="deleteCategory('${cat}')">
+                    <i class="fas fa-trash-alt"></i> 刪除類別
+                </button>
+            `;
             container.appendChild(catHeader);
 
             const catBody = document.createElement('div');
@@ -1088,7 +1104,7 @@
                     <div><label style="font-size:1.2rem; color:var(--text-muted); font-weight:900; margin-bottom:8px; display:block;">項目名稱</label><input type="text" value="${item.name}" onchange="engineeringDB[${dbIndex}].name = this.value; saveDBToFirebase();"></div>
                     <div><label style="font-size:1.2rem; color:var(--text-muted); font-weight:900; margin-bottom:8px; display:block;">單位</label><input type="text" value="${item.unit}" onchange="engineeringDB[${dbIndex}].unit = this.value; saveDBToFirebase();"></div>
                     <div style="align-self:end; padding-bottom:16px;"><label style="font-weight:900; font-size:1.4rem; cursor:pointer; display:flex; gap:14px;"><input type="checkbox" style="width:32px; height:32px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''} onchange="engineeringDB[${dbIndex}].hasDays = this.checked; saveDBToFirebase();"> 天數</label></div>
-                    <div style="align-self:end; padding-bottom:16px;"><button class="btn-text" style="background:#FF3B30; color:white; border-radius:14px; font-size:1.2rem; padding: 16px 24px;" onclick="if(confirm('確定刪除此項目?')){ engineeringDB.splice(${dbIndex}, 1); quoteList = quoteList.filter(q => q.dbId !== ${item.id}); saveDBToFirebase(); renderAdminView(); }"><i class="fas fa-trash"></i> 刪除</button></div>
+                    <div style="align-self:end; padding-bottom:16px;"><button class="btn-text" style="background:#FF3B30; color:white; border-radius:14px; font-size:1.2rem; padding: 16px 24px;" onclick="if(confirm('確定刪除此項目?')){ engineeringDB.splice(${dbIndex}, 1); quoteList = quoteList.filter(q => q.dbId !== ${item.id}); saveDBToFirebase(true); renderAdminView(); }"><i class="fas fa-trash"></i> 刪除</button></div>
                 `;
                 catBody.appendChild(row);
             });
@@ -1114,11 +1130,11 @@
         renderAdminView();
     };
 
+    // 簡化匯出格式，去除 ID 欄位
     window.exportDBToExcel = async function() {
         const workbook = new ExcelJS.Workbook();
         const ws = workbook.addWorksheet('資料庫設定');
         ws.columns = [
-            { header: '系統唯一識別碼(勿更動)', key: 'id', width: 30 },
             { header: '工程類型', key: 'category', width: 25 },
             { header: '工程項目名稱', key: 'name', width: 50 },
             { header: '單位', key: 'unit', width: 15 },
@@ -1131,7 +1147,7 @@
             cell.border = { top: {style:'medium'}, left: {style:'medium'}, bottom: {style:'medium'}, right: {style:'medium'} };
         });
         engineeringDB.forEach(item => {
-            ws.addRow({ id: item.id, category: item.category, name: item.name, unit: item.unit, hasDays: item.hasDays ? 'TRUE' : 'FALSE' });
+            ws.addRow({ category: item.category, name: item.name, unit: item.unit, hasDays: item.hasDays ? 'TRUE' : 'FALSE' });
         });
         const buf = await workbook.xlsx.writeBuffer();
         const d = new Date();
@@ -1139,6 +1155,7 @@
         saveAs(new Blob([buf]), `劉氏工程資料庫匯出_${dateStr}.xlsx`);
     };
 
+    // 更新匯入邏輯：自動產生 ID，並對應簡化後的 4 欄位
     window.importDBFromExcel = function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -1154,22 +1171,24 @@
                 let newDB = [];
                 ws.eachRow((row, rowNumber) => {
                     if (rowNumber === 1) return; 
-                    const cellId = row.getCell(1).text;
-                    const idVal = cellId ? cellId : ('id_' + Date.now() + Math.random().toString(36).substr(2, 5));
+                    const catCell = row.getCell(1).text;
+                    if (!catCell) return; // 跳過空行
+                    
+                    // 系統自動產生專屬識別碼，並自動根據名稱配對顏色與圖示
                     newDB.push({
-                        id: idVal,
-                        category: row.getCell(2).text || '未分類',
-                        name: row.getCell(3).text || '未命名',
-                        unit: row.getCell(4).text || '式',
-                        hasDays: String(row.getCell(5).value).toUpperCase() === 'TRUE'
+                        id: 'id_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        category: catCell || '未分類',
+                        name: row.getCell(2).text || '未命名',
+                        unit: row.getCell(3).text || '式',
+                        hasDays: String(row.getCell(4).value).toUpperCase() === 'TRUE'
                     });
                 });
 
                 if (newDB.length > 0) {
                     engineeringDB = newDB;
-                    await window.saveDBToFirebase(true); // 匯入後強力儲存
+                    await window.saveDBToFirebase(true); // 匯入後強制即時儲存
                     window.renderAdminView();
-                    alert(`✅ 成功匯入並覆蓋 ${newDB.length} 筆資料！`);
+                    alert(`✅ 成功匯入並覆蓋 ${newDB.length} 筆資料！\n系統已自動完成 ID 與圖示配對設定。`);
                 }
             } catch(error) {
                 console.error("Excel匯入失敗", error);
