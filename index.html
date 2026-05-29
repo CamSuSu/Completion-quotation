@@ -171,7 +171,7 @@
         .delete-btn { flex-shrink: 0; background: rgba(255, 59, 48, 0.1); color: var(--danger); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.7rem; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.05); }
 
-        /* 縮減底部欄高度 */
+        /* 底部置底區塊 */
         .bottom-bar-fixed {
             position: fixed; bottom: 0; left: 0; right: 0; width: 100%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.92), rgba(245,245,248,0.98));
@@ -215,7 +215,7 @@
         .btn-excel { background: #34C759; color: white; border: 3px solid rgba(52,199,89,0.3); }
         .btn-excel:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 30px rgba(52,199,89,0.3); }
 
-        /* 回頂部按鈕：電腦版往左往上移避免被裁掉 */
+        /* 回頂部按鈕：電腦版位置修正 */
         #scrollTopBtn {
             position: fixed; bottom: 140px; right: 40px;
             width: 56px; height: 56px; border-radius: 28px;
@@ -245,10 +245,12 @@
         .btn-text:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .btn-text:active { transform: scale(0.95); }
 
+        /* 後台編輯列表樣式 (電腦版 Grid) */
         .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end; padding: 20px 0; border-bottom: 2px solid rgba(0,0,0,0.05); }
         .admin-col label { display: block; font-size: 1.1rem; font-weight: 900; color: var(--text-muted); margin-bottom: 8px; }
         .admin-col input[type="text"] { width: 100%; padding: 14px; font-size: 1.2rem; border: 2px solid #E5E5EA; border-radius: 10px; background: #F9F9FB; font-weight: 900; }
         .admin-col input[type="text"]:focus { border-color: var(--primary); background: #FFFFFF; outline: none; }
+        .admin-actions { display: flex; gap: 8px; width: 100%; }
         
         .admin-category-header { background: #1C1C1E; color: white; padding: 22px 32px; border-radius: var(--radius-md) var(--radius-md) 0 0; font-weight: 900; margin-top: 36px; font-size: 1.7rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 15px rgba(0,0,0,0.15); letter-spacing: 1px; }
         .admin-category-body { border: 2px solid rgba(0,0,0,0.05); border-top: none; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 0 32px; background: white; margin-bottom: 36px; }
@@ -262,7 +264,9 @@
         .history-item-row { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; color: var(--text-main); padding: 12px 0; border-bottom: 2px dashed rgba(0,0,0,0.08); }
         .history-item-row:last-child { border-bottom: none; }
 
+        /* 手機版完美適配 RWD */
         @media (max-width: 900px) {
+            .hide-mobile { display: none !important; }
             .container { padding: 16px 12px; padding-bottom: 90px; } 
             .card { padding: 24px 16px; margin-bottom: 20px; }
             .header { padding: 20px 16px; padding-top: calc(20px + env(safe-area-inset-top)); }
@@ -270,9 +274,7 @@
             .brand-icon { width: 64px; height: 64px; font-size: 2.2rem; }
             
             .top-action-btn { padding: 8px 14px; font-size: 0.95rem; }
-            
             input[type="text"], input[type="number"]:not(.qty-input-center), select { padding: 18px; font-size: 1.2rem; }
-            
             .category-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 12px; }
             .cat-btn { padding: 16px 8px; }
             .cat-btn i { font-size: 2.2rem; }
@@ -283,11 +285,7 @@
             .table-responsive-wrapper::after { display: none; }
             .quote-table { min-width: 100%; }
             
-            .quote-item-row { 
-                display: flex; flex-direction: column; gap: 12px; 
-                padding: 20px 16px; align-items: stretch; border-left-width: 6px !important;
-                margin-bottom: 16px;
-            }
+            .quote-item-row { display: flex; flex-direction: column; gap: 12px; padding: 20px 16px; align-items: stretch; border-left-width: 6px !important; margin-bottom: 16px; }
             .quote-item-row:hover { transform: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
             .item-name { font-size: 1.4rem; border-bottom: 2px dashed rgba(0,0,0,0.08); padding-bottom: 12px; margin-bottom: 8px; }
             
@@ -300,24 +298,22 @@
             .subtotal-display { width: 100%; text-align: right; padding-top: 16px; margin-top: 8px; border-top: 2px dashed rgba(0,0,0,0.08); font-size: 1.6rem; color: var(--danger); }
             .delete-btn { width: 100%; height: 50px; border-radius: 12px; margin-top: 8px; font-size: 1.4rem; }
 
+            /* 後台頂部按鈕精簡 (匯出匯入/新增儲存) */
+            .admin-db-actions { flex-wrap: nowrap !important; width: 100%; gap: 12px !important; }
+            .admin-db-actions button { flex: 1; justify-content: center; padding: 12px !important; font-size: 1.1rem !important; }
+            #btn-add-item { padding: 14px 20px !important; font-size: 1.2rem !important; }
+
+            /* 後台列表卡片化轉換 */
             .admin-category-header { font-size: 1.3rem; padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
             .admin-category-body { padding: 16px; background: transparent; border: none; }
-            .admin-row { 
-                display: flex; flex-direction: column; align-items: stretch; background: white; 
-                padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
-                margin-bottom: 16px; border: 2px solid rgba(0,0,0,0.05); 
-            }
+            .admin-row { display: flex; flex-direction: column; align-items: stretch; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 16px; border: 2px solid rgba(0,0,0,0.05); }
             .admin-col { margin-bottom: 14px; }
             .admin-col:last-child { margin-bottom: 0; }
             .checkbox-col { display: flex; align-items: center; height: 48px; border-top: 2px dashed rgba(0,0,0,0.05); border-bottom: 2px dashed rgba(0,0,0,0.05); padding: 10px 0; margin-bottom: 14px !important; }
-            .admin-col button { height: 50px; width: 100%; }
+            .admin-actions { flex-direction: row; gap: 10px; }
+            .admin-actions button { flex: 1; }
             
-            .bottom-bar-fixed { 
-                flex-direction: row; 
-                padding: 10px 16px; 
-                padding-bottom: max(10px, env(safe-area-inset-bottom)); 
-                gap: 12px; justify-content: space-between; align-items: center; height: auto;
-            }
+            .bottom-bar-fixed { flex-direction: row; padding: 10px 16px; padding-bottom: max(10px, env(safe-area-inset-bottom)); gap: 12px; justify-content: space-between; align-items: center; height: auto; }
             .bottom-left { flex: unset; gap: 10px; }
             .bottom-center { width: auto; flex: 1; align-items: flex-end; }
             .bottom-right { display: none; }
@@ -327,7 +323,7 @@
             .bottom-total-amount .currency { font-size: 1.2rem; }
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.2rem; border-width: 2px; }
             
-            /* 手機版：回頂部按鈕極度貼右、縮小並再往下移 */
+            /* 手機版回頂部按鈕再縮小貼右 */
             #scrollTopBtn { bottom: 95px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
             .modal-content { width: 95%; max-height: 90vh; }
@@ -411,12 +407,12 @@
                     <div style="display:flex; align-items:center; gap:16px;">
                         <i class="fas fa-database"></i> 系統資料庫維護
                     </div>
-                    <div style="display:flex; gap:16px; flex-wrap: wrap;">
+                    <div class="admin-db-actions" style="display:flex; gap:16px; flex-wrap: wrap;">
                         <button class="btn-text" onclick="exportDBToExcel()" style="background: #E8F5E9; color: #28a745; border: 3px solid rgba(40,167,69,0.3);">
-                            <i class="fas fa-file-export"></i> <span style="display:inline;">匯出資料庫</span>
+                            <i class="fas fa-file-export"></i> <span>匯出<span class="hide-mobile">資料庫</span></span>
                         </button>
                         <button class="btn-text" onclick="document.getElementById('importDBInput').click()" style="background: #EBF4FF; color: #0A7AFF; border: 3px solid rgba(10,122,255,0.3);">
-                            <i class="fas fa-file-import"></i> <span style="display:inline;">匯入還原</span>
+                            <i class="fas fa-file-import"></i> <span>匯入<span class="hide-mobile">還原</span></span>
                         </button>
                         <input type="file" id="importDBInput" class="hidden" accept=".xlsx" onchange="importDBFromExcel(event)" style="display: none;">
                     </div>
@@ -451,8 +447,8 @@
                         <label style="display:flex; align-items:center; gap:14px; font-weight:900; font-size:1.5rem; cursor:pointer;">
                             <input type="checkbox" id="new-item-has-days" style="width: 32px; height: 32px; accent-color: var(--primary);"> 啟用「天數」選項
                         </label>
-                        <button class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 18px 36px; font-size: 1.4rem;">
-                            <i class="fas fa-cloud-upload-alt"></i> <span style="display:inline;">儲存至雲端</span>
+                        <button id="btn-add-item" class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 18px 36px; font-size: 1.4rem;">
+                            <i class="fas fa-cloud-upload-alt"></i> <span>儲存<span class="hide-mobile">至雲端</span></span>
                         </button>
                     </div>
                 </div>
@@ -537,7 +533,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // [重點修復]：對齊 Firebase 規則，指向允許讀寫的正確資料庫路徑！
+    // [已對齊權限] 指向 current_db 文件
     const dbRef = doc(db, "su_system", "current_db");
 
     let scrollIdleTimer;
@@ -548,11 +544,8 @@
         if (scrollContainerElement.scrollTop > 300) {
             topBtn.classList.add('visible');
             topBtn.classList.remove('idle'); 
-            
             clearTimeout(scrollIdleTimer);
-            scrollIdleTimer = setTimeout(() => {
-                topBtn.classList.add('idle'); 
-            }, 1500);
+            scrollIdleTimer = setTimeout(() => { topBtn.classList.add('idle'); }, 1500);
         } else {
             topBtn.classList.remove('visible');
             topBtn.classList.remove('idle');
@@ -599,38 +592,9 @@
 
     const defaultDB = [
         { id: 'def_p1', category: "保護工程", name: "室內地板防護 (防潮布+瓦楞板+木夾板)", unit: "坪", hasDays: false },
-        { id: 'def_p2', category: "保護工程", name: "電梯及公共走道防護", unit: "式", hasDays: false },
         { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true },
-        { id: 'def_d2', category: "拆除工程", name: "浴室磁磚剔除至見底", unit: "間", hasDays: true },
-        { id: 'def_d3', category: "拆除工程", name: "廢棄物清運 (3.5噸)", unit: "車", hasDays: false },
         { id: 'def_m1', category: "泥作工程", name: "磚牆砌磚 (1/2B)", unit: "坪", hasDays: false },
-        { id: 'def_m2', category: "泥作工程", name: "牆面粗底粉光處理", unit: "坪", hasDays: true },
-        { id: 'def_m3', category: "泥作工程", name: "浴室防水塗佈 (彈性水泥塗刷至頂)", unit: "間", hasDays: true },
-        { id: 'def_m4', category: "泥作工程", name: "室內地磚鋪設 (60x60/80x80)", unit: "坪", hasDays: false },
-        { id: 'def_e1', category: "水電工程", name: "冷熱水管重新配置 (含打石與管材)", unit: "式", hasDays: true },
-        { id: 'def_e2', category: "水電工程", name: "專用電源迴路配置 (含無熔絲開關)", unit: "迴", hasDays: false },
-        { id: 'def_e3', category: "水電工程", name: "燈具/插座/開關 面板更換", unit: "口", hasDays: false },
-        { id: 'def_e4', category: "水電工程", name: "總開關箱整理與無熔絲開關更換", unit: "式", hasDays: false },
-        { id: 'def_a1', category: "空調工程", name: "分離式冷氣安裝 (含基本安裝)", unit: "台", hasDays: false },
-        { id: 'def_a2', category: "空調工程", name: "冷媒管線佈設與包覆", unit: "米", hasDays: false },
-        { id: 'def_w1', category: "木作工程", name: "平釘天花板 (日本矽酸鈣板)", unit: "坪", hasDays: false },
-        { id: 'def_w2', category: "木作工程", name: "木作造型天花板/間接照明", unit: "坪", hasDays: false },
-        { id: 'def_w3', category: "木作工程", name: "木作隱藏門/造型門 (含五金)", unit: "樘", hasDays: false },
-        { id: 'def_w4', category: "木作工程", name: "木作高櫃/衣櫃", unit: "尺", hasDays: false },
-        { id: 'def_pt1', category: "油漆工程", name: "全室水泥漆 (含兩批兩刷及打磨)", unit: "坪", hasDays: false },
-        { id: 'def_pt2', category: "油漆工程", name: "乳膠漆升級與跳色處理", unit: "式", hasDays: false },
-        { id: 'def_pt3', category: "油漆工程", name: "木作櫃體/門片 烤漆處理", unit: "尺", hasDays: false },
-        { id: 'def_i1', category: "鐵工工程", name: "不鏽鋼防盜窗安裝", unit: "才", hasDays: false },
-        { id: 'def_i2', category: "鐵工工程", name: "採光罩/雨遮搭建", unit: "坪", hasDays: false },
-        { id: 'def_al1', category: "鋁門窗工程", name: "隔音氣密窗安裝 (5mm+5mm膠合)", unit: "才", hasDays: false },
-        { id: 'def_al2', category: "鋁門窗工程", name: "三合一通風門", unit: "樘", hasDays: false },
-        { id: 'def_al3', category: "鋁門窗工程", name: "浴室乾濕分離 (一字型淋浴拉門)", unit: "組", hasDays: false },
-        { id: 'def_c1', category: "系統櫃工程", name: "系統衣櫃 (高240cm內 E1 V313板材)", unit: "尺", hasDays: false },
-        { id: 'def_c2', category: "系統櫃工程", name: "廚具上下櫃 (含人造石檯面)", unit: "公分", hasDays: false },
-        { id: 'def_g1', category: "玻璃工程", name: "廚房烤漆玻璃 (含洗孔與光邊)", unit: "才", hasDays: false },
-        { id: 'def_g2', category: "玻璃工程", name: "明鏡/茶鏡/灰鏡 安裝", unit: "才", hasDays: false },
-        { id: 'def_cl1', category: "清潔工程", name: "裝潢後全室細清", unit: "坪", hasDays: true },
-        { id: 'def_cl2', category: "清潔工程", name: "施工期間階段性粗清", unit: "趟", hasDays: false }
+        { id: 'def_e1', category: "水電工程", name: "冷熱水管重新配置 (含打石與管材)", unit: "式", hasDays: true }
     ];
 
     let systemCategories = [];
@@ -671,8 +635,7 @@
             if (quoteList.length === 0) renderFrontView();
         }
     }, (error) => {
-        console.error("Firebase 讀取失敗，可能是權限或網路問題:", error);
-        alert("⚠️ 雲端資料庫連線異常：\n" + error.message + "\n\n目前系統已切換為「本機離線模式」，資料將不會上傳至雲端。");
+        console.error("Firebase 讀取失敗:", error);
         if(engineeringDB.length === 0) {
             engineeringDB = defaultDB;
             systemCategories = Array.from(new Set(defaultDB.map(item => item.category)));
@@ -691,7 +654,6 @@
                     const cleanCategories = JSON.parse(JSON.stringify(systemCategories));
                     
                     const payload = { items: cleanItems, history: cleanHistory, categories: cleanCategories };
-                    
                     const currentStr = JSON.stringify(payload);
                     if (currentStr === lastSavedDataStr) { isSaving = false; return resolve(); }
                     
@@ -700,7 +662,6 @@
                     resolve();
                 } catch (e) {
                     console.error("Firebase 寫入雲端失敗：", e);
-                    alert("⚠️ 儲存至雲端失敗！\n錯誤原因：" + e.message + "\n請確認 Firebase 規則與網路連線。");
                     reject(e);
                 } finally {
                     isSaving = false;
@@ -717,6 +678,35 @@
             }
         });
     }
+
+    // 後台項目獨立儲存與刪除 (綁定在 global window 供 HTML onclick 使用)
+    window.updateItem = async function(id, index) {
+        const nameEl = document.getElementById(`edit-name-${id}`);
+        const unitEl = document.getElementById(`edit-unit-${id}`);
+        const daysEl = document.getElementById(`edit-days-${id}`);
+        
+        if(!nameEl || !unitEl || !daysEl) return;
+        
+        const newName = nameEl.value.trim();
+        if(!newName) return alert('項目名稱不可為空！');
+        
+        engineeringDB[index].name = newName;
+        engineeringDB[index].unit = unitEl.value.trim() || '式';
+        engineeringDB[index].hasDays = daysEl.checked;
+        
+        await window.saveDBToFirebase(true); // 點擊儲存即強制寫入
+        alert('✅ 項目修改已儲存！');
+        renderAdminView();
+    };
+
+    window.deleteItem = async function(id, index) {
+        if(confirm('確定刪除此項目?')) {
+            engineeringDB.splice(index, 1);
+            quoteList = quoteList.filter(q => q.dbId !== id);
+            await window.saveDBToFirebase(true);
+            renderAdminView();
+        }
+    };
 
     function getFormattedDateString2(d) {
         const yyyy = d.getFullYear();
@@ -1164,11 +1154,15 @@
                     const row = document.createElement('div');
                     row.className = 'admin-row';
                     
+                    // 修改：為每一個輸入框加上 ID，並將刪除按鈕旁邊新增「儲存」按鈕 (取消邊打邊存)
                     row.innerHTML = `
-                        <div class="admin-col"><label>項目名稱</label><input type="text" value="${item.name}" onchange="engineeringDB[${dbIndex}].name = this.value; saveDBToFirebase();"></div>
-                        <div class="admin-col"><label>單位</label><input type="text" value="${item.unit}" onchange="engineeringDB[${dbIndex}].unit = this.value; saveDBToFirebase();"></div>
-                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px;"><input type="checkbox" style="width:28px; height:28px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''} onchange="engineeringDB[${dbIndex}].hasDays = this.checked; saveDBToFirebase();"> 啟用天數</label></div>
-                        <div class="admin-col"><button class="btn-text" style="width:100%; background:#FF3B30; color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="if(confirm('確定刪除此項目?')){ engineeringDB.splice(${dbIndex}, 1); quoteList = quoteList.filter(q => q.dbId !== ${item.id}); saveDBToFirebase(true); renderAdminView(); }"><i class="fas fa-trash"></i> 刪除</button></div>
+                        <div class="admin-col"><label>項目名稱</label><input type="text" id="edit-name-${item.id}" value="${item.name}"></div>
+                        <div class="admin-col"><label>單位</label><input type="text" id="edit-unit-${item.id}" value="${item.unit}"></div>
+                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px;"><input type="checkbox" id="edit-days-${item.id}" style="width:28px; height:28px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''}> 啟用天數</label></div>
+                        <div class="admin-col admin-actions">
+                            <button class="btn-text" style="background:var(--primary); color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="updateItem('${item.id}', ${dbIndex})"><i class="fas fa-save"></i> 儲存</button>
+                            <button class="btn-text" style="background:#FF3B30; color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="deleteItem('${item.id}', ${dbIndex})"><i class="fas fa-trash"></i> 刪除</button>
+                        </div>
                     `;
                     catBody.appendChild(row);
                 });
@@ -1495,7 +1489,7 @@
         titleCell.font = { name: '微軟正黑體', size: 26, bold: true, color: { argb: 'FF1C1C1E' } };
         titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
 
-        ws.addRow([]); ws.mergeCells('A4:D4'); ws.mergeCells('E4:G4');
+        ws.addRow([]); ws.mergeCells('A4:D4'); ws.mergeCells('E4:F4');
         ws.getCell('A4').value = `客戶名稱：${clientName}`; ws.getCell('A4').font = { name: '微軟正黑體', size: 15, bold: true };
         
         const d = new Date();
@@ -1546,11 +1540,21 @@
             });
         });
 
-        ws.addRow([]); const tRow = ws.addRow(['', '', '', '', '總計金額：', currentGrandTotal]); tRow.height = 50;
-        tRow.getCell(5).font = { name: '微軟正黑體', size: 20, bold: true }; tRow.getCell(5).alignment = { horizontal: 'right', vertical: 'middle' };
-        tRow.getCell(6).font = { name: 'Arial', size: 24, bold: true, color: { argb: 'FFFF3B30' } }; tRow.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
+        // 徹底修正 Excel 匯出總計欄位合併與寬度問題
+        ws.addRow([]); 
+        const tRow = ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal]); 
+        tRow.height = 50;
+        
+        ws.mergeCells(`A${tRow.number}:E${tRow.number}`);
+        tRow.getCell(1).font = { name: '微軟正黑體', size: 20, bold: true }; 
+        tRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+        tRow.getCell(6).font = { name: 'Arial', size: 24, bold: true, color: { argb: 'FFFF3B30' } }; 
+        tRow.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
         tRow.getCell(6).numFmt = '"NT$" #,##0';
-        tRow.eachCell({ includeEmpty: true }, (cell, colIdx) => { if(colIdx >= 5) cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color: { argb: 'FFFF3B30' }}, right: {style:'thin'} }; });
+
+        const borderStyle = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color: { argb: 'FFFF3B30' }}, right: {style:'thin'} };
+        tRow.getCell(1).border = borderStyle;
+        tRow.getCell(6).border = borderStyle;
 
         const buf = await workbook.xlsx.writeBuffer();
         saveAs(new Blob([buf]), `${currentQuoteNo}_${clientName}.xlsx`);
