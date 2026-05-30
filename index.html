@@ -204,7 +204,7 @@
         }
         
         .bottom-bar-inner {
-            display: flex; justify-content: space-between; align-items: flex-end; /* 關鍵:強迫所有內容下沉對位 */
+            display: flex; justify-content: space-between; align-items: flex-end; 
             padding: 10px 24px 8px 24px;
             min-height: 75px;
         }
@@ -284,15 +284,10 @@
         .history-item-row { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; color: var(--text-main); padding: 12px 0; border-bottom: 2px dashed rgba(0,0,0,0.08); }
         .history-item-row:last-child { border-bottom: none; }
 
-        /* 歷史明細總計區域 */
         .history-detail-total-box {
-            text-align: right; 
-            font-size: 2.2rem; 
-            font-weight: 900; 
-            color: var(--danger); 
-            margin-bottom: 10px; 
-            font-family: 'Arial', sans-serif; 
-            letter-spacing: -0.5px;
+            text-align: right; font-size: 2.2rem; font-weight: 900; 
+            color: var(--danger); margin-bottom: 10px; 
+            font-family: 'Arial', sans-serif; letter-spacing: -0.5px;
         }
 
         @media (max-width: 900px) {
@@ -353,7 +348,6 @@
             .admin-actions { flex-direction: row; gap: 10px; }
             .admin-actions button { flex: 1; }
             
-            /* 將手機版底部欄位完美壓底對位 */
             .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
             .bottom-bar-inner { padding: 8px 16px 8px 16px; min-height: 70px; }
             
@@ -366,10 +360,10 @@
             
             #scrollTopBtn { bottom: 120px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
-            .modal-content { width: 95%; max-height: 90vh; }
-            .modal-header { padding: 20px; }
-            .modal-header h3 { font-size: 1.6rem; }
-            .modal-body { padding: 16px; }
+            .modal-content { width: 98%; max-height: 90vh; }
+            .modal-header { padding: 16px; }
+            .modal-header h3 { font-size: 1.5rem; }
+            .modal-body { padding: 12px; }
             .selectable-item { flex-direction: column; gap: 16px; padding: 20px; align-items: flex-start; }
             .selectable-item button { width: 100%; height: 50px; }
             
@@ -377,21 +371,14 @@
             .history-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .history-card-header > div:last-child { width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end; margin-top: 10px; text-align: left !important; }
             
-            /* 歷史報價 RWD 完美防跳行防切割 */
             .history-item-row { flex-direction: row; align-items: center; font-size: 1.05rem; gap: 6px; }
             .history-item-row > span:first-child { flex: 1; white-space: normal; word-break: break-all; }
             .history-item-row > span:last-child { white-space: nowrap; font-size: 1.15rem; }
             
-            /* 詳細明細 Modal Table RWD (防滑動優化) */
-            .history-detail-total-box {
-                text-align: left !important;
-                font-size: 1.5rem !important;
-                white-space: nowrap;
-                margin-top: 12px;
-            }
-            .detail-table { font-size: 0.85rem !important; }
-            .detail-table th, .detail-table td { padding: 6px 4px !important; white-space: normal !important; word-break: break-all; }
-            .detail-table td:nth-child(2) { min-width: 80px; }
+            .history-detail-total-box { text-align: left !important; font-size: 1.5rem !important; white-space: nowrap; margin-top: 12px; }
+            .detail-table { font-size: 0.85rem !important; width: 100% !important; }
+            .detail-table th, .detail-table td { padding: 6px 3px !important; white-space: nowrap !important; }
+            .detail-table th:nth-child(2), .detail-table td:nth-child(2) { white-space: normal !important; word-break: break-all; min-width: 90px; text-align: left !important; }
         }
     </style>
 </head>
@@ -651,7 +638,7 @@
             <button class="close-modal" onclick="closeModal('history-detail-modal')"><i class="fas fa-times-circle"></i></button>
         </div>
         <div class="modal-body" id="history-detail-content" style="padding: 0;">
-            </div>
+        </div>
     </div>
 </div>
 
@@ -765,6 +752,7 @@
     let saveTimeout = null;
     let isFirstLoad = true;
 
+    // 即時監聽與無限迴圈安全防護
     onSnapshot(dbRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
@@ -777,9 +765,23 @@
             systemCategories = data.categories || Array.from(new Set(engineeringDB.map(item => item.category)));
             systemSettings = data.settings || { defaultShowTitle: true };
             
-            // 首載入時自動注入大里範例紀錄 (將 hideUnit 設為 true 且 unit 設為空字串，完全去除'式')
-            let hasDali = quoteHistory.some(h => h.quoteNo === '20260529-001');
-            if (!hasDali) {
+            // 安全修正大里紀錄：使用專屬標記 isFixedDali 避免 JSON.stringify 造成的無限寫入死循環
+            let daliIndex = quoteHistory.findIndex(h => h.quoteNo === '20260529-001');
+            let daliItems = [
+                { cat: '木作工程', name: '地、木板材料費', price: 12000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                { cat: '木作工程', name: '地板木條', price: 450, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                { cat: '其他', name: '工資', price: 42000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                { cat: '油漆工程', name: '油漆', price: 3000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                { cat: '油漆工程', name: '補土', price: 600, qty: 1, unit: '', days: null, discount: 0, hideUnit: true }
+            ];
+
+            if (daliIndex !== -1) {
+                if (!quoteHistory[daliIndex].isFixedDali) {
+                    quoteHistory[daliIndex].items = daliItems;
+                    quoteHistory[daliIndex].isFixedDali = true; // 鎖定標記，未來不再觸發
+                    window.saveDBToFirebase(true);
+                }
+            } else {
                 quoteHistory.push({
                     id: 'R_1716940800000',
                     quoteNo: '20260529-001',
@@ -787,13 +789,8 @@
                     time: '12:00:00',
                     client: '大里',
                     total: 58050,
-                    items: [
-                        { cat: '木作工程', name: '地、木板材料費', price: 12000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
-                        { cat: '木作工程', name: '地板木條', price: 450, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
-                        { cat: '其他', name: '工資', price: 42000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
-                        { cat: '油漆工程', name: '油漆', price: 3000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
-                        { cat: '油漆工程', name: '補土', price: 600, qty: 1, unit: '', days: null, discount: 0, hideUnit: true }
-                    ]
+                    isFixedDali: true,
+                    items: daliItems
                 });
                 quoteHistory.sort((a, b) => b.id.localeCompare(a.id));
                 window.saveDBToFirebase(true);
@@ -832,6 +829,7 @@
         updateCategoryUI();
     });
 
+    // 此函數只在重大變更與送出報價時才會呼叫，前台打字輸入「絕對不會」呼叫此函數，完美節省效能
     window.saveDBToFirebase = function(immediate = false) {
         return new Promise((resolve) => {
             const executeSave = async () => {
@@ -956,7 +954,7 @@
         };
         
         quoteHistory.unshift(record);
-        if (quoteHistory.length > 1000) quoteHistory = quoteHistory.slice(0, 1000); // 確保上限維持 1000 筆，採取 FIFO
+        if (quoteHistory.length > 1000) quoteHistory = quoteHistory.slice(0, 1000); 
         
         await window.saveDBToFirebase(true); 
         
@@ -1009,32 +1007,32 @@
             
             return `
             <tr style="background:${bg}; border-bottom: 1px solid #E5E5EA;">
-                <td style="padding:14px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900;">${i.cat}</td>
-                <td style="padding:14px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main); word-break: break-all;">${i.name}${optTag}</td>
-                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.price.toLocaleString()}</td>
-                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.qty}${unitDisplay}</td>
-                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${daysDisplay}</td>
-                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${sub.toLocaleString()}</td>
+                <td style="padding:10px 8px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900; white-space:nowrap;">${i.cat}</td>
+                <td style="padding:10px 8px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main); word-break: break-all; min-width: 110px;">${i.name}${optTag}</td>
+                <td style="padding:10px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.price.toLocaleString()}</td>
+                <td style="padding:10px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.qty}${unitDisplay}</td>
+                <td style="padding:10px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${daysDisplay}</td>
+                <td style="padding:10px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${sub.toLocaleString()}</td>
             </tr>`;
         }).join('');
         
         document.getElementById('history-detail-content').innerHTML = `
-            <div style="padding: 24px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom: 20px; font-weight:900; font-size:1.2rem; color:var(--text-main);">
-                    <div style="font-size: 1.6rem;">客戶名稱：${record.client}</div>
-                    <div style="text-align:right; color: #3A3A3C;">報價單號：${record.quoteNo || ''}<br>報價日期：${record.date.replace(/-/g, '/')}</div>
+            <div style="padding: 12px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 16px; font-weight:900; font-size:1.1rem; color:var(--text-main);">
+                    <div style="font-size: 1.4rem;">客戶：${record.client}</div>
+                    <div style="text-align:right; color: #3A3A3C; font-size: 1rem;">單號：${record.quoteNo || ''}<br>日期：${record.date.replace(/-/g, '/')}</div>
                 </div>
                 
-                <div class="table-responsive-wrapper" style="margin-bottom: 24px; padding-bottom: 0;">
-                    <table class="detail-table" style="width:100%; border-collapse: collapse; text-align:center; border: 3px solid #1C1C1E; font-size: 1.15rem; background: white;">
+                <div class="table-responsive-wrapper" style="margin-bottom: 20px; padding-bottom: 0;">
+                    <table class="detail-table" style="width:100%; border-collapse: collapse; text-align:center; border: 3px solid #1C1C1E; font-size: 1.05rem; background: white;">
                         <thead>
                             <tr style="background:#1C1C1E; color:white;">
-                                <th style="padding:14px; border: 2px solid #1C1C1E;">類別</th>
-                                <th style="padding:14px; border: 2px solid #1C1C1E; text-align:left;">項目明細</th>
-                                <th style="padding:14px; border: 2px solid #1C1C1E;">單價</th>
-                                <th style="padding:14px; border: 2px solid #1C1C1E;">數量</th>
-                                <th style="padding:14px; border: 2px solid #1C1C1E;">天數</th>
-                                <th style="padding:14px; border: 2px solid #1C1C1E;">項目小計</th>
+                                <th style="padding:10px 8px; border: 2px solid #1C1C1E; white-space:nowrap;">類別</th>
+                                <th style="padding:10px 8px; border: 2px solid #1C1C1E; text-align:left;">項目明細</th>
+                                <th style="padding:10px 8px; border: 2px solid #1C1C1E; white-space:nowrap;">單價</th>
+                                <th style="padding:10px 8px; border: 2px solid #1C1C1E; white-space:nowrap;">數量</th>
+                                <th style="padding:10px 8px; border: 2px solid #1C1C1E; white-space:nowrap;">天數</th>
+                                <th style="padding:10px 8px; border: 2px solid #1C1C1E; white-space:nowrap;">小計</th>
                             </tr>
                         </thead>
                         <tbody>${rowsHtml}</tbody>
@@ -1063,7 +1061,7 @@
                 let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
                 return `
                 <div class="history-item-row">
-                    <span>${i.name} <span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}</span>
+                    <span style="flex:1;">${i.name} <span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}</span>
                     <span>$${sub.toLocaleString()}</span>
                 </div>`;
             }).join('');
@@ -1106,52 +1104,101 @@
         renderAdminHistoryList();
     };
 
-    // 新增：匯出全部歷史報價紀錄
+    // 全新重構升級：匯出歷史紀錄 Excel (依年月份分頁、依單號跳色區分)
     window.exportHistoryToExcel = async function() {
         if(quoteHistory.length === 0) return alert('目前無歷史紀錄可匯出！');
         
         const workbook = new ExcelJS.Workbook();
-        const ws = workbook.addWorksheet('歷史報價紀錄');
         
-        ws.columns = [
-            { header: '報價單號', key: 'quoteNo', width: 20 },
-            { header: '日期', key: 'date', width: 15 },
-            { header: '時間', key: 'time', width: 15 },
-            { header: '客戶名稱', key: 'client', width: 20 },
-            { header: '總金額', key: 'total', width: 15 },
-            { header: '類別', key: 'cat', width: 20 },
-            { header: '項目名稱', key: 'name', width: 40 },
-            { header: '單價', key: 'price', width: 15 },
-            { header: '數量', key: 'qty', width: 10 },
-            { header: '單位', key: 'unit', width: 10 },
-            { header: '天數', key: 'days', width: 10 },
-            { header: '折抵', key: 'discount', width: 15 }
-        ];
-        
-        ws.getRow(1).eachCell(cell => {
-            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0A7AFF' } };
-            cell.alignment = { vertical: 'middle', horizontal: 'center' };
-        });
-        
+        // 1. 將資料依「年-月」分組
+        const groupedRecords = {};
         quoteHistory.forEach(record => {
-            record.items.forEach((item, index) => {
-                ws.addRow({
-                    quoteNo: index === 0 ? record.quoteNo : '',
-                    date: index === 0 ? record.date : '',
-                    time: index === 0 ? record.time : '',
-                    client: index === 0 ? record.client : '',
-                    total: index === 0 ? record.total : '',
-                    cat: item.cat,
-                    name: item.name,
-                    price: item.price,
-                    qty: item.qty,
-                    unit: item.hideUnit ? '' : item.unit,
-                    days: item.days || '-',
-                    discount: item.discount || 0
+            const ym = record.date.substring(0, 7); // 擷取 "YYYY-MM"
+            if (!groupedRecords[ym]) groupedRecords[ym] = [];
+            groupedRecords[ym].push(record);
+        });
+
+        // 2. 為每個「年-月」建立獨立工作表
+        for (const [ym, records] of Object.entries(groupedRecords)) {
+            const ws = workbook.addWorksheet(ym + ' 歷史報價');
+            
+            ws.columns = [
+                { header: '報價單號', key: 'quoteNo', width: 18 },
+                { header: '日期', key: 'date', width: 14 },
+                { header: '時間', key: 'time', width: 12 },
+                { header: '客戶名稱', key: 'client', width: 18 },
+                { header: '總金額', key: 'total', width: 15 },
+                { header: '工程類別', key: 'cat', width: 18 },
+                { header: '項目名稱', key: 'name', width: 35 },
+                { header: '單價', key: 'price', width: 12 },
+                { header: '數量', key: 'qty', width: 10 },
+                { header: '單位', key: 'unit', width: 10 },
+                { header: '天數', key: 'days', width: 10 },
+                { header: '折抵', key: 'discount', width: 12 }
+            ];
+            
+            // 設定標題列樣式
+            ws.getRow(1).eachCell(cell => {
+                cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1C1C1E' } };
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+            });
+            ws.getRow(1).height = 25;
+            
+            // 寫入資料並設定交替顏色與粗框區隔
+            let isAltRecord = false;
+            records.forEach(record => {
+                // 每一張不同的報價單號交替背景色
+                const recordBgColor = isAltRecord ? 'FFF2F2F7' : 'FFFFFFFF';
+                isAltRecord = !isAltRecord;
+                
+                record.items.forEach((item, index) => {
+                    const row = ws.addRow({
+                        quoteNo: index === 0 ? record.quoteNo : '',
+                        date: index === 0 ? record.date : '',
+                        time: index === 0 ? record.time : '',
+                        client: index === 0 ? record.client : '',
+                        total: index === 0 ? record.total : '',
+                        cat: item.cat,
+                        name: item.name,
+                        price: item.price,
+                        qty: item.qty,
+                        unit: item.hideUnit ? '' : item.unit,
+                        days: item.days || '-',
+                        discount: item.discount || 0
+                    });
+                    
+                    row.height = 20;
+
+                    // 套用樣式到該列的所有儲存格
+                    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: recordBgColor } };
+                        cell.border = { 
+                            top: {style:'thin', color:{argb:'FFD1D1D6'}}, 
+                            left: {style:'thin', color:{argb:'FFD1D1D6'}}, 
+                            bottom: {style:'thin', color:{argb:'FFD1D1D6'}}, 
+                            right: {style:'thin', color:{argb:'FFD1D1D6'}} 
+                        };
+                        cell.alignment = { vertical: 'middle', horizontal: colNumber === 7 ? 'left' : 'center' };
+                        
+                        // 針對同一筆紀錄的「第一列」，加上藍色粗框頂部，完美區隔不同的報價單
+                        if (index === 0) {
+                            cell.border.top = { style: 'medium', color: { argb: 'FF0A7AFF' } };
+                            if (colNumber <= 5) {
+                                cell.font = { bold: true, color: { argb: 'FF1C1C1E' } };
+                                if (colNumber === 5) {
+                                    cell.font.color = { argb: 'FFFF3B30' }; // 總金額顯示為紅色
+                                    cell.numFmt = '"NT$" #,##0';
+                                }
+                            }
+                        }
+                        // 格式化數字欄位
+                        if (colNumber === 8) cell.numFmt = '#,##0';
+                    });
                 });
             });
-        });
+        }
         
         const buf = await workbook.xlsx.writeBuffer();
         const d = new Date();
@@ -1456,6 +1503,7 @@
                 const eyeClass = q.hideUnit ? 'fa-eye-slash' : 'fa-eye';
                 const unitStr = hideUnitDisplay ? '' : db.unit;
                 
+                // 如果後台單位留白，就不顯示單位與眼睛切換圖示
                 const toggleBtnHtml = hasUnit ? `
                     <button onclick="toggleUnit('${q.id}')">
                         <i id="unit-toggle-icon-${q.id}" class="fas ${eyeClass}" style="color:${eyeColor}; font-size:1.2rem;"></i>
@@ -1739,6 +1787,7 @@
         reader.readAsArrayBuffer(file);
     };
 
+    // 已完全修正：加入 receipt-wrap 結構，完美匯出 PNG
     window.exportToPNG = async function() {
         const clientName = document.getElementById('client-name-input').value.trim();
         if (!clientName) { alert('請輸入「客戶名稱」！'); document.getElementById('client-name-input').focus(); return; }
@@ -1764,7 +1813,7 @@
         let isEvenRow = true;
         const sortedQuoteList = [...quoteList].sort((a, b) => {
             const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
-            if(!dbA) return 1; if(!dbB) return -1;
+            if(!dbA || !dbB) return 0;
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
@@ -1836,6 +1885,19 @@
                 <img id="result-img" />
                 ${!isIOS ? '<button class="btn" id="btn-download" style="background:#0A7AFF; color:white; margin-top:10px;"><i class="fa-solid fa-download"></i> 下載圖片</button>' : ''}
                 <button class="btn" onclick="window.close()" style="background:white; color:#1C1C1E;"><i class="fa-solid fa-arrow-left"></i> 返回</button>
+            </div>
+            
+            <div id="receipt-wrap">
+                ${headerHtml}
+                <div class="r-info">
+                    <div>客戶名稱：${clientName}</div>
+                    <div style="text-align: right;">報價單號：${currentQuoteNo}<br>報價日期：${dateStr}</div>
+                </div>
+                <table>
+                    <thead><tr><th>工程類別</th><th style="text-align:left;">工程項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
+                    <tbody>${tbody}</tbody>
+                </table>
+                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
             </div>
             
             <script>
@@ -1919,7 +1981,7 @@
         ws.getCell('E4').alignment = { horizontal: 'right' };
         ws.addRow([]); 
 
-        const headerRow = ws.addRow(['類別', '項目明細', '單價', '數量', '天數', '項目小計']);
+        const headerRow = ws.addRow(['工程類別', '工程項目明細', '單價', '數量', '天數', '項目小計']);
         headerRow.height = 42;
         headerRow.eachCell((cell) => {
             cell.font = { name: '微軟正黑體', bold: true, size: 15, color: { argb: 'FFFFFFFF' } }; 
@@ -1930,7 +1992,7 @@
 
         const sortedQuoteList = [...quoteList].sort((a, b) => {
             const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
-            if(!dbA) return 1; if(!dbB) return -1;
+            if(!dbA || !dbB) return 0;
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
