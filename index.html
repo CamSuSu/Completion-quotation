@@ -284,6 +284,17 @@
         .history-item-row { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; color: var(--text-main); padding: 12px 0; border-bottom: 2px dashed rgba(0,0,0,0.08); }
         .history-item-row:last-child { border-bottom: none; }
 
+        /* 歷史明細總計區域 */
+        .history-detail-total-box {
+            text-align: right; 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            color: var(--danger); 
+            margin-bottom: 10px; 
+            font-family: 'Arial', sans-serif; 
+            letter-spacing: -0.5px;
+        }
+
         @media (max-width: 900px) {
             .hide-mobile { display: none !important; }
             .container { padding: 16px 12px; padding-bottom: 105px; } 
@@ -371,10 +382,16 @@
             .history-item-row > span:first-child { flex: 1; white-space: normal; word-break: break-all; }
             .history-item-row > span:last-child { white-space: nowrap; font-size: 1.15rem; }
             
-            /* 詳細明細 Modal Table RWD */
-            .detail-table { font-size: 0.9rem !important; }
-            .detail-table th, .detail-table td { padding: 8px 4px !important; white-space: nowrap; }
-            .detail-table td:nth-child(2) { white-space: normal; word-break: break-all; min-width: 120px; }
+            /* 詳細明細 Modal Table RWD (防滑動優化) */
+            .history-detail-total-box {
+                text-align: left !important;
+                font-size: 1.5rem !important;
+                white-space: nowrap;
+                margin-top: 12px;
+            }
+            .detail-table { font-size: 0.85rem !important; }
+            .detail-table th, .detail-table td { padding: 6px 4px !important; white-space: normal !important; word-break: break-all; }
+            .detail-table td:nth-child(2) { min-width: 80px; }
         }
     </style>
 </head>
@@ -542,7 +559,14 @@
             </div>
             
             <div class="card animate-card delay-2">
-                <div class="card-title"><i class="fas fa-history"></i> 歷史紀錄管理</div>
+                <div class="card-title" style="align-items: center; justify-content: space-between;">
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <i class="fas fa-history"></i> 歷史紀錄管理
+                    </div>
+                    <button class="btn-text" onclick="exportHistoryToExcel()" style="background: #EBF4FF; color: #0A7AFF; border: 3px solid rgba(10,122,255,0.3); padding: 10px 16px; font-size: 1rem;">
+                        <i class="fas fa-file-excel"></i> <span class="hide-mobile">匯出全部紀錄</span>
+                    </button>
+                </div>
                 <div style="display:flex; gap:16px; margin-bottom:32px; max-width: 600px;">
                     <select id="admin-history-year" onchange="renderAdminHistoryList()" style="flex:1;"></select>
                     <select id="admin-history-month" onchange="renderAdminHistoryList()" style="flex:1;"></select>
@@ -706,7 +730,7 @@
         'fa-link', 'fa-link-slash', 'fa-microchip', 'fa-memory', 'fa-server', 'fa-network-wired', 
         'fa-shield-halved', 'fa-satellite-dish', 'fa-camera', 'fa-video', 'fa-bell', 
         'fa-fire-extinguisher', 'fa-seedling', 'fa-tree', 'fa-leaf', 'fa-mound', 'fa-gem'
-    ]; // 內建至少 70 個泛用圖示，配合 360 個色相可組合 25,200 種不重複分類。
+    ]; 
 
     function getCatStyle(catName) {
         let match = CATEGORY_MAP.find(mapping => mapping.keywords.some(kw => catName.includes(kw)));
@@ -753,7 +777,7 @@
             systemCategories = data.categories || Array.from(new Set(engineeringDB.map(item => item.category)));
             systemSettings = data.settings || { defaultShowTitle: true };
             
-            // 首載入時自動注入大里範例紀錄 (將 hideUnit 設為 true 符合統一樣式)
+            // 首載入時自動注入大里範例紀錄 (將 hideUnit 設為 true 且 unit 設為空字串，完全去除'式')
             let hasDali = quoteHistory.some(h => h.quoteNo === '20260529-001');
             if (!hasDali) {
                 quoteHistory.push({
@@ -764,11 +788,11 @@
                     client: '大里',
                     total: 58050,
                     items: [
-                        { cat: '木作工程', name: '地、木板材料費', price: 12000, qty: 1, unit: '式', days: null, discount: 0, hideUnit: true },
-                        { cat: '木作工程', name: '地板木條', price: 450, qty: 1, unit: '式', days: null, discount: 0, hideUnit: true },
-                        { cat: '其他', name: '工資', price: 42000, qty: 1, unit: '式', days: null, discount: 0, hideUnit: true },
-                        { cat: '油漆工程', name: '油漆', price: 3000, qty: 1, unit: '式', days: null, discount: 0, hideUnit: true },
-                        { cat: '油漆工程', name: '補土', price: 600, qty: 1, unit: '式', days: null, discount: 0, hideUnit: true }
+                        { cat: '木作工程', name: '地、木板材料費', price: 12000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                        { cat: '木作工程', name: '地板木條', price: 450, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                        { cat: '其他', name: '工資', price: 42000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                        { cat: '油漆工程', name: '油漆', price: 3000, qty: 1, unit: '', days: null, discount: 0, hideUnit: true },
+                        { cat: '油漆工程', name: '補土', price: 600, qty: 1, unit: '', days: null, discount: 0, hideUnit: true }
                     ]
                 });
                 quoteHistory.sort((a, b) => b.id.localeCompare(a.id));
@@ -932,7 +956,7 @@
         };
         
         quoteHistory.unshift(record);
-        if (quoteHistory.length > 1000) quoteHistory = quoteHistory.slice(0, 1000); // 上限提升至 1000 筆
+        if (quoteHistory.length > 1000) quoteHistory = quoteHistory.slice(0, 1000); // 確保上限維持 1000 筆，採取 FIFO
         
         await window.saveDBToFirebase(true); 
         
@@ -968,7 +992,6 @@
         });
     };
 
-    /* 新版：開啟完整報價單表單彈窗 */
     window.openHistoryDetail = function(id) {
         const record = quoteHistory.find(q => q.id === id);
         if(!record) return;
@@ -987,7 +1010,7 @@
             return `
             <tr style="background:${bg}; border-bottom: 1px solid #E5E5EA;">
                 <td style="padding:14px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900;">${i.cat}</td>
-                <td style="padding:14px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main);">${i.name}${optTag}</td>
+                <td style="padding:14px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main); word-break: break-all;">${i.name}${optTag}</td>
                 <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.price.toLocaleString()}</td>
                 <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.qty}${unitDisplay}</td>
                 <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${daysDisplay}</td>
@@ -1018,7 +1041,7 @@
                     </table>
                 </div>
                 
-                <div style="text-align:right; font-size: 2.2rem; font-weight:900; color:var(--danger); margin-bottom: 10px; font-family: 'Arial', sans-serif; letter-spacing: -0.5px;">
+                <div class="history-detail-total-box">
                     總計金額：NT$ ${record.total.toLocaleString()}
                 </div>
             </div>
@@ -1081,6 +1104,59 @@
         await window.saveDBToFirebase(true);
         renderHistoryList();
         renderAdminHistoryList();
+    };
+
+    // 新增：匯出全部歷史報價紀錄
+    window.exportHistoryToExcel = async function() {
+        if(quoteHistory.length === 0) return alert('目前無歷史紀錄可匯出！');
+        
+        const workbook = new ExcelJS.Workbook();
+        const ws = workbook.addWorksheet('歷史報價紀錄');
+        
+        ws.columns = [
+            { header: '報價單號', key: 'quoteNo', width: 20 },
+            { header: '日期', key: 'date', width: 15 },
+            { header: '時間', key: 'time', width: 15 },
+            { header: '客戶名稱', key: 'client', width: 20 },
+            { header: '總金額', key: 'total', width: 15 },
+            { header: '工程類別', key: 'cat', width: 20 },
+            { header: '項目名稱', key: 'name', width: 40 },
+            { header: '單價', key: 'price', width: 15 },
+            { header: '數量', key: 'qty', width: 10 },
+            { header: '單位', key: 'unit', width: 10 },
+            { header: '天數', key: 'days', width: 10 },
+            { header: '折抵', key: 'discount', width: 15 }
+        ];
+        
+        ws.getRow(1).eachCell(cell => {
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0A7AFF' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+        
+        quoteHistory.forEach(record => {
+            record.items.forEach((item, index) => {
+                ws.addRow({
+                    quoteNo: index === 0 ? record.quoteNo : '',
+                    date: index === 0 ? record.date : '',
+                    time: index === 0 ? record.time : '',
+                    client: index === 0 ? record.client : '',
+                    total: index === 0 ? record.total : '',
+                    cat: item.cat,
+                    name: item.name,
+                    price: item.price,
+                    qty: item.qty,
+                    unit: item.hideUnit ? '' : item.unit,
+                    days: item.days || '-',
+                    discount: item.discount || 0
+                });
+            });
+        });
+        
+        const buf = await workbook.xlsx.writeBuffer();
+        const d = new Date();
+        const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        saveAs(new Blob([buf]), `劉氏工程_歷史報價紀錄_${dateStr}.xlsx`);
     };
 
     window.addSystemCategory = async function() {
@@ -1688,7 +1764,7 @@
         let isEvenRow = true;
         const sortedQuoteList = [...quoteList].sort((a, b) => {
             const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
-            if(!dbA || !dbB) return 0;
+            if(!dbA) return 1; if(!dbB) return -1;
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
@@ -1760,19 +1836,6 @@
                 <img id="result-img" />
                 ${!isIOS ? '<button class="btn" id="btn-download" style="background:#0A7AFF; color:white; margin-top:10px;"><i class="fa-solid fa-download"></i> 下載圖片</button>' : ''}
                 <button class="btn" onclick="window.close()" style="background:white; color:#1C1C1E;"><i class="fa-solid fa-arrow-left"></i> 返回</button>
-            </div>
-            
-            <div id="receipt-wrap">
-                ${headerHtml}
-                <div class="r-info">
-                    <div>客戶名稱：${clientName}</div>
-                    <div style="text-align: right;">報價單號：${currentQuoteNo}<br>報價日期：${dateStr}</div>
-                </div>
-                <table>
-                    <thead><tr><th>工程類別</th><th style="text-align:left;">工程項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
-                    <tbody>${tbody}</tbody>
-                </table>
-                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
             </div>
             
             <script>
@@ -1867,7 +1930,7 @@
 
         const sortedQuoteList = [...quoteList].sort((a, b) => {
             const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
-            if(!dbA || !dbB) return 0;
+            if(!dbA) return 1; if(!dbB) return -1;
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
