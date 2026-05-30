@@ -198,7 +198,8 @@
             background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(245,245,248,1));
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-top: 1px solid rgba(0,0,0,0.1); z-index: 1500;
-            padding: 10px 24px; padding-bottom: max(10px, env(safe-area-inset-bottom));
+            /* 優化底部空白區距，貼近安全距離 */
+            padding: 8px 24px calc(5px + env(safe-area-inset-bottom)) 24px; 
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.05);
         }
@@ -264,7 +265,7 @@
         .btn-text:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .btn-text:active { transform: scale(0.95); }
 
-        .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 16px; align-items: end; padding: 20px 0; border-bottom: 2px solid rgba(0,0,0,0.05); }
+        .admin-row { display: grid; grid-template-columns: 1.5fr 0.8fr 1fr 1fr auto; gap: 12px; align-items: end; padding: 20px 0; border-bottom: 2px solid rgba(0,0,0,0.05); }
         .admin-col label { display: block; font-size: 1.1rem; font-weight: 900; color: var(--text-muted); margin-bottom: 8px; }
         .admin-col input[type="text"] { width: 100%; padding: 14px; font-size: 1.2rem; border: 2px solid #E5E5EA; border-radius: 10px; background: #F9F9FB; font-weight: 900; }
         .admin-col input[type="text"]:focus { border-color: var(--primary); background: #FFFFFF; outline: none; }
@@ -287,7 +288,7 @@
 
         @media (max-width: 900px) {
             .hide-mobile { display: none !important; }
-            .container { padding: 16px 12px; padding-bottom: 100px; } 
+            .container { padding: 16px 12px; padding-bottom: 85px; } 
             
             .top-nav-wrapper { margin-top: env(safe-area-inset-top); margin-bottom: 12px; }
             .nav-tabs { max-width: 260px; padding: 4px; }
@@ -343,7 +344,8 @@
             .admin-actions { flex-direction: row; gap: 10px; }
             .admin-actions button { flex: 1; }
             
-            .bottom-bar-fixed { padding: 6px 16px; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
+            /* 極限壓縮底部安全距離 */
+            .bottom-bar-fixed { padding: 8px 16px calc(2px + env(safe-area-inset-bottom)) 16px; }
             .bottom-total-label { font-size: 1rem; }
             .bottom-total-amount { font-size: 2.2rem; gap: 4px; }
             .bottom-total-amount .currency { font-size: 1.2rem; }
@@ -505,13 +507,19 @@
                         </div>
                         <div>
                             <label style="display:block; margin-bottom:12px; font-weight:900; color:var(--text-muted);">預設單位</label>
-                            <input type="text" id="new-item-unit" value="式" placeholder="例：式、坪、個" style="padding:16px; border-radius:12px; width:100%; border: 2px solid #E5E5EA;">
+                            <input type="text" id="new-item-unit" value="式" placeholder="不輸入代表無單位" style="padding:16px; border-radius:12px; width:100%; border: 2px solid #E5E5EA;">
                         </div>
                     </div>
-                    <div class="add-new-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px;">
-                        <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.3rem; cursor:pointer; flex: 1; margin-bottom: 0;">
-                            <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用天數
-                        </label>
+                    
+                    <div class="add-new-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px; flex-wrap: wrap; gap: 16px;">
+                        <div style="display: flex; gap: 20px; flex: 1;">
+                            <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.3rem; cursor:pointer; margin-bottom: 0;">
+                                <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用天數
+                            </label>
+                            <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.3rem; cursor:pointer; margin-bottom: 0;">
+                                <input type="checkbox" id="new-item-hide-unit" style="width: 24px; height: 24px; accent-color: var(--primary);"> 預設隱藏單位
+                            </label>
+                        </div>
                         <button id="btn-add-item" class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 16px 36px; font-size: 1.4rem;">
                             <i class="fas fa-cloud-upload-alt"></i> <span>儲存<span class="hide-mobile">至雲端</span></span>
                         </button>
@@ -608,20 +616,28 @@
     const db = getFirestore(app);
     const dbRef = doc(db, "su_system", "current_db");
 
+    // 滾動效能優化 (RequestAnimationFrame)
     let scrollIdleTimer;
+    let scrollTicking = false;
     const scrollContainerElement = document.getElementById('main-scroll-container');
     const topBtn = document.getElementById('scrollTopBtn');
 
     scrollContainerElement.addEventListener('scroll', () => {
-        if (scrollContainerElement.scrollTop > 300) {
-            topBtn.classList.add('visible');
-            topBtn.classList.remove('idle'); 
-            clearTimeout(scrollIdleTimer);
-            scrollIdleTimer = setTimeout(() => { topBtn.classList.add('idle'); }, 1500);
-        } else {
-            topBtn.classList.remove('visible');
-            topBtn.classList.remove('idle');
-            clearTimeout(scrollIdleTimer);
+        if (!scrollTicking) {
+            window.requestAnimationFrame(() => {
+                if (scrollContainerElement.scrollTop > 300) {
+                    topBtn.classList.add('visible');
+                    topBtn.classList.remove('idle'); 
+                    clearTimeout(scrollIdleTimer);
+                    scrollIdleTimer = setTimeout(() => { topBtn.classList.add('idle'); }, 1500);
+                } else {
+                    topBtn.classList.remove('visible');
+                    topBtn.classList.remove('idle');
+                    clearTimeout(scrollIdleTimer);
+                }
+                scrollTicking = false;
+            });
+            scrollTicking = true;
         }
     });
 
@@ -655,18 +671,16 @@
         }
         return { 
             bg: `hsl(${match.h}, ${match.s}%, ${match.l}%)`, 
-            rowEven: `#FFFFFF`, // 偶數行保持純白
-            rowOdd: `hsla(${match.h}, ${match.s}%, 88%, 1)`, // 奇數行亮度降為 88%，讓顏色明顯區分但不過深
+            rowEven: `#FFFFFF`, 
+            rowOdd: `hsla(${match.h}, ${match.s}%, 88%, 1)`, 
             border: `hsla(${match.h}, ${match.s}%, 65%, 1)`, 
             icon: match.icon 
         };
     }
 
     const defaultDB = [
-        { id: 'def_p1', category: "保護工程", name: "室內地板防護 (防潮布+瓦楞板+木夾板)", unit: "坪", hasDays: false },
-        { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true },
-        { id: 'def_m1', category: "泥作工程", name: "磚牆砌磚 (1/2B)", unit: "坪", hasDays: false },
-        { id: 'def_e1', category: "水電工程", name: "冷熱水管重新配置 (含打石與管材)", unit: "式", hasDays: true }
+        { id: 'def_p1', category: "保護工程", name: "室內地板防護 (防潮布+瓦楞板+木夾板)", unit: "坪", hasDays: false, defaultHideUnit: false },
+        { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true, defaultHideUnit: false }
     ];
 
     let systemCategories = [];
@@ -676,7 +690,6 @@
     let quoteList = [];
     let currentGrandTotal = 0;
     let lastSavedDataStr = ""; 
-    let isSaving = false;
     let saveTimeout = null;
     let isFirstLoad = true;
 
@@ -725,11 +738,10 @@
         updateCategoryUI();
     });
 
+    // 修復頻繁輸入導致的存檔覆蓋卡頓問題 (使用 Debounce 機制替代生硬的 isSaving 防鎖)
     window.saveDBToFirebase = function(immediate = false) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const executeSave = async () => {
-                if (isSaving) return resolve();
-                isSaving = true;
                 try {
                     const cleanItems = JSON.parse(JSON.stringify(engineeringDB, (k, v) => v === undefined ? null : v));
                     const cleanHistory = JSON.parse(JSON.stringify(quoteHistory, (k, v) => v === undefined ? null : v));
@@ -737,26 +749,23 @@
                     
                     const payload = { items: cleanItems, history: cleanHistory, categories: cleanCategories, settings: systemSettings };
                     const currentStr = JSON.stringify(payload);
-                    if (currentStr === lastSavedDataStr) { isSaving = false; return resolve(); }
+                    if (currentStr === lastSavedDataStr) return resolve();
                     
-                    await setDoc(dbRef, payload, { merge: true });
+                    await setDoc(dbRef, JSON.parse(currentStr), { merge: true });
                     lastSavedDataStr = currentStr;
-                    resolve();
                 } catch (e) {
                     console.error("Firebase 寫入雲端失敗：", e);
-                    reject(e);
                 } finally {
-                    isSaving = false;
+                    resolve();
                 }
             };
 
             if (immediate) {
-                if (saveTimeout) clearTimeout(saveTimeout);
+                clearTimeout(saveTimeout);
                 executeSave();
             } else {
-                if (saveTimeout) clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(executeSave, 800);
-                resolve();
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(executeSave, 1000);
             }
         });
     }
@@ -773,15 +782,17 @@
         const nameEl = document.getElementById(`edit-name-${id}`);
         const unitEl = document.getElementById(`edit-unit-${id}`);
         const daysEl = document.getElementById(`edit-days-${id}`);
+        const hideUnitEl = document.getElementById(`edit-hide-unit-${id}`);
         
-        if(!nameEl || !unitEl || !daysEl) return;
+        if(!nameEl || !unitEl || !daysEl || !hideUnitEl) return;
         
         const newName = nameEl.value.trim();
         if(!newName) return alert('項目名稱不可為空！');
         
         engineeringDB[index].name = newName;
-        engineeringDB[index].unit = unitEl.value.trim() || '式';
+        engineeringDB[index].unit = unitEl.value.trim();
         engineeringDB[index].hasDays = daysEl.checked;
+        engineeringDB[index].defaultHideUnit = hideUnitEl.checked;
         
         await window.saveDBToFirebase(true); 
         alert('✅ 項目修改已儲存！');
@@ -899,7 +910,7 @@
                 if(i.discount > 0) optText.push(`折抵$${i.discount}`);
                 let optTag = optText.length > 0 ? `<span style="color:var(--text-muted); font-size:1.1rem; margin-left:10px;">(${optText.join(', ')})</span>` : '';
                 
-                let unitDisplay = i.hideUnit ? '' : i.unit;
+                let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
                 return `
                 <div class="history-item-row">
                     <span style="flex:1;">${i.name} <span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}</span>
@@ -975,7 +986,6 @@
             document.getElementById('tab-back').classList.remove('active');
             document.getElementById('tab-front').classList.add('active');
             
-            // 進入前台時，自動隱藏導覽列，須再次點擊安全帽三次才可進入後台
             document.getElementById('nav-tabs').style.display = 'none';
             
             if(quoteList.length > 0) document.getElementById('floating-cart').style.display = 'flex';
@@ -1031,11 +1041,14 @@
             const isEven = displayIndex % 2 === 0;
             const div = document.createElement('div');
             div.className = 'selectable-item';
-            div.style.background = isEven ? '#FFFFFF' : '#E5E5EA'; // 將奇數行底色改為深灰加深對比
+            div.style.background = isEven ? '#FFFFFF' : '#E5E5EA'; 
+            
+            const unitText = (item.unit && item.unit.trim() !== '') ? `單位: ${item.unit}` : '無單位';
+            
             div.innerHTML = `
                 <div>
                     <div style="font-weight:900; font-size:1.8rem; color: var(--text-main);">${item.name}</div>
-                    <div style="font-size:1.3rem; color:var(--text-muted); margin-top:10px; font-weight:900;">單位: ${item.unit} ${item.hasDays ? '&nbsp; <span style="color:var(--primary);"><i class="fas fa-clock"></i> 天數</span>' : ''}</div>
+                    <div style="font-size:1.3rem; color:var(--text-muted); margin-top:10px; font-weight:900;">${unitText} ${item.hasDays ? '&nbsp; <span style="color:var(--primary);"><i class="fas fa-clock"></i> 天數</span>' : ''}</div>
                 </div>
                 <button class="btn-text" style="background:var(--text-main); color:white; font-size:1.4rem; padding: 16px 30px;"><i class="fas fa-plus"></i> 加入</button>
             `;
@@ -1073,8 +1086,11 @@
 
     window.addItemToQuote = function(dbId) {
         if (quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
+        const dbItem = engineeringDB.find(db => db.id === dbId);
+        const defaultHide = dbItem ? (dbItem.defaultHideUnit || false) : false;
+        
         const newId = 'q_' + Date.now();
-        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: false });
+        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: defaultHide });
         renderFrontView();
         
         setTimeout(() => { 
@@ -1094,12 +1110,15 @@
     window.toggleUnit = function(qId) {
         const target = quoteList.find(q => q.id === qId);
         if (target) {
+            const dbItem = engineeringDB.find(db => db.id === target.dbId);
+            const hasUnit = dbItem && dbItem.unit && dbItem.unit.trim() !== '';
+            if (!hasUnit) return; 
+            
             target.hideUnit = !target.hideUnit;
             const unitSpan = document.getElementById(`unit-display-${qId}`);
             const eyeIcon = document.getElementById(`unit-toggle-icon-${qId}`);
             if (unitSpan && eyeIcon) {
-                const dbItem = engineeringDB.find(db => db.id === target.dbId);
-                unitSpan.innerText = target.hideUnit ? '' : (dbItem ? dbItem.unit : '');
+                unitSpan.innerText = target.hideUnit ? '' : dbItem.unit;
                 eyeIcon.className = `fas ${target.hideUnit ? 'fa-eye-slash' : 'fa-eye'}`;
                 eyeIcon.style.color = target.hideUnit ? 'var(--text-muted)' : 'var(--primary)';
             }
@@ -1208,7 +1227,7 @@
                 const row = document.createElement('div');
                 row.className = 'quote-item-row';
                 row.id = `quote-row-${q.id}`; 
-                // 偶數行為白底，奇數行為稍微調亮的主題底漆色彩
+                
                 row.style.background = isEven ? style.rowEven : style.rowOdd;
                 row.style.borderLeft = `8px solid ${style.border}`; 
                 isEven = !isEven;
@@ -1223,9 +1242,19 @@
                         </div>
                     </div>` : `<div style="text-align:center; font-size:2.4rem; color:#A1A1A6; font-weight:900; width: 100%;"> - </div>`;
 
+                const hasUnit = db.unit && db.unit.trim() !== '';
+                const hideUnitDisplay = q.hideUnit || !hasUnit;
                 const eyeColor = q.hideUnit ? 'var(--text-muted)' : 'var(--primary)';
                 const eyeClass = q.hideUnit ? 'fa-eye-slash' : 'fa-eye';
-                const unitStr = q.hideUnit ? '' : db.unit;
+                const unitStr = hideUnitDisplay ? '' : db.unit;
+                
+                // 如果後台單位留白，就不顯示單位與眼睛切換圖示
+                const toggleBtnHtml = hasUnit ? `
+                    <button onclick="toggleUnit('${q.id}')">
+                        <i id="unit-toggle-icon-${q.id}" class="fas ${eyeClass}" style="color:${eyeColor}; font-size:1.2rem;"></i>
+                    </button>
+                ` : '';
+
                 const discountVal = q.discount > 0 ? q.discount : 0;
 
                 row.innerHTML = `
@@ -1247,9 +1276,7 @@
                             <button class="qty-btn" onclick="changeQuoteQty('${q.id}', 'qty', 1)"><i class="fas fa-plus"></i></button>
                             <div class="unit-box">
                                 <span id="unit-display-${q.id}">${unitStr}</span>
-                                <button onclick="toggleUnit('${q.id}')">
-                                    <i id="unit-toggle-icon-${q.id}" class="fas ${eyeClass}" style="color:${eyeColor}; font-size:1.2rem;"></i>
-                                </button>
+                                ${toggleBtnHtml}
                             </div>
                         </div>
                     </div>
@@ -1328,8 +1355,9 @@
                     row.className = 'admin-row';
                     row.innerHTML = `
                         <div class="admin-col"><label>項目名稱</label><input type="text" id="edit-name-${item.id}" value="${item.name}"></div>
-                        <div class="admin-col"><label>單位</label><input type="text" id="edit-unit-${item.id}" value="${item.unit}"></div>
+                        <div class="admin-col"><label>單位</label><input type="text" id="edit-unit-${item.id}" value="${item.unit || ''}" placeholder="不填則不顯示"></div>
                         <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0;"><input type="checkbox" id="edit-days-${item.id}" style="width:24px; height:24px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''}> 啟用天數</label></div>
+                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0;"><input type="checkbox" id="edit-hide-unit-${item.id}" style="width:24px; height:24px; accent-color:var(--primary);" ${item.defaultHideUnit ? 'checked' : ''}> 隱藏單位</label></div>
                         <div class="admin-col admin-actions">
                             <button class="btn-text" style="background:var(--primary); color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="updateItem('${item.id}')"><i class="fas fa-save"></i> 儲存</button>
                             <button class="btn-text" style="background:#FF3B30; color:white; border-radius:12px; font-size:1.1rem; padding: 14px;" onclick="deleteItem('${item.id}')"><i class="fas fa-trash"></i> 刪除</button>
@@ -1356,8 +1384,9 @@
             id: newId, 
             category: catValue, 
             name: nameValue, 
-            unit: document.getElementById('new-item-unit').value.trim() || '式', 
-            hasDays: document.getElementById('new-item-has-days').checked 
+            unit: document.getElementById('new-item-unit').value.trim(), 
+            hasDays: document.getElementById('new-item-has-days').checked,
+            defaultHideUnit: document.getElementById('new-item-hide-unit').checked 
         });
         
         await window.saveDBToFirebase(true); 
@@ -1400,7 +1429,7 @@
             cell.border = { top: {style:'medium'}, left: {style:'medium'}, bottom: {style:'medium'}, right: {style:'medium'} };
         });
         engineeringDB.forEach(item => {
-            ws.addRow({ category: item.category, name: item.name, unit: item.unit, hasDays: item.hasDays ? 'TRUE' : 'FALSE' });
+            ws.addRow({ category: item.category, name: item.name, unit: item.unit || '', hasDays: item.hasDays ? 'TRUE' : 'FALSE' });
         });
 
         const ws2 = workbook.addWorksheet('系統分類管理');
@@ -1462,8 +1491,9 @@
                         id: 'id_' + Date.now() + Math.random().toString(36).substr(2, 5),
                         category: catCell || '未分類',
                         name: nameCell || '未命名',
-                        unit: unitCell || '式',
-                        hasDays: String(hasDaysCell).toUpperCase() === 'TRUE' || hasDaysCell === '1' || hasDaysCell === '是'
+                        unit: unitCell || '',
+                        hasDays: String(hasDaysCell).toUpperCase() === 'TRUE' || hasDaysCell === '1' || hasDaysCell === '是',
+                        defaultHideUnit: false
                     });
                 });
 
@@ -1531,16 +1561,17 @@
             return dbA.category === dbB.category ? dbA.name.localeCompare(dbB.name) : dbA.category.localeCompare(dbB.category);
         });
 
-        // 每一行都顯示完整的工程類別
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
             let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
             
             const displayCat = dbItem.category; 
-            
             const bg = isEvenRow ? '#FFFFFF' : '#F2F2F7'; isEvenRow = !isEvenRow;
             
-            const unitDisplay = qItem.hideUnit ? '' : ` ${dbItem.unit}`;
+            const hasUnit = dbItem.unit && dbItem.unit.trim() !== '';
+            const hideUnitDisplay = qItem.hideUnit || !hasUnit;
+            const unitDisplay = hideUnitDisplay ? '' : ` ${dbItem.unit}`;
+            
             const discountBadge = (qItem.discount && qItem.discount > 0) ? `<br><span style="display:inline-block; margin-top:6px; background:#FFF0F0; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:14px; font-weight:900; border:1px solid rgba(255,59,48,0.2);">✨ 優惠折抵: -$${qItem.discount.toLocaleString()}</span>` : '';
 
             tbody += `<tr style="background-color: ${bg}; border-bottom: 2px solid #E5E5EA;">
@@ -1581,7 +1612,6 @@
                 .r-header h1 { font-size: 46px; margin: 0 0 14px 0; color: #1C1C1E; font-weight: 900; letter-spacing: 4px; }
                 .r-info { display: flex; justify-content: space-between; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 35px; }
                 table { width: 100%; border-collapse: collapse; text-align: center; font-size: 18px; border: 4px solid #1C1C1E; table-layout: auto; }
-                /* 加入 white-space: nowrap 防止移動裝置在欄位名稱換行 */
                 th { background: #1C1C1E; color: white; padding: 20px; border: 4px solid #1C1C1E; font-size: 22px; font-weight: 900; white-space: nowrap; }
                 td { border: 2.5px solid #C7C7CC; }
                 td:nth-child(1), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6) { white-space: nowrap; }
@@ -1711,12 +1741,13 @@
         });
 
         let isEvenRow = true;
-        // 每一行都顯示完整的工程類別
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
             let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
             
-            const unitStr = qItem.hideUnit ? `${qItem.qty}` : `${qItem.qty} ${dbItem.unit}`;
+            const hasUnit = dbItem.unit && dbItem.unit.trim() !== '';
+            const hideUnitDisplay = qItem.hideUnit || !hasUnit;
+            const unitStr = hideUnitDisplay ? `${qItem.qty}` : `${qItem.qty} ${dbItem.unit}`;
             
             let itemNameText = dbItem.name;
             if (qItem.discount && qItem.discount > 0) {
