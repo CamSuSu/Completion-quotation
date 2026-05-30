@@ -1020,7 +1020,10 @@
             <div style="padding: 12px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 16px; font-weight:900; font-size:1.1rem; color:var(--text-main);">
                     <div style="font-size: 1.4rem;">客戶：${record.client}</div>
-                    <div style="text-align:right; color: #3A3A3C; font-size: 1rem;">單號：${record.quoteNo || ''}<br>日期：${record.date.replace(/-/g, '/')}</div>
+                    <div style="display:flex; flex-direction:column; gap:4px; text-align:left; color:#3A3A3C; font-size:1rem;">
+                        <div>單號：${record.quoteNo || ''}</div>
+                        <div>日期：${record.date.replace(/-/g, '/')}</div>
+                    </div>
                 </div>
                 
                 <div class="table-responsive-wrapper" style="margin-bottom: 20px; padding-bottom: 0;">
@@ -1891,7 +1894,10 @@
                 ${headerHtml}
                 <div class="r-info">
                     <div>客戶名稱：${clientName}</div>
-                    <div style="text-align: right;">報價單號：${currentQuoteNo}<br>報價日期：${dateStr}</div>
+                    <div style="display:flex; flex-direction:column; gap:6px; text-align:left;">
+                        <div>報價單號：${currentQuoteNo}</div>
+                        <div>報價日期：${dateStr}</div>
+                    </div>
                 </div>
                 <table>
                     <thead><tr><th>工程類別</th><th style="text-align:left;">工程項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
@@ -1972,14 +1978,29 @@
             ws.addRow([]); 
         }
 
-        ws.addRow([]); ws.mergeCells('A4:D4'); ws.mergeCells('E4:G4');
-        ws.getCell('A4').value = `客戶名稱：${clientName}`; ws.getCell('A4').font = { name: '微軟正黑體', size: 15, bold: true };
-        
-        const d = new Date();
-        ws.getCell('E4').value = `報價單號：${currentQuoteNo}     報價日期：${d.toLocaleDateString('zh-TW')}`; 
-        ws.getCell('E4').font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell('E4').alignment = { horizontal: 'right' };
         ws.addRow([]); 
+        
+        // 將資訊拆分為兩列，確保 Excel 內垂直並排且不會被截斷
+        const infoRow1 = ws.addRow([]);
+        const infoRow2 = ws.addRow([]);
+        
+        ws.mergeCells(`A${infoRow1.number}:D${infoRow2.number}`);
+        ws.getCell(`A${infoRow1.number}`).value = `客戶名稱：${clientName}`; 
+        ws.getCell(`A${infoRow1.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+        ws.getCell(`A${infoRow1.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+
+        ws.mergeCells(`E${infoRow1.number}:F${infoRow1.number}`);
+        ws.getCell(`E${infoRow1.number}`).value = `報價單號：${currentQuoteNo}`;
+        ws.getCell(`E${infoRow1.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+        ws.getCell(`E${infoRow1.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+
+        const d = new Date();
+        ws.mergeCells(`E${infoRow2.number}:F${infoRow2.number}`);
+        ws.getCell(`E${infoRow2.number}`).value = `報價日期：${d.toLocaleDateString('zh-TW')}`;
+        ws.getCell(`E${infoRow2.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+        ws.getCell(`E${infoRow2.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+
+        ws.addRow([]);
 
         const headerRow = ws.addRow(['工程類別', '工程項目明細', '單價', '數量', '天數', '項目小計']);
         headerRow.height = 42;
