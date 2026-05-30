@@ -1029,7 +1029,7 @@
                     <table class="detail-table" style="width:100%; border-collapse: collapse; text-align:center; border: 3px solid #1C1C1E; font-size: 1.15rem; background: white;">
                         <thead>
                             <tr style="background:#1C1C1E; color:white;">
-                                <th style="padding:14px; border: 2px solid #1C1C1E;">工程類別</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E;">類別</th>
                                 <th style="padding:14px; border: 2px solid #1C1C1E; text-align:left;">工程項目明細</th>
                                 <th style="padding:14px; border: 2px solid #1C1C1E;">單價</th>
                                 <th style="padding:14px; border: 2px solid #1C1C1E;">數量</th>
@@ -1119,7 +1119,7 @@
             { header: '時間', key: 'time', width: 15 },
             { header: '客戶名稱', key: 'client', width: 20 },
             { header: '總金額', key: 'total', width: 15 },
-            { header: '工程類別', key: 'cat', width: 20 },
+            { header: '類別', key: 'cat', width: 20 },
             { header: '項目名稱', key: 'name', width: 40 },
             { header: '單價', key: 'price', width: 15 },
             { header: '數量', key: 'qty', width: 10 },
@@ -1919,7 +1919,7 @@
         ws.getCell('E4').alignment = { horizontal: 'right' };
         ws.addRow([]); 
 
-        const headerRow = ws.addRow(['工程類別', '工程項目明細', '單價', '數量', '天數', '項目小計']);
+        const headerRow = ws.addRow(['類別', '工程項目明細', '單價', '數量', '天數', '項目小計']);
         headerRow.height = 42;
         headerRow.eachCell((cell) => {
             cell.font = { name: '微軟正黑體', bold: true, size: 15, color: { argb: 'FFFFFFFF' } }; 
