@@ -194,7 +194,7 @@
         .delete-btn { flex-shrink: 0; background: rgba(255, 59, 48, 0.1); color: var(--danger); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.7rem; cursor: pointer; transition: all 0.2s; margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.05); }
 
-        /* 新版導覽列架構 - 解決 iOS 安全邊距對齊漂移問題 */
+        /* 全新導覽列架構 - 解決 iOS 安全邊距與「偏下對齊」問題 */
         .bottom-bar-fixed {
             position: absolute; /* 完美服貼 100dvh body 底部 */
             bottom: 0; left: 0; right: 0; width: 100%;
@@ -207,21 +207,27 @@
         }
         
         .bottom-bar-inner {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 24px; /* 內層處理實際元素對齊，不受 safe-area 影響 */
+            display: flex; justify-content: space-between; align-items: flex-end; /* 將內容強勢靠下對齊 */
+            padding: 12px 24px 8px 24px; /* 透過較小的底部 padding 讓視覺完美偏下 */
+            min-height: 70px;
         }
 
         .bottom-left { display: flex; justify-content: flex-start; gap: 14px; align-items: center; }
-        .bottom-center { flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: center; gap: 16px; margin-bottom: 0; padding-right: 30px; }
+        
+        .bottom-center { 
+            flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: baseline; /* 讓「總計」與金額底線對齊 */
+            gap: 20px; /* 大幅拉開「總計」與金額的距離 */
+            margin-bottom: 0; padding-right: 15px; padding-bottom: 2px;
+        }
 
         .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
         .action-btn-label { font-size: 0.85rem; font-weight: 900; color: #8E8E93; line-height: 1; }
 
-        /* 完工總計字樣調整 */
-        .bottom-total-label { font-size: 1.4rem; color: #1C1C1E; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+        /* 總計與金額全新設定 */
+        .bottom-total-label { font-size: 1.8rem; color: #1C1C1E; font-weight: 900; letter-spacing: 2px; margin: 0; }
         
         .bottom-total-amount { 
-            font-size: 3.2rem; font-weight: 900; color: #FF3B30; 
+            font-size: 3.4rem; font-weight: 900; color: #FF3B30; 
             letter-spacing: -1px; font-family: "Arial", sans-serif; 
             display: flex; align-items: baseline; gap: 8px; line-height: 1; 
             transition: transform 0.2s; margin: 0;
@@ -233,7 +239,7 @@
             100% { transform: scale(1); color: #FF3B30; } 
         }
 
-        .bottom-total-amount .currency { font-size: 1.4rem; color: #8E8E93; font-weight: 900; filter: none; letter-spacing: 0; }
+        .bottom-total-amount .currency { font-size: 1.6rem; color: #8E8E93; font-weight: 900; filter: none; letter-spacing: 0; }
         
         .action-circle-btn {
             width: 48px; height: 48px; border-radius: 50%;
@@ -288,8 +294,15 @@
         .collapsed-body { display: none !important; }
         .toggle-icon { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        .history-card { background: white; border: 3px solid rgba(0,0,0,0.04); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .history-card { background: white; border: 3px solid rgba(0,0,0,0.04); border-radius: var(--radius-lg); padding: 28px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: transform 0.2s; }
         .history-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+        .history-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #F2F2F7; padding-bottom: 24px; margin-bottom: 24px; }
+        .history-client { font-weight: 900; font-size: 1.9rem; color: var(--text-main); display: flex; align-items: center; }
+        .history-time { font-size: 1.25rem; color: var(--text-muted); font-weight: 900; margin-top: 8px; }
+        .history-total { font-weight: 900; font-size: 2.6rem; color: var(--danger); letter-spacing: -0.5px; font-family: "Arial", sans-serif; }
+        
+        .history-item-row { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; color: var(--text-main); padding: 12px 0; border-bottom: 2px dashed rgba(0,0,0,0.08); }
+        .history-item-row:last-child { border-bottom: none; }
 
         @media (max-width: 900px) {
             .hide-mobile { display: none !important; }
@@ -349,16 +362,16 @@
             .admin-actions { flex-direction: row; gap: 10px; }
             .admin-actions button { flex: 1; }
             
-            /* 將手機版 padding 調小 (厚度變窄) */
+            /* 將手機版底部欄位壓到偏下方 */
             .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
-            .bottom-bar-inner { padding: 10px 16px; }
+            .bottom-bar-inner { padding: 10px 16px 6px 16px; min-height: 65px; }
             
             .action-btn-label { font-size: 0.85rem; }
-            .bottom-total-label { font-size: 1.3rem; }
-            .bottom-total-amount { font-size: 2.8rem; gap: 6px; }
-            .bottom-total-amount .currency { font-size: 1.3rem; }
+            .bottom-total-label { font-size: 1.6rem; }
+            .bottom-total-amount { font-size: 3rem; gap: 8px; }
+            .bottom-total-amount .currency { font-size: 1.4rem; }
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.3rem; }
-            .bottom-center { gap: 12px; padding-right: 20px; }
+            .bottom-center { gap: 16px; padding-right: 10px; }
             
             #scrollTopBtn { bottom: 120px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
@@ -369,9 +382,9 @@
             .selectable-item { flex-direction: column; gap: 16px; padding: 20px; align-items: flex-start; }
             .selectable-item button { width: 100%; height: 50px; }
             
-            .history-card { padding: 16px; }
+            .history-card { padding: 20px; }
             .history-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .history-card-header > div:last-child { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 10px; text-align: left !important; }
+            .history-card-header > div:last-child { width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end; margin-top: 10px; text-align: left !important; }
         }
     </style>
 </head>
@@ -601,7 +614,7 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="history-modal">
+<div class="modal-overlay" id="history-modal" style="z-index: 2000;">
     <div class="modal-content" style="max-width: 900px;">
         <div class="modal-header">
             <h3><i class="fas fa-history" style="color: var(--primary);"></i> 歷史報價紀錄</h3>
@@ -614,6 +627,17 @@
             </div>
             <div id="history-list-container"></div>
         </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="history-detail-modal" style="z-index: 2100;">
+    <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-file-invoice-dollar" style="color: var(--primary);"></i> 報價詳細明細</h3>
+            <button class="close-modal" onclick="closeModal('history-detail-modal')"><i class="fas fa-times-circle"></i></button>
+        </div>
+        <div class="modal-body" id="history-detail-content" style="padding: 0;">
+            </div>
     </div>
 </div>
 
@@ -634,7 +658,6 @@
     const db = getFirestore(app);
     const dbRef = doc(db, "su_system", "current_db");
 
-    // 滾動效能優化 (RequestAnimationFrame)
     let scrollIdleTimer;
     let scrollTicking = false;
     const scrollContainerElement = document.getElementById('main-scroll-container');
@@ -723,7 +746,7 @@
             systemCategories = data.categories || Array.from(new Set(engineeringDB.map(item => item.category)));
             systemSettings = data.settings || { defaultShowTitle: true };
             
-            // 首載入時檢查是否需要匯入預設的 3.jpg 大里 報價紀錄
+            // 首載入時自動注入 3.jpg 展示用報價紀錄
             let hasDali = quoteHistory.some(h => h.quoteNo === '20260529-001');
             if (!hasDali) {
                 quoteHistory.push({
@@ -938,102 +961,105 @@
         });
     };
 
-    // 展開歷史紀錄明細用
-    window.toggleHistoryDetail = function(id) {
-        const detailDiv = document.getElementById(`detail-${id}`);
-        const icon = document.getElementById(`icon-${id}`);
-        if (detailDiv.style.display === 'none') {
-            detailDiv.style.display = 'block';
-            icon.className = 'fas fa-minus-circle';
-            icon.style.color = 'var(--danger)';
-            icon.style.transform = 'rotate(180deg)';
-        } else {
-            detailDiv.style.display = 'none';
-            icon.className = 'fas fa-plus-circle';
-            icon.style.color = 'var(--primary)';
-            icon.style.transform = 'rotate(0deg)';
-        }
+    /* 新增：開啟進階明細圖表 (如 3.jpg 樣式) */
+    window.openHistoryDetail = function(id) {
+        const record = quoteHistory.find(q => q.id === id);
+        if(!record) return;
+        
+        let rowsHtml = record.items.map((i, idx) => {
+            let sub = Math.max(0, (i.price * i.qty * (i.days || 1)) - (i.discount || 0));
+            let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
+            let daysDisplay = i.days ? `${i.days}` : '-';
+            let optText = [];
+            if(i.discount > 0) optText.push(`(折抵$${i.discount})`);
+            let optTag = optText.length > 0 ? `<br><span style="color:var(--danger); font-size:0.95rem;">${optText.join(' ')}</span>` : '';
+            
+            let bg = idx % 2 === 0 ? '#FFFFFF' : '#F9F9FB';
+            let catColor = i.cat.includes('油漆') ? '#007AFF' : '#0A7AFF'; // 依附圖呈現些微變化
+            
+            return `
+            <tr style="background:${bg}; border-bottom: 1px solid #E5E5EA;">
+                <td style="padding:14px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900;">${i.cat}</td>
+                <td style="padding:14px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main);">${i.name}${optTag}</td>
+                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.price.toLocaleString()}</td>
+                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.qty}${unitDisplay}</td>
+                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${daysDisplay}</td>
+                <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${sub.toLocaleString()}</td>
+            </tr>`;
+        }).join('');
+        
+        document.getElementById('history-detail-content').innerHTML = `
+            <div style="padding: 24px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom: 20px; font-weight:900; font-size:1.2rem; color:var(--text-main);">
+                    <div style="font-size: 1.6rem;">客戶名稱：${record.client}</div>
+                    <div style="text-align:right; color: #3A3A3C;">報價單號：${record.quoteNo || ''}<br>報價日期：${record.date.replace(/-/g, '/')}</div>
+                </div>
+                
+                <div class="table-responsive-wrapper" style="margin-bottom: 24px; padding-bottom: 0;">
+                    <table style="width:100%; border-collapse: collapse; text-align:center; border: 3px solid #1C1C1E; font-size: 1.15rem; min-width: 600px; background: white;">
+                        <thead>
+                            <tr style="background:#1C1C1E; color:white;">
+                                <th style="padding:14px; border: 2px solid #1C1C1E;">工程類別</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E; text-align:left;">工程項目明細</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E;">單價</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E;">數量</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E;">天數</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E;">項目小計</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                </div>
+                
+                <div style="text-align:right; font-size: 2.2rem; font-weight:900; color:var(--danger); margin-bottom: 10px; font-family: 'Arial', sans-serif; letter-spacing: -0.5px;">
+                    總計金額：NT$ ${record.total.toLocaleString()}
+                </div>
+            </div>
+        `;
+        openModal('history-detail-modal');
     };
 
+    /* 還原先前的清單顯示方式，並整合「+ 詳細明細」按鈕 */
     window.buildHistoryHTML = function(records, isAdmin) {
         if(records.length === 0) return '<div style="text-align:center; color:#8E8E93; padding:60px; font-weight:900; font-size:1.6rem; border:3px dashed var(--border-light); border-radius:var(--radius-lg);">目前尚無紀錄</div>';
         
         return records.map(r => {
-            let isEven = true;
-            let rowsHtml = r.items.map(i => {
+            let itemsHtml = r.items.map(i => {
                 let sub = Math.max(0, (i.price * i.qty * (i.days || 1)) - (i.discount || 0));
                 let optText = [];
-                if(i.discount > 0) optText.push(`(折抵$${i.discount})`);
-                let optTag = optText.length > 0 ? `<br><span style="color:var(--danger); font-size:0.95rem;">${optText.join(' ')}</span>` : '';
+                if(i.days) optText.push(`${i.days}天`);
+                if(i.discount > 0) optText.push(`折抵$${i.discount}`);
+                let optTag = optText.length > 0 ? `<span style="color:var(--text-muted); font-size:1.1rem; margin-left:10px;">(${optText.join(', ')})</span>` : '';
                 
                 let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
-                let daysDisplay = i.days ? `${i.days}` : '-';
-                
-                let catColor = '#0A7AFF'; // 預設藍
-                if (i.cat.includes('油漆')) catColor = '#007AFF'; // 稍微區分色調配合 3.jpg
-                
-                let bg = isEven ? '#FFFFFF' : '#F9F9FB';
-                isEven = !isEven;
-
                 return `
-                <tr style="background:${bg}; border-bottom: 1px solid #E5E5EA;">
-                    <td style="padding:14px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900;">${i.cat}</td>
-                    <td style="padding:14px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main);">${i.name}${optTag}</td>
-                    <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.price.toLocaleString()}</td>
-                    <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${i.qty}${unitDisplay}</td>
-                    <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${daysDisplay}</td>
-                    <td style="padding:14px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main);">${sub.toLocaleString()}</td>
-                </tr>`;
+                <div class="history-item-row">
+                    <span style="flex:1;">${i.name} <span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}</span>
+                    <span>$${sub.toLocaleString()}</span>
+                </div>`;
             }).join('');
 
-            let delBtn = isAdmin ? `<button onclick="deleteHistoryRecord('${r.id}')" style="margin-top: 15px; background:#FF3B30; color:white; border:none; padding:12px 24px; border-radius:12px; cursor:pointer; font-weight:900; transition:all 0.2s; font-size:1.1rem;"><i class="fas fa-trash"></i> 刪除此筆紀錄</button>` : '';
+            let delBtn = isAdmin ? `<button onclick="deleteHistoryRecord('${r.id}')" style="background:#FF3B30; color:white; border:none; padding:10px 18px; border-radius:12px; cursor:pointer; font-weight:900; transition:all 0.2s; font-size:1.1rem;"><i class="fas fa-trash"></i> 刪除</button>` : '';
+            let quoteBadge = r.quoteNo ? `<span style="margin-left:12px; padding:4px 10px; background:var(--primary); color:white; border-radius:8px; font-size:1.1rem;">#${r.quoteNo}</span>` : '';
 
             return `
-            <div class="history-card" style="padding: 24px;">
-                <div class="history-card-header" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; margin: 0; border: none; padding: 0;" onclick="toggleHistoryDetail('${r.id}')">
-                    <div style="display:flex; align-items:center; gap: 12px;">
-                        <i id="icon-${r.id}" class="fas fa-plus-circle" style="color:var(--primary); font-size:2rem; transition: transform 0.3s;"></i>
-                        <div>
-                            <div style="font-size:1.6rem; font-weight:900; color:var(--text-main);">客戶名稱：${r.client}</div>
-                            <div style="color:var(--text-muted); font-size:1.1rem; font-weight:900; margin-top:4px;">${r.date.replace(/-/g, '/')}</div>
+            <div class="history-card">
+                <div class="history-card-header">
+                    <div>
+                        <div class="history-client"><i class="fas fa-user-circle" style="color:var(--primary); margin-right:12px;"></i>${r.client}</div>
+                        <div class="history-time">${r.date} ${r.time} ${quoteBadge}</div>
+                    </div>
+                    <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end;">
+                        <div class="history-total">$${r.total.toLocaleString()}</div>
+                        <div style="display:flex; gap: 8px; margin-top: 12px;">
+                            <button onclick="openHistoryDetail('${r.id}')" style="background:#EBF4FF; color:var(--primary); border:2px solid rgba(10,122,255,0.3); padding:10px 16px; border-radius:12px; cursor:pointer; font-weight:900; font-size:1.1rem; transition:all 0.2s;">
+                                <i class="fas fa-plus"></i> 詳細明細
+                            </button>
+                            ${delBtn}
                         </div>
                     </div>
-                    <div style="text-align:right; font-size:1.8rem; font-weight:900; color:var(--text-main);">
-                        $${r.total.toLocaleString()}
-                    </div>
                 </div>
-                
-                <div id="detail-${r.id}" class="history-detail-container" style="display:none; padding-top: 24px; border-top: 2px dashed #E5E5EA; margin-top: 20px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 20px; font-weight:900; font-size:1.2rem; color:var(--text-main);">
-                        <div style="font-size: 1.4rem;">客戶名稱：${r.client}</div>
-                        <div style="text-align:right; color: #3A3A3C;">報價單號：${r.quoteNo || ''}<br>報價日期：${r.date.replace(/-/g, '/')}</div>
-                    </div>
-                    
-                    <div class="table-responsive-wrapper" style="margin-bottom: 24px; padding-bottom: 0;">
-                        <table style="width:100%; border-collapse: collapse; text-align:center; border: 3px solid #1C1C1E; font-size: 1.15rem; min-width: 600px; background: white;">
-                            <thead>
-                                <tr style="background:#1C1C1E; color:white;">
-                                    <th style="padding:14px; border: 2px solid #1C1C1E;">工程類別</th>
-                                    <th style="padding:14px; border: 2px solid #1C1C1E; text-align:left;">工程項目明細</th>
-                                    <th style="padding:14px; border: 2px solid #1C1C1E;">單價</th>
-                                    <th style="padding:14px; border: 2px solid #1C1C1E;">數量</th>
-                                    <th style="padding:14px; border: 2px solid #1C1C1E;">天數</th>
-                                    <th style="padding:14px; border: 2px solid #1C1C1E;">項目小計</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHtml}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div style="text-align:right; font-size: 2.2rem; font-weight:900; color:var(--danger); margin-bottom: 10px; font-family: 'Arial', sans-serif; letter-spacing: -0.5px;">
-                        總計金額：NT$ ${r.total.toLocaleString()}
-                    </div>
-                    <div style="text-align:right;">
-                        ${delBtn}
-                    </div>
-                </div>
+                <div>${itemsHtml}</div>
             </div>`;
         }).join('');
     };
