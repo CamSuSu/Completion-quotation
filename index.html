@@ -1131,7 +1131,7 @@
                 { header: '時間', key: 'time', width: 12 },
                 { header: '客戶名稱', key: 'client', width: 18 },
                 { header: '總金額', key: 'total', width: 15 },
-                { header: '工程類別', key: 'cat', width: 18 },
+                { header: '類別', key: 'cat', width: 18 },
                 { header: '項目名稱', key: 'name', width: 35 },
                 { header: '單價', key: 'price', width: 12 },
                 { header: '數量', key: 'qty', width: 10 },
@@ -1900,7 +1900,7 @@
                     </div>
                 </div>
                 <table>
-                    <thead><tr><th>工程類別</th><th style="text-align:left;">工程項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
+                    <thead><tr><th>類別</th><th style="text-align:left;">項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
                     <tbody>${tbody}</tbody>
                 </table>
                 <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
@@ -2002,7 +2002,7 @@
 
         ws.addRow([]);
 
-        const headerRow = ws.addRow(['工程類別', '工程項目明細', '單價', '數量', '天數', '項目小計']);
+        const headerRow = ws.addRow(['類別', '項目明細', '單價', '數量', '天數', '項目小計']);
         headerRow.height = 42;
         headerRow.eachCell((cell) => {
             cell.font = { name: '微軟正黑體', bold: true, size: 15, color: { argb: 'FFFFFFFF' } }; 
