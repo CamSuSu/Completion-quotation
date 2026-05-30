@@ -1030,7 +1030,7 @@
                         <thead>
                             <tr style="background:#1C1C1E; color:white;">
                                 <th style="padding:14px; border: 2px solid #1C1C1E;">類別</th>
-                                <th style="padding:14px; border: 2px solid #1C1C1E; text-align:left;">工程項目明細</th>
+                                <th style="padding:14px; border: 2px solid #1C1C1E; text-align:left;">項目明細</th>
                                 <th style="padding:14px; border: 2px solid #1C1C1E;">單價</th>
                                 <th style="padding:14px; border: 2px solid #1C1C1E;">數量</th>
                                 <th style="padding:14px; border: 2px solid #1C1C1E;">天數</th>
@@ -1919,7 +1919,7 @@
         ws.getCell('E4').alignment = { horizontal: 'right' };
         ws.addRow([]); 
 
-        const headerRow = ws.addRow(['類別', '工程項目明細', '單價', '數量', '天數', '項目小計']);
+        const headerRow = ws.addRow(['類別', '項目明細', '單價', '數量', '天數', '項目小計']);
         headerRow.height = 42;
         headerRow.eachCell((cell) => {
             cell.font = { name: '微軟正黑體', bold: true, size: 15, color: { argb: 'FFFFFFFF' } }; 
