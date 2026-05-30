@@ -349,14 +349,34 @@
             .admin-actions button { flex: 1; }
             
             .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
-            .bottom-bar-inner { padding: 8px 16px 8px 16px; min-height: 70px; }
+            .bottom-bar-inner { padding: 8px 16px 8px 16px; min-height: 70px; align-items: center; } /* 確保左右兩側按鈕垂直置中 */
             
             .action-btn-label { font-size: 0.85rem; }
-            .bottom-total-label { font-size: 1.4rem; }
-            .bottom-total-amount { font-size: 3.2rem; gap: 10px; }
-            .bottom-total-amount .currency { font-size: 1.4rem; }
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.3rem; }
-            .bottom-center { gap: 14px; padding-right: 8px; }
+            
+            /* --- 修改開始：總計與金額排版重構 (手機版) --- */
+            .bottom-center { 
+                flex-direction: column; /* 讓總計與金額改為上下排列 */
+                align-items: flex-end;  /* 靠右對齊 */
+                justify-content: center; 
+                gap: 4px;               /* 縮小上下間距 */
+                padding-right: 4px; 
+            }
+            .bottom-total-label { 
+                font-size: 1.15rem;     /* 總計字體縮小 */
+                color: #8E8E93;         /* 顏色調淡，把視覺焦點留給金額 */
+                line-height: 1; 
+            }
+            .bottom-total-amount { 
+                font-size: 2.2rem;      /* 金額字體縮小，就算破百萬也不跑版 */
+                gap: 6px; 
+                line-height: 1;
+            }
+            .bottom-total-amount .currency { 
+                font-size: 1.2rem;      /* NT$ 符號隨之縮小 */
+                margin-bottom: 0; 
+            }
+            /* --- 修改結束 --- */
             
             #scrollTopBtn { bottom: 120px; right: 12px; width: 44px; height: 44px; font-size: 1.2rem; border-radius: 22px; }
             
