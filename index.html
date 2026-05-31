@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>劉氏工程 報價系統</title>
     
     <link rel="manifest" href="manifest.json">
@@ -36,13 +36,19 @@
         
         body { 
             background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 0; 
-            height: 100svh; width: 100vw; overflow: hidden; position: relative; -webkit-font-smoothing: antialiased; 
+            height: 100%; min-height: 100vh; width: 100vw; overflow: hidden; position: relative; -webkit-font-smoothing: antialiased; 
             background-image: radial-gradient(circle at top right, #FFFFFF, transparent 500px);
             overscroll-behavior: none;
         }
+
+        html {
+            height: 100%;
+            /* 確保 html 層級也撐滿，避免 PWA 模式底部安全區域失效 */
+        }
         
         #main-scroll-container { 
-            position: absolute; inset: 0; width: 100%; height: 100%; 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
             overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; 
         }
 
@@ -205,7 +211,7 @@
         .delete-btn { flex-shrink: 0; background: rgba(255, 59, 48, 0.08); color: var(--danger); width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.8rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.1); box-shadow: 0 8px 20px rgba(255,59,48,0.3); }
 
-        /* 全域底部導覽列優化：電腦版置中 */
+        /* 全域底部導覽列：使用 fixed + 獨立合成層，完全隔離於內容排版之外 */
         .bottom-bar-fixed {
             position: fixed;
             bottom: 0; 
@@ -217,17 +223,21 @@
             -webkit-backdrop-filter: blur(40px);
             border-top: 1px solid rgba(0,0,0,0.05); 
             z-index: 1500;
-            /* 使用 svh 為基礎的 bottom，確保不隨虛擬鍵盤位移 */
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+            /* 核心修正：用 padding-bottom 吸收 iOS/Android PWA 的底部安全區域
+               使用 max() 確保 PWA standalone 模式下 env() 正確生效 */
+            padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06);
-            /* will-change 讓瀏覽器預先在獨立合成層處理此元素，防止鍵盤彈出時重排抖動 */
-            will-change: transform;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
+            /* 強制獨立 GPU 合成層，防止任何子元素動畫觸發父層重排 */
+            isolation: isolate;
+            contain: layout style;
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
         
         .bottom-bar-inner {
-            display: flex; justify-content: space-between; align-items: center; /* 垂直置中 */
+            display: flex; justify-content: space-between; align-items: center;
             padding: 12px 28px;
             min-height: 75px;
         }
@@ -235,7 +245,7 @@
         .bottom-left { display: flex; justify-content: flex-start; gap: 16px; align-items: center; margin-bottom: 0; height: 100%; }
         
         .bottom-center { 
-            flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: center; /* 【修正】改為 center 確保主軸完美置中 */
+            flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: center;
             gap: 24px; margin-bottom: 0; padding-right: 15px;
         }
 
@@ -248,10 +258,21 @@
             font-size: 3.8rem; font-weight: 900; color: #FF3B30; 
             letter-spacing: -1px; font-family: "Arial", sans-serif; 
             display: flex; align-items: baseline; gap: 10px; line-height: 1; 
-            transition: transform 0.2s; margin: 0; text-shadow: 0 4px 12px rgba(255,59,48,0.15);
+            /* 移除 transition: transform，改用 color 動畫避免觸發 layout */
+            transition: color 0.2s; margin: 0; text-shadow: 0 4px 12px rgba(255,59,48,0.15);
+            /* 金額文字獨立合成層，動畫不影響父層位置 */
+            will-change: color;
+            transform: translateZ(0);
+            contain: layout;
         }
+        /* 關鍵修正：動畫改為只變色，完全不使用 transform: scale()
+           scale 會觸發 reflow 並向上傳播，導致 fixed 底部導覽列跳動 */
         .bottom-total-amount.updated { animation: popInTotal 0.45s ease-out; }
-        @keyframes popInTotal { 0% { transform: scale(1); color: #FF3B30; } 30% { transform: scale(1.08); color: #0A7AFF; } 100% { transform: scale(1); color: #FF3B30; } }
+        @keyframes popInTotal { 
+            0% { color: #FF3B30; } 
+            30% { color: #0A7AFF; } 
+            100% { color: #FF3B30; } 
+        }
 
         .bottom-total-amount .currency { font-size: 1.7rem; color: #8E8E93; font-weight: 900; filter: none; letter-spacing: 0; margin-bottom: 4px; text-shadow: none; }
         
@@ -390,7 +411,7 @@
             .admin-actions button { flex: 1; padding: 14px; }
             
             /* 底部導覽列完美垂直置中優化 */
-            .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
+            .bottom-bar-fixed { padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px); }
             .bottom-bar-inner { 
                 padding: 8px 16px; /* 【修正】微調上下 padding 讓 flex 居中更精確 */
                 min-height: 65px; 
