@@ -207,14 +207,21 @@
 
         /* 全域底部導覽列優化：電腦版置中 */
         .bottom-bar-fixed {
-            position: fixed; /* 【修正】改為 fixed，防止 iOS 橡皮筋回彈產生底部空隙 */
-            bottom: 0; left: 0; right: 0; width: 100%;
+            position: fixed;
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            width: 100%;
             background: rgba(255, 255, 255, 0.92); 
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border-top: 1px solid rgba(0,0,0,0.05); z-index: 1500;
+            backdrop-filter: blur(40px); 
+            -webkit-backdrop-filter: blur(40px);
+            border-top: 1px solid rgba(0,0,0,0.05); 
+            z-index: 1500;
+            /* 保留底部安全距離以避開 iOS 底部橫條，確保無縫貼合 */
             padding-bottom: env(safe-area-inset-bottom, 0px);
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06);
-            transform: translateZ(0); /* 【修正】開啟硬體加速，穩定 iOS 渲染避免滑動閃爍 */
+            /* 【重要修正】：移除 transform: translateZ(0); 
+               避免在行動裝置上因虛擬鍵盤彈出或視口重繪，導致 fixed 元素座標偏移懸空或抖動 */
         }
         
         .bottom-bar-inner {
