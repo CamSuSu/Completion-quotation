@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>劉氏工程 完工報價系統</title>
+    <title>劉氏工程 報價系統</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#F2F2F7">
@@ -443,7 +443,7 @@
         <div class="header">
             <div class="brand-section">
                 <div class="brand-icon" id="secret-trigger"><i class="fas fa-hard-hat"></i></div>
-                <h1>劉氏工程 完工報價系統</h1>
+                <h1>劉氏工程 報價系統</h1>
             </div>
         </div>
 
@@ -453,12 +453,12 @@
                     <i class="fas fa-history"></i> 歷史報價
                 </button>
                 <button onclick="clearAllQuotes()" class="top-action-btn btn-clear">
-                    <i class="fas fa-trash-alt"></i> 一鍵清空
+                    <i class="fas fa-trash-alt"></i> 清空下方明細
                 </button>
             </div>
 
             <div class="card animate-card delay-1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div class="card-title" style="justify-content: center;"><i class="fas fa-file-signature"></i> 基本報價資訊</div>
+                <div class="card-title" style="justify-content: center;"><i class="fas fa-file-signature"></i> 基本資訊</div>
                 <div style="width: 100%; max-width: 550px; text-align: center;">
                     <div class="form-group" style="text-align: left; margin-bottom: 24px;">
                         <label style="display:flex; justify-content:space-between; align-items:center;">
@@ -477,14 +477,14 @@
             </div>
 
             <div class="card animate-card delay-2" style="background: rgba(242,242,247,0.7); border: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.03);">
-                <div class="card-title"><i class="fas fa-cubes"></i> 選擇工程類型以加入項目</div>
+                <div class="card-title"><i class="fas fa-cubes"></i> 選擇工程項目加入明細清單</div>
                 <div class="category-grid" id="category-buttons-container"></div>
             </div>
 
             <div class="card animate-card delay-3" style="padding: 40px 24px;">
                 <div class="card-title" style="padding-left: 10px;">
                     <div style="display:flex; align-items:center; gap:16px;">
-                        <i class="fas fa-list-check"></i> 完工報價明細清單
+                        <i class="fas fa-list-check"></i> 報價明細清單
                     </div>
                 </div>
                 
@@ -514,8 +514,8 @@
                 <div style="background: #F2F2F7; padding: 28px; border-radius: var(--radius-lg); border: 1px solid rgba(0,0,0,0.04);">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; background:white; padding: 24px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.03);">
                         <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 1.4rem; font-weight: 900; color: var(--text-main); word-break: break-word;">預設開啟報價單抬頭</div>
-                            <div style="font-size: 1.1rem; color: #8E8E93; margin-top: 8px; word-break: break-word;">開啟後，重新整理或初次開啟系統時前台將預設勾選「顯示抬頭」</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: var(--text-main); word-break: break-word;">預設開啟抬頭</div>
+                            <div style="font-size: 1.1rem; color: #8E8E93; margin-top: 8px; word-break: break-word;">開啟後，系統前台將預設勾選「顯示抬頭」</div>
                         </div>
                         <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
                             <label class="switch" style="margin: 0;">
@@ -537,7 +537,7 @@
                             <i class="fas fa-file-export"></i> <span>匯出<span class="hide-mobile">資料庫</span></span>
                         </button>
                         <button class="btn-text" onclick="document.getElementById('importDBInput').click()" style="background: #EBF4FF; color: #0A7AFF; border: 2px solid rgba(10,122,255,0.2);">
-                            <i class="fas fa-file-import"></i> <span>匯入<span class="hide-mobile">還原</span></span>
+                            <i class="fas fa-file-import"></i> <span>匯入<span class="hide-mobile">資訊庫</span></span>
                         </button>
                         <input type="file" id="importDBInput" class="hidden" accept=".xlsx" onchange="importDBFromExcel(event)" style="display: none;">
                     </div>
@@ -546,14 +546,14 @@
                 <div style="background: #F2F2F7; padding: 32px; border-radius: var(--radius-lg); margin-bottom: 32px; border: 1px solid rgba(0,0,0,0.04);">
                     <div class="admin-sys-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h4 style="margin: 0; font-size: 1.6rem; color: var(--text-main); font-weight: 900;"><i class="fas fa-tags" style="color:var(--primary);"></i> 系統分類管理</h4>
-                        <span style="font-size: 1.1rem; color:#8E8E93;"><i class="fas fa-info-circle"></i> 可透過上下箭頭暫存順序</span>
+                        <span style="font-size: 1.1rem; color:#8E8E93;"><i class="fas fa-info-circle"></i> 可透過上下調整順序</span>
                     </div>
                     
                     <div id="admin-category-tags" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;"></div>
                     <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                         <input type="text" id="new-sys-category" placeholder="輸入新分類名稱" style="flex: 1; min-width: 200px; padding: 18px; border-radius: 14px; border: 2px solid rgba(0,0,0,0.08); font-weight:900;">
-                        <button onclick="addSystemCategory()" class="btn-text" style="background: #EBF4FF; color: var(--primary); border: 2px solid rgba(10,122,255,0.2); border-radius: 14px; padding: 16px 24px;"><i class="fas fa-plus"></i> 新增暫存</button>
-                        <button onclick="saveCategoriesToDB()" class="btn-text" style="background: var(--text-main); color: white; border-radius: 14px; padding: 16px 28px;"><i class="fas fa-save"></i> 儲存分類變更</button>
+                        <button onclick="addSystemCategory()" class="btn-text" style="background: #EBF4FF; color: var(--primary); border: 2px solid rgba(10,122,255,0.2); border-radius: 14px; padding: 16px 24px;"><i class="fas fa-plus"></i> 新增</button>
+                        <button onclick="saveCategoriesToDB()" class="btn-text" style="background: var(--text-main); color: white; border-radius: 14px; padding: 16px 28px;"><i class="fas fa-save"></i> 儲存變更</button>
                     </div>
                 </div>
 
@@ -580,11 +580,11 @@
                                 <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用天數
                             </label>
                             <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.35rem; cursor:pointer; margin-bottom: 0;">
-                                <input type="checkbox" id="new-item-hide-unit" style="width: 24px; height: 24px; accent-color: var(--primary);"> 預設隱藏單位
+                                <input type="checkbox" id="new-item-hide-unit" style="width: 24px; height: 24px; accent-color: var(--primary);"> 隱藏單位
                             </label>
                         </div>
                         <button id="btn-add-item" class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 18px 40px; font-size: 1.45rem; border-radius: 16px;">
-                            <i class="fas fa-cloud-upload-alt"></i> <span>儲存<span class="hide-mobile">至雲端</span></span>
+                            <i class="fas fa-cloud-upload-alt"></i> <span>儲存<span class="hide-mobile">變更</span></span>
                         </button>
                     </div>
                 </div>
@@ -1627,7 +1627,7 @@
 
     window.clearAllQuotes = function() {
         if(quoteList.length === 0) return;
-        if(confirm('確定要一鍵清空所有報價內容？')) { quoteList = []; renderFrontView(); }
+        if(confirm('確定要清空下方添加的明細清單內容？')) { quoteList = []; renderFrontView(); }
     };
 
     function calculateTotal() {
