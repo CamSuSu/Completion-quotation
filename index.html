@@ -467,17 +467,17 @@
                                 <input type="checkbox" id="show-title-cb" checked style="width:20px; height:20px; accent-color:var(--primary);"> 顯示抬頭
                             </label>
                         </label>
-                        <input type="text" id="quote-title-input" value="劉氏工程 — 完工報價單" placeholder="例如：劉氏工程 — 完工報價單">
+                        <input type="text" id="quote-title-input" value="劉氏工程 完工報價單" placeholder="例：劉氏工程 完工報價單">
                     </div>
                     <div class="form-group" style="text-align: left;">
                         <label>客戶名稱 (必填)</label>
-                        <input type="text" id="client-name-input" placeholder="例如：蘇先生">
+                        <input type="text" id="client-name-input" placeholder="例：蘇先生">
                     </div>
                 </div>
             </div>
 
             <div class="card animate-card delay-2" style="background: rgba(242,242,247,0.7); border: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.03);">
-                <div class="card-title"><i class="fas fa-cubes"></i> 選擇工程項目加入明細清單</div>
+                <div class="card-title"><i class="fas fa-cubes"></i> 選擇項目加入明細清單</div>
                 <div class="category-grid" id="category-buttons-container"></div>
             </div>
 
@@ -499,7 +499,7 @@
                 
                 <div id="empty-quote-msg" style="text-align: center; padding: 120px 20px; color: #8E8E93; font-size: 1.7rem; font-weight: 900;">
                     <i class="fas fa-clipboard-list" style="font-size: 5.5rem; opacity: 0.2; margin-bottom: 28px; display: block;"></i>
-                    請選擇工程項目加入明細
+                    請選擇工程項目加入明細清單
                 </div>
             </div>
         </div>
@@ -514,7 +514,7 @@
                 <div style="background: #F2F2F7; padding: 28px; border-radius: var(--radius-lg); border: 1px solid rgba(0,0,0,0.04);">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; background:white; padding: 24px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.03);">
                         <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 1.4rem; font-weight: 900; color: var(--text-main); word-break: break-word;">預設開啟抬頭</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: var(--text-main); word-break: break-word;">預設開啟報價單抬頭</div>
                             <div style="font-size: 1.1rem; color: #8E8E93; margin-top: 8px; word-break: break-word;">開啟後，系統前台將預設勾選「顯示抬頭」</div>
                         </div>
                         <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
@@ -566,11 +566,11 @@
                         </div>
                         <div>
                             <label style="display:block; margin-bottom:12px; font-weight:900; color:#8E8E93;">工程項目名稱</label>
-                            <input type="text" id="new-item-name" placeholder="輸入名稱..." style="padding:18px; border-radius:14px; width:100%; border: 2px solid rgba(0,0,0,0.08);">
+                            <input type="text" id="new-item-name" placeholder="輸入名稱" style="padding:18px; border-radius:14px; width:100%; border: 2px solid rgba(0,0,0,0.08);">
                         </div>
                         <div>
                             <label style="display:block; margin-bottom:12px; font-weight:900; color:#8E8E93;">預設單位</label>
-                            <input type="text" id="new-item-unit" value="" placeholder="不輸入代表無單位" style="padding:18px; border-radius:14px; width:100%; border: 2px solid rgba(0,0,0,0.08);">
+                            <input type="text" id="new-item-unit" value="" placeholder="不輸入則無單位" style="padding:18px; border-radius:14px; width:100%; border: 2px solid rgba(0,0,0,0.08);">
                         </div>
                     </div>
                     
