@@ -101,33 +101,33 @@
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
 
-        /* 購物車：加深底色為深鈦灰 */
+        /* 購物車圖示改小且加深底色 */
         #floating-cart {
             position: fixed; top: max(20px, env(safe-area-inset-top)); right: 20px;
-            background: #3A3A3C; color: white;
-            width: 60px; height: 60px; border-radius: 30px;
+            background: #1C1C1E; color: white;
+            width: 50px; height: 50px; border-radius: 25px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; z-index: 1400; cursor: pointer;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 2px solid rgba(255,255,255,0.8); backdrop-filter: blur(8px);
+            font-size: 1.5rem; z-index: 1400; cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid rgba(255,255,255,0.4); backdrop-filter: blur(8px);
         }
         #floating-cart::before {
             content: ''; position: absolute; inset: -4px; border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.9), transparent);
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.6), transparent);
             animation: spinGlowCart 3s linear infinite; z-index: -1;
             opacity: 1; transition: opacity 0.4s;
         }
-        #floating-cart:hover { transform: scale(1.08); background: #1C1C1E; }
-        #floating-cart.idle { opacity: 0.35; box-shadow: none; border-color: rgba(255,255,255,0.3); transform: scale(0.95); }
+        #floating-cart:hover { transform: scale(1.08); background: #000000; }
+        #floating-cart.idle { opacity: 0.35; box-shadow: none; border-color: rgba(255,255,255,0.2); transform: scale(0.95); }
         #floating-cart.idle::before { opacity: 0; animation: none; }
         #floating-cart.idle:hover { opacity: 1; transform: scale(1.05); }
 
         #cart-badge {
             position: absolute; top: -6px; right: -4px;
-            background: var(--danger); color: white; font-size: 0.95rem; font-weight: 900;
-            width: 26px; height: 26px; border-radius: 13px;
+            background: var(--danger); color: white; font-size: 0.9rem; font-weight: 900;
+            width: 24px; height: 24px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            border: 2.5px solid white; box-shadow: 0 4px 10px rgba(255,59,48,0.4);
+            border: 2px solid white; box-shadow: 0 4px 10px rgba(255,59,48,0.4);
             transition: transform 0.2s;
         }
 
@@ -217,18 +217,18 @@
         
         .bottom-bar-inner {
             display: flex; justify-content: space-between; align-items: flex-end; 
-            padding: 12px 28px 10px 28px;
-            min-height: 80px;
+            padding: 10px 28px 8px 28px;
+            min-height: 75px;
         }
 
-        .bottom-left { display: flex; justify-content: flex-start; gap: 16px; align-items: center; }
+        .bottom-left { display: flex; justify-content: flex-start; gap: 16px; align-items: center; margin-bottom: 0; }
         
         .bottom-center { 
             flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: baseline; 
-            gap: 24px; margin-bottom: 0; padding-right: 15px; padding-bottom: 4px;
+            gap: 24px; margin-bottom: 0; padding-right: 15px; padding-bottom: 2px;
         }
 
-        .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+        .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; margin-bottom: 0; }
         .action-btn-label { font-size: 0.9rem; font-weight: 900; color: #8E8E93; line-height: 1; letter-spacing: 0.5px; }
 
         .bottom-total-label { font-size: 1.9rem; color: #1C1C1E; font-weight: 900; letter-spacing: 2px; margin: 0; }
@@ -244,7 +244,7 @@
 
         .bottom-total-amount .currency { font-size: 1.7rem; color: #8E8E93; font-weight: 900; filter: none; letter-spacing: 0; margin-bottom: 4px; text-shadow: none; }
         
-        .action-circle-btn { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+        .action-circle-btn { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
         .btn-png { background: linear-gradient(135deg, #0A7AFF, #0056b3); color: white; border: 2px solid rgba(255,255,255,0.4); }
         .btn-png:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 10px 24px rgba(10,122,255,0.4); }
         .btn-excel { background: linear-gradient(135deg, #34C759, #248a3d); color: white; border: 2px solid rgba(255,255,255,0.4); }
@@ -302,7 +302,6 @@
             font-family: 'Arial', sans-serif; letter-spacing: -0.5px;
         }
 
-        /* 圖示選擇器樣式 */
         .icon-option { font-size: 1.8rem; padding: 16px; text-align: center; cursor: pointer; border-radius: 12px; border: 2px solid transparent; background: transparent; transition: all 0.2s; color: var(--text-main); }
         .icon-option:hover { background: rgba(0,0,0,0.05); transform: scale(1.1); }
         .icon-option.selected { border-color: var(--primary); background: #EBF4FF; color: var(--primary); box-shadow: 0 4px 12px rgba(10,122,255,0.15); }
@@ -323,7 +322,8 @@
             .header h1 { font-size: 1.9rem; }
             .brand-icon { width: 64px; height: 64px; font-size: 2.3rem; }
             
-            #floating-cart { top: max(75px, calc(15px + env(safe-area-inset-top))); right: 15px; width: 50px; height: 50px; font-size: 1.4rem; border-width: 1.5px; }
+            /* 行動版購物車圖示再縮小與顏色加深 */
+            #floating-cart { top: max(75px, calc(15px + env(safe-area-inset-top))); right: 15px; width: 44px; height: 44px; font-size: 1.2rem; border-width: 1.5px; }
 
             .top-action-btn { padding: 10px 16px; font-size: 1rem; }
             input[type="text"], input[type="number"]:not(.qty-input-center), select { padding: 18px; font-size: 1.25rem; }
@@ -368,16 +368,17 @@
             .admin-actions { flex-direction: row; gap: 12px; }
             .admin-actions button { flex: 1; padding: 14px; }
             
+            /* 底部導覽列優化：向下貼合並對齊底緣 */
             .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
-            .bottom-bar-inner { padding: 10px 16px; min-height: 75px; align-items: center; } 
+            .bottom-bar-inner { padding: 8px 16px 6px 16px; min-height: 65px; align-items: flex-end; } 
             
             .action-btn-label { font-size: 0.85rem; }
-            .action-circle-btn { width: 46px; height: 46px; font-size: 1.35rem; }
+            .action-circle-btn { width: 42px; height: 42px; font-size: 1.25rem; }
             
-            .bottom-center { flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; padding-right: 4px; }
+            .bottom-center { flex-direction: column; align-items: flex-end; justify-content: flex-end; gap: 4px; padding-right: 4px; padding-bottom: 0px; }
             .bottom-total-label { font-size: 1.2rem; color: #8E8E93; line-height: 1; }
-            .bottom-total-amount { font-size: 2.4rem; gap: 6px; line-height: 1; }
-            .bottom-total-amount .currency { font-size: 1.3rem; margin-bottom: 0; }
+            .bottom-total-amount { font-size: 2.4rem; gap: 6px; line-height: 1; margin-bottom: -2px; }
+            .bottom-total-amount .currency { font-size: 1.3rem; margin-bottom: 2px; }
             
             #scrollTopBtn { bottom: 120px; right: 15px; width: 48px; height: 48px; font-size: 1.3rem; border-radius: 24px; }
             
@@ -526,13 +527,14 @@
                 <div style="background: #F2F2F7; padding: 32px; border-radius: var(--radius-lg); margin-bottom: 32px; border: 1px solid rgba(0,0,0,0.04);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h4 style="margin: 0; font-size: 1.6rem; color: var(--text-main); font-weight: 900;"><i class="fas fa-tags" style="color:var(--primary);"></i> 系統分類管理</h4>
-                        <span style="font-size: 1.1rem; color:#8E8E93;"><i class="fas fa-info-circle"></i> 可透過上下箭頭調整分類順序</span>
+                        <span style="font-size: 1.1rem; color:#8E8E93;"><i class="fas fa-info-circle"></i> 可透過上下箭頭暫存順序</span>
                     </div>
                     
                     <div id="admin-category-tags" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;"></div>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <input type="text" id="new-sys-category" placeholder="輸入分類名" style="flex: 1; padding: 18px; border-radius: 14px; border: 2px solid rgba(0,0,0,0.08); font-weight:900;">
-                        <button onclick="addSystemCategory()" class="btn-text" style="background: var(--primary); color: white; border-radius: 14px; padding: 18px 28px;"><i class="fas fa-plus"></i> 新增</button>
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="new-sys-category" placeholder="輸入新分類名稱" style="flex: 1; min-width: 200px; padding: 18px; border-radius: 14px; border: 2px solid rgba(0,0,0,0.08); font-weight:900;">
+                        <button onclick="addSystemCategory()" class="btn-text" style="background: #EBF4FF; color: var(--primary); border: 2px solid rgba(10,122,255,0.2); border-radius: 14px; padding: 16px 24px;"><i class="fas fa-plus"></i> 新增暫存</button>
+                        <button onclick="saveCategoriesToDB()" class="btn-text" style="background: var(--text-main); color: white; border-radius: 14px; padding: 16px 28px;"><i class="fas fa-save"></i> 儲存分類變更</button>
                     </div>
                 </div>
 
@@ -766,7 +768,6 @@
         { keywords: ['玻', '璃', '鏡'], icon: 'fa-chess-board', h: 195, s: 35, l: 65 }              
     ];
 
-    // 擴充至 75 個高品質圖示供選擇
     const fallbackIcons = [
         'fa-tools', 'fa-wrench', 'fa-hammer', 'fa-screwdriver', 'fa-cogs', 'fa-cog', 'fa-nut', 
         'fa-bolt', 'fa-plug', 'fa-lightbulb', 'fa-solar-panel', 'fa-hard-hat', 'fa-helmet-safety', 
@@ -852,6 +853,8 @@
             ];
 
             if (daliIndex !== -1) {
+                // 強制覆寫大里報價單號移除連接線
+                quoteHistory[daliIndex].quoteNo = '20260529001';
                 if (!quoteHistory[daliIndex].isFixedDaliV2) {
                     quoteHistory[daliIndex].items = daliItems;
                     quoteHistory[daliIndex].isFixedDaliV2 = true; 
@@ -933,11 +936,19 @@
                 executeSave();
             } else {
                 clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(executeSave, 1000); // 增加 debounce，對付頻繁排序
+                saveTimeout = setTimeout(executeSave, 1000); 
             }
         });
     }
     
+    // 全新：點擊儲存分類變更按鈕才寫入資料庫
+    window.saveCategoriesToDB = async function() {
+        await window.saveDBToFirebase(true);
+        alert('✅ 分類設定已成功儲存至雲端並同步至前台！');
+        renderAdminView();
+        if(!document.getElementById('view-front').classList.contains('hidden')) renderFrontView();
+    };
+
     window.updateSystemSetting = async function(key, value) {
         systemSettings[key] = value;
         await window.saveDBToFirebase(true);
@@ -1292,7 +1303,8 @@
         
         systemCategories.push(catName);
         input.value = '';
-        await window.saveDBToFirebase(true);
+        
+        // 變更為手動儲存：僅更新本地畫面，提示用戶儲存
         updateCategoryUI();
         renderAdminView();
     };
@@ -1305,6 +1317,7 @@
             
             if (categorySettings[catName]) delete categorySettings[catName];
             
+            // 刪除屬於重大變更，強制直接儲存
             await window.saveDBToFirebase(true); 
             renderAdminView();
             updateCategoryUI();
@@ -1312,7 +1325,7 @@
         }
     };
 
-    // 新增：重新排序分類
+    // 重新排序分類：改為暫存更新畫面，不自動存資料庫
     window.moveCategory = async function(index, direction) {
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= systemCategories.length) return;
@@ -1321,15 +1334,10 @@
         systemCategories[index] = systemCategories[newIndex];
         systemCategories[newIndex] = temp;
         
-        // 呼叫 debounce 儲存，提升效能
-        window.saveDBToFirebase(false); 
-        
         updateCategoryUI();
         renderAdminView();
-        if(!document.getElementById('view-front').classList.contains('hidden')) renderFrontView();
     };
 
-    // 選取圖示的渲染邏輯
     window.renderIconSelector = function(selectedIcon) {
         const grid = document.getElementById('icon-selector-grid');
         grid.innerHTML = fallbackIcons.map(icon => `
@@ -1468,11 +1476,10 @@
         
         let displayIndex = 0;
         filteredDB.forEach(item => {
-            // 前台跳色處理
             const isEven = displayIndex % 2 === 0;
             const div = document.createElement('div');
             div.className = 'selectable-item';
-            div.style.background = isEven ? '#FFFFFF' : '#EAEAEA'; // 明顯的跳色
+            div.style.background = isEven ? '#FFFFFF' : '#EAEAEA'; 
             
             const hasUnitStr = (item.unit && item.unit.trim() !== '');
             const unitText = hasUnitStr ? `單位: ${item.unit}` : '';
@@ -1786,11 +1793,10 @@
                  catBody.innerHTML = `<div style="text-align:center; padding:40px; color:#8E8E93; font-size:1.3rem; font-weight:900;">此分類目前無項目</div>`;
             } else {
                 itemsInCat.forEach((item, idx) => {
-                    // 後台跳色處理
                     const isEven = idx % 2 === 0;
                     const row = document.createElement('div');
                     row.className = 'admin-row';
-                    row.style.backgroundColor = isEven ? '#FFFFFF' : '#F2F2F7'; // 明顯交錯色
+                    row.style.backgroundColor = isEven ? '#FFFFFF' : '#F2F2F7'; 
                     row.style.borderRadius = '12px';
                     
                     row.innerHTML = `
@@ -1996,7 +2002,6 @@
         let tbody = '';
         let isEvenRow = true;
         
-        // 依照 systemCategories 順序排列截圖的項目
         const sortedQuoteList = [...quoteList].sort((a, b) => {
             const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
             if(!dbA || !dbB) return 0;
@@ -2074,6 +2079,22 @@
                 <img id="result-img" />
                 ${!isIOS ? '<button class="btn" id="btn-download" style="background:#0A7AFF; color:white; margin-top:10px;"><i class="fa-solid fa-download"></i> 下載圖片</button>' : ''}
                 <button class="btn" onclick="window.close()" style="background:white; color:#1C1C1E;"><i class="fa-solid fa-arrow-left"></i> 返回</button>
+            </div>
+            
+            <div id="receipt-wrap">
+                ${headerHtml}
+                <div class="r-info">
+                    <div>客戶名稱：${clientName}</div>
+                    <div style="display:flex; flex-direction:column; gap:6px; text-align:left;">
+                        <div>報價單號：${currentQuoteNo}</div>
+                        <div>報價日期：${dateStr}</div>
+                    </div>
+                </div>
+                <table>
+                    <thead><tr><th>類別</th><th style="text-align:left;">項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
+                    <tbody>${tbody}</tbody>
+                </table>
+                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
             </div>
             
             <script>
@@ -2180,7 +2201,6 @@
             cell.border = { top: {style:'medium'}, left: {style:'medium'}, bottom: {style:'medium'}, right: {style:'medium'} };
         });
 
-        // 依照 systemCategories 順序排列 Excel 的項目
         const sortedQuoteList = [...quoteList].sort((a, b) => {
             const dbA = engineeringDB.find(db => db.id === a.dbId), dbB = engineeringDB.find(db => db.id === b.dbId);
             if(!dbA || !dbB) return 0;
