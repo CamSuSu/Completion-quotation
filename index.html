@@ -311,6 +311,14 @@
 
         /* ================= 手機版優化 ================= */
         @media (max-width: 900px) {
+            /* 加入強制不換行及動態字體，讓標題完美置於同行 */
+            .header h1 { font-size: clamp(1.35rem, 4.5vw, 1.8rem); white-space: nowrap; letter-spacing: 1px; }
+            .card-title { font-size: 1.35rem !important; white-space: nowrap !important; letter-spacing: 0 !important; margin-bottom: 20px; }
+            .card-title i { font-size: 1.5rem !important; }
+            #empty-quote-msg { font-size: 1.3rem !important; white-space: nowrap !important; padding: 80px 10px !important; }
+            h4 { font-size: 1.35rem !important; white-space: nowrap !important; }
+            .admin-sys-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+
             .hide-mobile { display: none !important; }
             .container { padding: 16px 12px; padding-bottom: 110px; } 
             
@@ -320,7 +328,6 @@
 
             .card { padding: 24px 16px; margin-bottom: 24px; border-radius: var(--radius-lg); }
             .header { padding: 28px 16px; border-radius: var(--radius-lg); }
-            .header h1 { font-size: 1.9rem; }
             .brand-icon { width: 64px; height: 64px; font-size: 2.3rem; }
             
             #floating-cart { top: max(75px, calc(15px + env(safe-area-inset-top))); right: 15px; width: 44px; height: 44px; font-size: 1.2rem; border-width: 1.5px; }
@@ -342,7 +349,7 @@
             .quote-item-row:hover { transform: none; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
             .item-name { font-size: 1.45rem; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 14px; margin-bottom: 8px; }
             
-            /* 行動版避免跳行配置 (對齊 1.html) */
+            /* 行動版避免跳行配置 */
             .mobile-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
             .mobile-field::before { content: attr(data-label); font-weight: 900; color: #8E8E93; font-size: 1.1rem; flex-shrink: 0; min-width: 70px; }
             
@@ -363,7 +370,7 @@
             .admin-category-header > div { display: flex; justify-content: space-between; align-items: center; width: 100%; }
             .admin-category-body { padding: 8px; background: transparent; border: none; margin-top: 0; box-shadow: none; }
             
-            /* 後台行動版輸入格配置 (對齊 1.html) */
+            /* 後台行動版輸入格配置 */
             .admin-row { display: flex; flex-direction: column; align-items: stretch; padding: 20px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); margin-bottom: 14px; border: 2px solid rgba(0,0,0,0.05); }
             .admin-col { margin-bottom: 16px; }
             .admin-col:last-child { margin-bottom: 0; }
@@ -537,7 +544,7 @@
                 </div>
 
                 <div style="background: #F2F2F7; padding: 32px; border-radius: var(--radius-lg); margin-bottom: 32px; border: 1px solid rgba(0,0,0,0.04);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div class="admin-sys-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h4 style="margin: 0; font-size: 1.6rem; color: var(--text-main); font-weight: 900;"><i class="fas fa-tags" style="color:var(--primary);"></i> 系統分類管理</h4>
                         <span style="font-size: 1.1rem; color:#8E8E93;"><i class="fas fa-info-circle"></i> 可透過上下箭頭暫存順序</span>
                     </div>
@@ -781,7 +788,6 @@
         { keywords: ['玻', '璃', '鏡'], icon: 'fa-chess-board', h: 195, s: 35, l: 65 }              
     ];
 
-    // 新增超過 50 個工程、建築、五金、工具、系統管理相關之圖示
     const fallbackIcons = [
         'fa-tools', 'fa-wrench', 'fa-hammer', 'fa-screwdriver', 'fa-cogs', 'fa-cog', 'fa-nut', 
         'fa-bolt', 'fa-plug', 'fa-lightbulb', 'fa-solar-panel', 'fa-hard-hat', 'fa-helmet-safety', 
@@ -796,7 +802,6 @@
         'fa-shield-halved', 'fa-satellite-dish', 'fa-camera', 'fa-video', 'fa-bell', 
         'fa-fire-extinguisher', 'fa-seedling', 'fa-tree', 'fa-leaf', 'fa-mound', 'fa-gem',
         'fa-broom', 'fa-wind', 'fa-droplet', 'fa-water', 'fa-tint',
-        // 擴充區：
         'fa-plug-circle-bolt', 'fa-plug-circle-check', 'fa-house-signal', 'fa-bridge', 'fa-road', 'fa-road-barrier',
         'fa-helmet-un', 'fa-vest', 'fa-tractor', 'fa-truck-pickup', 'fa-dumpster', 'fa-tents', 'fa-archway',
         'fa-tower-observation', 'fa-tower-broadcast', 'fa-walkie-talkie', 'fa-fire-hydrant', 'fa-water-ladder',
@@ -1069,7 +1074,7 @@
         quoteHistory.unshift(record);
         
         if (quoteHistory.length >= 995 && quoteHistory.length <= 1000) {
-            alert(`【系統提醒】歷史報價紀錄即將額滿！目前已達 ${quoteHistory.length} 筆，剩餘 ${1000 - quoteHistory.length} 筆空間。\n超過 1000 筆時，最舊的歷史資料將會被自動刪除，請儘早備份！`);
+            alert(`【系統提醒】歷史報價紀錄即滿額！目前已達 ${quoteHistory.length} 筆，剩餘 ${1000 - quoteHistory.length} 筆空間。\n超過 1000 筆時，最舊的資料將自動刪除，請儘早備份！`);
         }
 
         if (quoteHistory.length > 1000) quoteHistory = quoteHistory.slice(0, 1000); 
