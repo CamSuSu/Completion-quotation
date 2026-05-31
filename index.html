@@ -207,12 +207,14 @@
 
         /* 全域底部導覽列優化：電腦版置中 */
         .bottom-bar-fixed {
-            position: absolute; bottom: 0; left: 0; right: 0; width: 100%;
+            position: fixed; /* 【修正】改為 fixed，防止 iOS 橡皮筋回彈產生底部空隙 */
+            bottom: 0; left: 0; right: 0; width: 100%;
             background: rgba(255, 255, 255, 0.92); 
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-top: 1px solid rgba(0,0,0,0.05); z-index: 1500;
             padding-bottom: env(safe-area-inset-bottom, 0px);
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06);
+            transform: translateZ(0); /* 【修正】開啟硬體加速，穩定 iOS 渲染避免滑動閃爍 */
         }
         
         .bottom-bar-inner {
@@ -221,15 +223,15 @@
             min-height: 75px;
         }
 
-        .bottom-left { display: flex; justify-content: flex-start; gap: 16px; align-items: center; margin-bottom: 0; }
+        .bottom-left { display: flex; justify-content: flex-start; gap: 16px; align-items: center; margin-bottom: 0; height: 100%; }
         
         .bottom-center { 
-            flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: baseline; 
-            gap: 24px; margin-bottom: 0; padding-right: 15px; padding-bottom: 2px;
+            flex: 1; display: flex; flex-direction: row; justify-content: flex-end; align-items: center; /* 【修正】改為 center 確保主軸完美置中 */
+            gap: 24px; margin-bottom: 0; padding-right: 15px;
         }
 
-        .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; margin-bottom: 0; }
-        .action-btn-label { font-size: 0.9rem; font-weight: 900; color: #8E8E93; line-height: 1; letter-spacing: 0.5px; }
+        .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; margin-bottom: 0; }
+        .action-btn-label { font-size: 0.9rem; font-weight: 900; color: #8E8E93; line-height: 1; letter-spacing: 0.5px; margin-top: 0; }
 
         .bottom-total-label { font-size: 1.9rem; color: #1C1C1E; font-weight: 900; letter-spacing: 2px; margin: 0; }
         
@@ -380,24 +382,29 @@
             
             /* 底部導覽列完美垂直置中優化 */
             .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
-            .bottom-bar-inner { padding: 10px 16px; min-height: 70px; align-items: center; } 
+            .bottom-bar-inner { 
+                padding: 8px 16px; /* 【修正】微調上下 padding 讓 flex 居中更精確 */
+                min-height: 65px; 
+                align-items: center; 
+            } 
             
-            .action-btn-label { font-size: 0.85rem; margin-top: 2px; }
+            .action-btn-label { font-size: 0.85rem; margin-top: 0; line-height: 1; } /* 【修正】移除 margin-top，改用 wrapper 的 gap 控制以防干擾置中 */
             .action-circle-btn { width: 44px; height: 44px; font-size: 1.3rem; margin-bottom: 0; }
-            .action-btn-wrapper { justify-content: center; }
+            .action-btn-wrapper { justify-content: center; gap: 4px; }
             
             /* 總計與金額排版重構 (完美對齊) */
             .bottom-center { 
                 flex-direction: column; 
                 align-items: flex-end; 
                 justify-content: center; 
-                gap: 4px; 
+                gap: 2px; /* 【修正】縮減 gap 讓右側「總計金額」群組更緊湊對齊主軸 */
                 padding-right: 4px; 
                 padding-bottom: 0px; 
+                margin-bottom: 0;
             }
             .bottom-total-label { font-size: 1.15rem; color: #8E8E93; line-height: 1; margin-bottom: 0; }
-            .bottom-total-amount { font-size: 2.2rem; gap: 6px; line-height: 1; margin-bottom: 0; }
-            .bottom-total-amount .currency { font-size: 1.2rem; margin-bottom: 0; }
+            .bottom-total-amount { font-size: 2.2rem; gap: 6px; line-height: 1; margin-bottom: 0; display: flex; align-items: baseline; }
+            .bottom-total-amount .currency { font-size: 1.2rem; margin-bottom: 0; line-height: 1; }
             
             #scrollTopBtn { bottom: 120px; right: 15px; width: 48px; height: 48px; font-size: 1.3rem; border-radius: 24px; }
             
