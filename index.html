@@ -101,7 +101,6 @@
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
 
-        /* 購物車圖示改小且加深底色 */
         #floating-cart {
             position: fixed; top: max(20px, env(safe-area-inset-top)); right: 20px;
             background: #1C1C1E; color: white;
@@ -206,6 +205,7 @@
         .delete-btn { flex-shrink: 0; background: rgba(255, 59, 48, 0.08); color: var(--danger); width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.8rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin: 0 auto; }
         .delete-btn:hover { background: var(--danger); color: white; transform: scale(1.1); box-shadow: 0 8px 20px rgba(255,59,48,0.3); }
 
+        /* 全域底部導覽列優化：電腦版置中 */
         .bottom-bar-fixed {
             position: absolute; bottom: 0; left: 0; right: 0; width: 100%;
             background: rgba(255, 255, 255, 0.92); 
@@ -216,8 +216,8 @@
         }
         
         .bottom-bar-inner {
-            display: flex; justify-content: space-between; align-items: flex-end; 
-            padding: 10px 28px 8px 28px;
+            display: flex; justify-content: space-between; align-items: center; /* 垂直置中 */
+            padding: 12px 28px;
             min-height: 75px;
         }
 
@@ -228,7 +228,7 @@
             gap: 24px; margin-bottom: 0; padding-right: 15px; padding-bottom: 2px;
         }
 
-        .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; margin-bottom: 0; }
+        .action-btn-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; margin-bottom: 0; }
         .action-btn-label { font-size: 0.9rem; font-weight: 900; color: #8E8E93; line-height: 1; letter-spacing: 0.5px; }
 
         .bottom-total-label { font-size: 1.9rem; color: #1C1C1E; font-weight: 900; letter-spacing: 2px; margin: 0; }
@@ -309,6 +309,7 @@
         .cat-tag-action-btn { background: rgba(0,0,0,0.1); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
         .cat-tag-action-btn:hover { background: rgba(0,0,0,0.25); transform: scale(1.1); }
 
+        /* ================= 手機版優化 ================= */
         @media (max-width: 900px) {
             .hide-mobile { display: none !important; }
             .container { padding: 16px 12px; padding-bottom: 110px; } 
@@ -322,7 +323,6 @@
             .header h1 { font-size: 1.9rem; }
             .brand-icon { width: 64px; height: 64px; font-size: 2.3rem; }
             
-            /* 行動版購物車圖示再縮小與顏色加深 */
             #floating-cart { top: max(75px, calc(15px + env(safe-area-inset-top))); right: 15px; width: 44px; height: 44px; font-size: 1.2rem; border-width: 1.5px; }
 
             .top-action-btn { padding: 10px 16px; font-size: 1rem; }
@@ -342,14 +342,15 @@
             .quote-item-row:hover { transform: none; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
             .item-name { font-size: 1.45rem; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 14px; margin-bottom: 8px; }
             
+            /* 行動版避免跳行配置 (對齊 1.html) */
             .mobile-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
-            .mobile-field::before { content: attr(data-label); font-weight: 900; color: #8E8E93; font-size: 1.15rem; flex-shrink: 0; min-width: 75px; }
+            .mobile-field::before { content: attr(data-label); font-weight: 900; color: #8E8E93; font-size: 1.1rem; flex-shrink: 0; min-width: 70px; }
             
-            .qty-control-group, .input-wrapper { height: 54px; flex: 1; border-radius: 12px; }
-            .qty-btn { width: 44px; font-size: 1.5rem; }
-            .qty-control-group input, .input-wrapper input { font-size: 1.3rem !important; }
+            .qty-control-group, .input-wrapper { height: 50px; flex: 1; border-radius: 12px; }
+            .qty-btn { width: 40px; font-size: 1.4rem; }
+            .qty-control-group input, .input-wrapper input { font-size: 1.25rem !important; }
             .subtotal-display { width: 100%; text-align: right; padding-top: 18px; margin-top: 10px; border-top: 1px dashed rgba(0,0,0,0.1); font-size: 1.7rem; color: var(--danger); }
-            .delete-btn { width: 100%; height: 54px; border-radius: 14px; margin-top: 10px; font-size: 1.5rem; }
+            .delete-btn { width: 100%; height: 50px; border-radius: 12px; margin-top: 10px; font-size: 1.5rem; }
 
             .admin-db-actions { flex-wrap: nowrap !important; width: 100%; gap: 12px !important; }
             .admin-db-actions button { flex: 1; justify-content: center; padding: 14px !important; font-size: 1.15rem !important; }
@@ -361,24 +362,35 @@
             .admin-category-header { font-size: 1.3rem; padding: 18px; flex-direction: column; align-items: stretch; gap: 14px; border-radius: 14px; }
             .admin-category-header > div { display: flex; justify-content: space-between; align-items: center; width: 100%; }
             .admin-category-body { padding: 8px; background: transparent; border: none; margin-top: 0; box-shadow: none; }
-            .admin-row { display: flex; flex-direction: column; align-items: stretch; padding: 22px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.06); }
+            
+            /* 後台行動版輸入格配置 (對齊 1.html) */
+            .admin-row { display: flex; flex-direction: column; align-items: stretch; padding: 20px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); margin-bottom: 14px; border: 2px solid rgba(0,0,0,0.05); }
             .admin-col { margin-bottom: 16px; }
             .admin-col:last-child { margin-bottom: 0; }
-            .checkbox-col { display: flex; align-items: center; height: 50px; border-top: 1px dashed rgba(0,0,0,0.08); border-bottom: 1px dashed rgba(0,0,0,0.08); padding: 12px 0; margin-bottom: 16px !important; }
+            .checkbox-col { display: flex; align-items: center; height: 48px; border-top: 1px dashed rgba(0,0,0,0.08); border-bottom: 1px dashed rgba(0,0,0,0.08); padding: 10px 0; margin-bottom: 14px !important; }
             .admin-actions { flex-direction: row; gap: 12px; }
             .admin-actions button { flex: 1; padding: 14px; }
             
-            /* 底部導覽列優化：向下貼合並對齊底緣 */
+            /* 底部導覽列完美垂直置中優化 */
             .bottom-bar-fixed { padding-bottom: env(safe-area-inset-bottom, 0px); }
-            .bottom-bar-inner { padding: 8px 16px 6px 16px; min-height: 65px; align-items: flex-end; } 
+            .bottom-bar-inner { padding: 10px 16px; min-height: 70px; align-items: center; } 
             
-            .action-btn-label { font-size: 0.85rem; }
-            .action-circle-btn { width: 42px; height: 42px; font-size: 1.25rem; }
+            .action-btn-label { font-size: 0.85rem; margin-top: 2px; }
+            .action-circle-btn { width: 44px; height: 44px; font-size: 1.3rem; margin-bottom: 0; }
+            .action-btn-wrapper { justify-content: center; }
             
-            .bottom-center { flex-direction: column; align-items: flex-end; justify-content: flex-end; gap: 4px; padding-right: 4px; padding-bottom: 0px; }
-            .bottom-total-label { font-size: 1.2rem; color: #8E8E93; line-height: 1; }
-            .bottom-total-amount { font-size: 2.4rem; gap: 6px; line-height: 1; margin-bottom: -2px; }
-            .bottom-total-amount .currency { font-size: 1.3rem; margin-bottom: 2px; }
+            /* 總計與金額排版重構 (完美對齊) */
+            .bottom-center { 
+                flex-direction: column; 
+                align-items: flex-end; 
+                justify-content: center; 
+                gap: 4px; 
+                padding-right: 4px; 
+                padding-bottom: 0px; 
+            }
+            .bottom-total-label { font-size: 1.15rem; color: #8E8E93; line-height: 1; margin-bottom: 0; }
+            .bottom-total-amount { font-size: 2.2rem; gap: 6px; line-height: 1; margin-bottom: 0; }
+            .bottom-total-amount .currency { font-size: 1.2rem; margin-bottom: 0; }
             
             #scrollTopBtn { bottom: 120px; right: 15px; width: 48px; height: 48px; font-size: 1.3rem; border-radius: 24px; }
             
@@ -393,9 +405,9 @@
             .history-card-header { flex-direction: column; align-items: flex-start; gap: 14px; }
             .history-card-header > div:last-child { width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end; margin-top: 12px; text-align: left !important; }
             
-            .history-item-row { flex-direction: row; align-items: center; font-size: 1.1rem; gap: 8px; }
+            .history-item-row { flex-direction: row; align-items: center; font-size: 1.05rem; gap: 6px; }
             .history-item-row > span:first-child { flex: 1; white-space: normal; word-break: break-all; }
-            .history-item-row > span:last-child { white-space: nowrap; font-size: 1.2rem; }
+            .history-item-row > span:last-child { white-space: nowrap; font-size: 1.15rem; }
             
             .history-detail-total-box { text-align: left !important; font-size: 1.6rem !important; white-space: nowrap; margin-top: 16px; }
             .detail-table { font-size: 0.95rem !important; width: 100% !important; }
@@ -723,6 +735,7 @@
     const topBtn = document.getElementById('scrollTopBtn');
     const cartBtn = document.getElementById('floating-cart');
 
+    // 解決 scroll 事件在移動設備上的資源浪費 (使用 requestAnimationFrame 防抖)
     scrollContainerElement.addEventListener('scroll', () => {
         if (!scrollTicking) {
             window.requestAnimationFrame(() => {
@@ -768,6 +781,7 @@
         { keywords: ['玻', '璃', '鏡'], icon: 'fa-chess-board', h: 195, s: 35, l: 65 }              
     ];
 
+    // 新增超過 50 個工程、建築、五金、工具、系統管理相關之圖示
     const fallbackIcons = [
         'fa-tools', 'fa-wrench', 'fa-hammer', 'fa-screwdriver', 'fa-cogs', 'fa-cog', 'fa-nut', 
         'fa-bolt', 'fa-plug', 'fa-lightbulb', 'fa-solar-panel', 'fa-hard-hat', 'fa-helmet-safety', 
@@ -781,7 +795,17 @@
         'fa-link', 'fa-microchip', 'fa-memory', 'fa-server', 'fa-network-wired', 
         'fa-shield-halved', 'fa-satellite-dish', 'fa-camera', 'fa-video', 'fa-bell', 
         'fa-fire-extinguisher', 'fa-seedling', 'fa-tree', 'fa-leaf', 'fa-mound', 'fa-gem',
-        'fa-broom', 'fa-wind', 'fa-droplet', 'fa-water', 'fa-tint'
+        'fa-broom', 'fa-wind', 'fa-droplet', 'fa-water', 'fa-tint',
+        // 擴充區：
+        'fa-plug-circle-bolt', 'fa-plug-circle-check', 'fa-house-signal', 'fa-bridge', 'fa-road', 'fa-road-barrier',
+        'fa-helmet-un', 'fa-vest', 'fa-tractor', 'fa-truck-pickup', 'fa-dumpster', 'fa-tents', 'fa-archway',
+        'fa-tower-observation', 'fa-tower-broadcast', 'fa-walkie-talkie', 'fa-fire-hydrant', 'fa-water-ladder',
+        'fa-tarp', 'fa-tarp-droplet', 'fa-elevator', 'fa-stairs', 'fa-tape', 'fa-scale-balanced', 'fa-filter',
+        'fa-filter-circle-dollar', 'fa-scissors', 'fa-screwdriver-wrench', 'fa-compass', 'fa-pencil', 'fa-pen-ruler',
+        'fa-stapler', 'fa-flask', 'fa-temperature-arrow-up', 'fa-temperature-arrow-down', 'fa-hurricane', 'fa-tornado',
+        'fa-smog', 'fa-cloud-sun', 'fa-cloud-rain', 'fa-bolt-lightning', 'fa-gears', 'fa-microscope', 'fa-shield-dog',
+        'fa-fire-flame-simple', 'fa-fire', 'fa-grip', 'fa-border-all', 'fa-code-branch', 'fa-draw-polygon',
+        'fa-vector-square', 'fa-bezier-curve', 'fa-car-battery', 'fa-building-shield', 'fa-building-user', 'fa-warehouse'
     ]; 
 
     let categorySettings = {}; 
@@ -830,11 +854,12 @@
     let saveTimeout = null;
     let isFirstLoad = true;
 
+    // 防止遞迴觸發無限迴圈的安全監聽
     onSnapshot(dbRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
             const incomingStr = JSON.stringify(data);
-            if (incomingStr === lastSavedDataStr) return; 
+            if (incomingStr === lastSavedDataStr) return; // 避免自體寫入觸發無限迴圈重整 (防死當機制)
             lastSavedDataStr = incomingStr;
 
             engineeringDB = data.items || [];
@@ -853,7 +878,7 @@
             ];
 
             if (daliIndex !== -1) {
-                // 強制覆寫大里報價單號移除連接線
+                // 強制覆寫大里報價單號移除連接線，並防止迴圈
                 quoteHistory[daliIndex].quoteNo = '20260529001';
                 if (!quoteHistory[daliIndex].isFixedDaliV2) {
                     quoteHistory[daliIndex].items = daliItems;
@@ -941,7 +966,6 @@
         });
     }
     
-    // 全新：點擊儲存分類變更按鈕才寫入資料庫
     window.saveCategoriesToDB = async function() {
         await window.saveDBToFirebase(true);
         alert('✅ 分類設定已成功儲存至雲端並同步至前台！');
@@ -1045,8 +1069,7 @@
         quoteHistory.unshift(record);
         
         if (quoteHistory.length >= 995 && quoteHistory.length <= 1000) {
-            const remaining = 1000 - quoteHistory.length;
-            alert(`【系統提醒】歷史報價紀錄即將額滿！目前已達 ${quoteHistory.length} 筆，剩餘 ${remaining} 筆空間。\n超過 1000 筆時，最舊的歷史資料將會被自動刪除，請儘早備份！`);
+            alert(`【系統提醒】歷史報價紀錄即將額滿！目前已達 ${quoteHistory.length} 筆，剩餘 ${1000 - quoteHistory.length} 筆空間。\n超過 1000 筆時，最舊的歷史資料將會被自動刪除，請儘早備份！`);
         }
 
         if (quoteHistory.length > 1000) quoteHistory = quoteHistory.slice(0, 1000); 
@@ -1304,7 +1327,6 @@
         systemCategories.push(catName);
         input.value = '';
         
-        // 變更為手動儲存：僅更新本地畫面，提示用戶儲存
         updateCategoryUI();
         renderAdminView();
     };
@@ -1317,7 +1339,6 @@
             
             if (categorySettings[catName]) delete categorySettings[catName];
             
-            // 刪除屬於重大變更，強制直接儲存
             await window.saveDBToFirebase(true); 
             renderAdminView();
             updateCategoryUI();
@@ -1325,7 +1346,6 @@
         }
     };
 
-    // 重新排序分類：改為暫存更新畫面，不自動存資料庫
     window.moveCategory = async function(index, direction) {
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= systemCategories.length) return;
@@ -2057,7 +2077,8 @@
                 #result-img { max-width: 100%; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
                 .hint { background: rgba(10, 122, 255, 0.1); border: 2.5px solid rgba(10, 122, 255, 0.3); color: #0A7AFF; padding: 18px 28px; border-radius: 18px; font-weight: 900; font-size: 1.35rem; margin-bottom: 10px; }
                 
-                #receipt-wrap { position: absolute; left: -9999px; top: 0; width: 950px; background: white; padding: 60px; }
+                /* 防止行動裝置截圖時版面被撐破，改用絕對負空間與 z-index 防護 */
+                #receipt-wrap { position: absolute; left: -9999px; top: -9999px; width: 950px; background: white; padding: 60px; z-index: -9999; }
                 .r-header { text-align: center; margin-bottom: 40px; border-bottom: 6px solid #1C1C1E; padding-bottom: 25px; }
                 .r-header h1 { font-size: 46px; margin: 0 0 14px 0; color: #1C1C1E; font-weight: 900; letter-spacing: 4px; }
                 .r-info { display: flex; justify-content: space-between; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 35px; }
