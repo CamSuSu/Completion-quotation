@@ -514,7 +514,7 @@
                 <div style="background: #F2F2F7; padding: 28px; border-radius: var(--radius-lg); border: 1px solid rgba(0,0,0,0.04);">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; background:white; padding: 24px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.03);">
                         <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 1.4rem; font-weight: 900; color: var(--text-main); word-break: break-word;">預設開啟報價單抬頭</div>
+                            <div style="font-size: clamp(1.15rem, 4vw, 1.4rem); font-weight: 900; color: var(--text-main); white-space: nowrap;">預設開啟報價單抬頭</div>
                             <div style="font-size: 1.1rem; color: #8E8E93; margin-top: 8px; word-break: break-word;">開啟後，系統前台將預設勾選「顯示抬頭」</div>
                         </div>
                         <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
@@ -576,11 +576,11 @@
                     
                     <div class="add-new-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 36px; flex-wrap: wrap; gap: 16px;">
                         <div style="display: flex; gap: 24px; flex: 1;">
-                            <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.35rem; cursor:pointer; margin-bottom: 0;">
-                                <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> 啟用天數
+                            <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.35rem; cursor:pointer; margin-bottom: 0; white-space: nowrap;">
+                                <input type="checkbox" id="new-item-has-days" style="width: 24px; height: 24px; accent-color: var(--primary);"> <span style="line-height: 1.2;">啟用<br>天數</span>
                             </label>
-                            <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.35rem; cursor:pointer; margin-bottom: 0;">
-                                <input type="checkbox" id="new-item-hide-unit" style="width: 24px; height: 24px; accent-color: var(--primary);"> 隱藏單位
+                            <label style="display:flex; align-items:center; gap:10px; font-weight:900; font-size:1.35rem; cursor:pointer; margin-bottom: 0; white-space: nowrap;">
+                                <input type="checkbox" id="new-item-hide-unit" style="width: 24px; height: 24px; accent-color: var(--primary);"> <span style="line-height: 1.2;">隱藏<br>單位</span>
                             </label>
                         </div>
                         <button id="btn-add-item" class="btn-text" onclick="addNewItem()" style="background: #1C1C1E; color: white; padding: 18px 40px; font-size: 1.45rem; border-radius: 16px;">
@@ -1827,8 +1827,8 @@
                     row.innerHTML = `
                         <div class="admin-col"><label>項目名稱</label><input type="text" id="edit-name-${item.id}" value="${item.name}"></div>
                         <div class="admin-col"><label>單位</label><input type="text" id="edit-unit-${item.id}" value="${item.unit || ''}" placeholder="不填不顯示"></div>
-                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.25rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0;"><input type="checkbox" id="edit-days-${item.id}" style="width:22px; height:22px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''}> 啟用天數</label></div>
-                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.25rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0;"><input type="checkbox" id="edit-hide-unit-${item.id}" style="width:22px; height:22px; accent-color:var(--primary);" ${item.defaultHideUnit ? 'checked' : ''}> 隱藏單位</label></div>
+                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.25rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0; white-space: nowrap;"><input type="checkbox" id="edit-days-${item.id}" style="width:22px; height:22px; accent-color:var(--primary);" ${item.hasDays ? 'checked' : ''}> <span style="line-height: 1.2;">啟用<br>天數</span></label></div>
+                        <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.25rem; cursor:pointer; display:flex; align-items:center; gap:10px; margin:0; white-space: nowrap;"><input type="checkbox" id="edit-hide-unit-${item.id}" style="width:22px; height:22px; accent-color:var(--primary);" ${item.defaultHideUnit ? 'checked' : ''}> <span style="line-height: 1.2;">隱藏<br>單位</span></label></div>
                         <div class="admin-col admin-actions">
                             <button class="btn-text" style="background:var(--primary); color:white; border-radius:12px; font-size:1.15rem; padding: 14px;" onclick="updateItem('${item.id}')"><i class="fas fa-save"></i> 儲存</button>
                             <button class="btn-text" style="background:rgba(255,59,48,0.1); color:var(--danger); border-radius:12px; font-size:1.15rem; padding: 14px; box-shadow:none;" onclick="deleteItem('${item.id}')"><i class="fas fa-trash"></i></button>
