@@ -348,7 +348,7 @@
 
         .global-header-row {
             display: grid;
-            grid-template-columns: 2fr 1.2fr 1.6fr 1.1fr 1.3fr 1.5fr 60px;
+            grid-template-columns: minmax(180px,2fr) minmax(120px,1.2fr) minmax(300px,1.6fr) minmax(170px,1.1fr) minmax(120px,1.3fr) minmax(120px,1.5fr) 60px;
             gap: 12px; padding: 16px 20px;
             background: rgba(10,122,255,0.06);
             border-radius: var(--radius-md);
@@ -369,7 +369,7 @@
 
         .quote-item-row {
             display: grid;
-            grid-template-columns: 2fr 1.2fr 1.6fr 1.1fr 1.3fr 1.5fr 60px;
+            grid-template-columns: minmax(180px,2fr) minmax(120px,1.2fr) minmax(300px,1.6fr) minmax(170px,1.1fr) minmax(120px,1.3fr) minmax(120px,1.5fr) 60px;
             gap: 12px; align-items: center;
             padding: 18px 20px;
             border-radius: var(--radius-md);
@@ -401,7 +401,7 @@
             box-shadow: 0 0 0 4px rgba(10,122,255,0.12);
         }
         .qty-control-group input, .input-wrapper input {
-            flex: 1; width: 100%; min-width: 36px; height: 100%;
+            flex: 1 1 auto; width: 100%; min-width: 40px; height: 100%;
             border: none !important; background: transparent !important;
             box-shadow: none !important; text-align: center;
             padding: 0 4px !important; font-size: 1.3rem !important;
@@ -417,10 +417,11 @@
         .qty-btn:hover { background: rgba(0,0,0,0.05); color: var(--primary); }
 
         .unit-box {
-            flex-shrink: 0; padding-right: 10px;
+            flex-shrink: 0; padding-right: 10px; padding-left: 4px;
             display: flex; align-items: center; gap: 6px; justify-content: flex-end;
         }
         .unit-box span { font-weight: 900; color: #8E8E9E; font-size: 1.1rem; white-space: nowrap; }
+        .unit-box select { flex-shrink: 0; }
         .unit-box button {
             width: 32px; height: 32px; border-radius: 10px; border: none;
             background: rgba(0,0,0,0.06); cursor: pointer;
@@ -738,9 +739,12 @@
             .mobile-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; }
             .mobile-field::before { content: attr(data-label); font-weight: 900; color: var(--text-muted); font-size: 1rem; flex-shrink: 0; min-width: 64px; }
 
-            .qty-control-group, .input-wrapper { height: 46px; flex: 1; border-radius: 10px; }
-            .qty-btn { width: 36px; font-size: 1.25rem; }
-            .qty-control-group input, .input-wrapper input { font-size: 1.15rem !important; }
+            .qty-control-group, .input-wrapper { height: 46px; flex: 1; min-width: 0; border-radius: 10px; }
+            .qty-btn { width: 32px; flex-shrink: 0; font-size: 1.15rem; }
+            .qty-control-group input, .input-wrapper input { font-size: 1.1rem !important; min-width: 34px; }
+            .mobile-field::before { min-width: 52px; }
+            .unit-box { padding-right: 6px; padding-left: 2px; gap: 4px; }
+            .unit-box select { max-width: 82px !important; font-size: 0.98rem !important; }
             .subtotal-display { width: 100%; text-align: right; padding-top: 14px; margin-top: 8px; border-top: 1px dashed rgba(0,0,0,0.09); font-size: 1.5rem; color: var(--danger); }
             .delete-btn { width: 100%; height: 46px; border-radius: 10px; margin-top: 8px; font-size: 1.3rem; }
 
@@ -860,6 +864,25 @@
                         <label>客戶名稱 (必填)</label>
                         <input type="text" id="client-name-input" placeholder="例：蘇先生">
                     </div>
+                    <div class="form-group" style="text-align:left;">
+                        <label>客戶地址 (選填)</label>
+                        <input type="text" id="client-address-input" placeholder="例：南投縣草屯鎮富寮里富昌路103號">
+                    </div>
+                    <div class="form-group" style="text-align:left;">
+                        <label>統一編號 (選填)</label>
+                        <input type="text" id="client-taxid-input" placeholder="例：95846393">
+                    </div>
+                    <div class="form-group" style="text-align:left;">
+                        <label>工程名稱 (選填)</label>
+                        <input type="text" id="project-name-input" placeholder="例：設置樓梯扶手工程">
+                    </div>
+                    <div class="form-group" style="text-align:left; margin-bottom:0;">
+                        <label>稅務設定</label>
+                        <label style="font-size:1.05rem; color:var(--text-main); display:flex; align-items:center; gap:10px; margin-top:4px; cursor:pointer; background:#F0F2F8; padding:14px 16px; border-radius:12px; line-height:1.5;">
+                            <input type="checkbox" id="tax-excluded-cb" style="width:20px; height:20px; flex-shrink:0; accent-color:var(--primary);">
+                            本報價金額皆為未稅（匯出時將自動加計 5% 營業稅並列出稅額與總計金額）
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -902,6 +925,18 @@
                         <div style="flex-shrink:0; display:flex; align-items:center; justify-content:center;">
                             <label class="switch" style="margin:0;">
                                 <input type="checkbox" id="admin-setting-show-title" onchange="updateSystemSetting('defaultShowTitle', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; background:white; padding:20px; border-radius:14px; box-shadow:0 4px 12px rgba(0,0,0,0.03); margin-top:14px;">
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:clamp(1.05rem,3.5vw,1.3rem); font-weight:900; color:var(--text-main);">允許重複加入相同項目</div>
+                            <div style="font-size:1rem; color:#8E8E9E; margin-top:6px; word-break:break-word;">開啟後，前台可將同一個工程項目重複加入報價明細清單（各自獨立計價）</div>
+                        </div>
+                        <div style="flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+                            <label class="switch" style="margin:0;">
+                                <input type="checkbox" id="admin-setting-allow-duplicate" onchange="updateSystemSetting('allowDuplicateItems', this.checked)">
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -1218,10 +1253,88 @@
         { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true, defaultHideUnit: false }
     ];
 
+    /* ══ 工程常用單位換算表 (以群組內第一個單位換算基準值) ══ */
+    const UNIT_GROUP_FACTORS = [
+        { '毫米': 0.1, '公分': 1, '公尺': 100, '公里': 100000, '台尺': 30.3, '尺': 30.3, '台寸': 3.03, '寸': 3.03, '英吋': 2.54, '吋': 2.54, '英呎': 30.48, '呎': 30.48, '碼': 91.44 },
+        { '平方公分': 1, '平方公尺': 10000, '坪': 33057.85, '才': 918.09 },
+        { '公克': 1, '公斤': 1000, '台斤': 600, '斤': 600, '公噸': 1000000, '噸': 1000000 },
+        { '毫升': 1, 'CC': 1, '立方公分': 1, '公升': 1000, '立方公尺': 1000000 }
+    ];
+    const UNIT_GROUP_DISPLAY = [
+        ['公分', '公尺', '公里', '毫米', '台尺', '台寸', '英吋', '英呎', '碼'],
+        ['平方公分', '平方公尺', '坪', '才'],
+        ['公克', '公斤', '台斤', '公噸'],
+        ['毫升', '公升', '立方公分', '立方公尺']
+    ];
+    function findUnitInfo(unitStr) {
+        if (!unitStr) return null;
+        const u = String(unitStr).trim();
+        for (let i = 0; i < UNIT_GROUP_FACTORS.length; i++) {
+            if (UNIT_GROUP_FACTORS[i][u] !== undefined) return { groupIndex: i, factor: UNIT_GROUP_FACTORS[i][u] };
+        }
+        return null;
+    }
+    function getConversionRatio(fromUnit, toUnit) {
+        const from = findUnitInfo(fromUnit), to = findUnitInfo(toUnit);
+        if (!from || !to || from.groupIndex !== to.groupIndex) return null;
+        return from.factor / to.factor;
+    }
+    function roundSmart(n) {
+        if (!isFinite(n)) return 0;
+        return Math.round(n * 10000) / 10000;
+    }
+    function getUnitConvertOptions(currentUnit) {
+        const info = findUnitInfo(currentUnit);
+        if (!info) return null;
+        let opts = [...UNIT_GROUP_DISPLAY[info.groupIndex]];
+        if (!opts.includes(currentUnit)) opts.unshift(currentUnit);
+        return opts;
+    }
+
+    /* ══ 數字轉中文大寫金額 ══ */
+    function numberToChineseUpper(num) {
+        num = Math.round(Math.max(0, num || 0));
+        if (num === 0) return '零';
+        const digits = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖'];
+        const units = ['', '拾', '佰', '仟'];
+        const bigUnits = ['', '萬', '億', '兆'];
+        let numStr = String(num);
+        let groups = [];
+        while (numStr.length > 0) {
+            groups.unshift(numStr.slice(-4));
+            numStr = numStr.slice(0, -4);
+        }
+        let result = '';
+        for (let g = 0; g < groups.length; g++) {
+            const groupStr = groups[g];
+            let groupResult = '';
+            let zeroFlag = false;
+            for (let i = 0; i < groupStr.length; i++) {
+                const d = parseInt(groupStr[i], 10);
+                const unitIdx = groupStr.length - 1 - i;
+                if (d === 0) {
+                    zeroFlag = true;
+                } else {
+                    if (zeroFlag && groupResult !== '') groupResult += '零';
+                    zeroFlag = false;
+                    groupResult += digits[d] + units[unitIdx];
+                }
+            }
+            if (groupResult !== '') {
+                if (result !== '' && zeroFlag === false && groupStr[0] === '0') result += '零';
+                result += groupResult + bigUnits[groups.length - 1 - g];
+            } else if (result !== '' && g < groups.length - 1) {
+                result += '零';
+            }
+        }
+        result = result.replace(/零+/g, '零').replace(/零$/, '');
+        return result || '零';
+    }
+
     let systemCategories = [];
     let engineeringDB = [];
     let quoteHistory = [];
-    let systemSettings = { defaultShowTitle: true };
+    let systemSettings = { defaultShowTitle: true, allowDuplicateItems: false };
     let quoteList = [];
     let currentGrandTotal = 0;
     let lastSavedDataStr = "";
@@ -1238,7 +1351,7 @@
             engineeringDB = data.items || [];
             quoteHistory = data.history || [];
             systemCategories = data.categories || Array.from(new Set(engineeringDB.map(item => item.category)));
-            systemSettings = data.settings || { defaultShowTitle: true };
+            systemSettings = data.settings || { defaultShowTitle: true, allowDuplicateItems: false };
             categorySettings = data.categorySettings || {};
 
             let daliIndex = quoteHistory.findIndex(h => h.quoteNo === '20260529-001' || h.quoteNo === '20260529001');
@@ -1277,11 +1390,12 @@
                 isFirstLoad = false;
             }
             document.getElementById('admin-setting-show-title').checked = systemSettings.defaultShowTitle;
+            document.getElementById('admin-setting-allow-duplicate').checked = !!systemSettings.allowDuplicateItems;
         } else {
             engineeringDB = defaultDB;
             quoteHistory = [];
             systemCategories = Array.from(new Set(defaultDB.map(item => item.category)));
-            systemSettings = { defaultShowTitle: true };
+            systemSettings = { defaultShowTitle: true, allowDuplicateItems: false };
             categorySettings = {};
             window.saveDBToFirebase(true);
         }
@@ -1387,11 +1501,15 @@
         const dateStr = getFormattedDateString2(d);
         const todayNoStr = dateStr.replace(/-/g, '');
         const timeStr = d.toLocaleTimeString('zh-TW', { hour12: false });
+        const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientTaxId = document.getElementById('client-taxid-input').value.trim();
+        const projectName = document.getElementById('project-name-input').value.trim();
+        const taxExcluded = document.getElementById('tax-excluded-cb').checked;
         const mappedItems = quoteList.map(q => {
             const dbItem = engineeringDB.find(db => db.id === q.dbId);
             return {
                 cat: dbItem ? dbItem.category : '', name: dbItem ? dbItem.name : '未知',
-                price: q.price, qty: q.qty, unit: dbItem ? dbItem.unit : '',
+                price: q.price, qty: q.qty, unit: q.unit || (dbItem ? dbItem.unit : ''),
                 days: dbItem && dbItem.hasDays ? q.days : null, discount: q.discount || 0,
                 hideUnit: q.hideUnit || false
             };
@@ -1416,6 +1534,10 @@
             date: dateStr,
             time: timeStr,
             client: clientName,
+            clientAddress: clientAddress || '',
+            clientTaxId: clientTaxId || '',
+            projectName: projectName || '',
+            taxExcluded: taxExcluded || false,
             total: currentGrandTotal,
             items: mappedItems
         };
@@ -1828,7 +1950,7 @@
             listContainer.innerHTML = quoteList.map(q => {
                 const dbItem = engineeringDB.find(db => db.id === q.dbId);
                 if (!dbItem) return '';
-                let subtotal = Math.max(0, (q.price * q.qty * (dbItem.hasDays ? q.days : 1)) - q.discount);
+                let subtotal = Math.max(0, Math.round(q.price * q.qty * (dbItem.hasDays ? q.days : 1)) - q.discount);
                 return `
                 <div style="padding:18px; border:1px solid rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; background:white; margin-bottom:10px; border-radius:14px; box-shadow:0 3px 12px rgba(0,0,0,0.04);">
                     <div style="flex:1; padding-right:12px;">
@@ -1846,11 +1968,11 @@
     };
 
     window.addItemToQuote = function(dbId) {
-        if (quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
+        if (!systemSettings.allowDuplicateItems && quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
         const dbItem = engineeringDB.find(db => db.id === dbId);
         const defaultHide = dbItem ? (dbItem.defaultHideUnit || false) : false;
-        const newId = 'q_' + Date.now();
-        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: defaultHide });
+        const newId = 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: defaultHide, unit: dbItem ? dbItem.unit : '' });
         renderFrontView();
         setTimeout(() => {
             const newRowEl = document.getElementById(`quote-row-${newId}`);
@@ -1869,17 +1991,34 @@
         const target = quoteList.find(q => q.id === qId);
         if (target) {
             const dbItem = engineeringDB.find(db => db.id === target.dbId);
-            const hasUnit = dbItem && dbItem.unit && dbItem.unit.trim() !== '';
+            const displayUnit = target.unit || (dbItem ? dbItem.unit : '');
+            const hasUnit = displayUnit && displayUnit.trim() !== '';
             if (!hasUnit) return;
             target.hideUnit = !target.hideUnit;
             const unitSpan = document.getElementById(`unit-display-${qId}`);
             const eyeIcon = document.getElementById(`unit-toggle-icon-${qId}`);
-            if (unitSpan && eyeIcon) {
-                unitSpan.innerText = target.hideUnit ? '' : dbItem.unit;
+            if (unitSpan) unitSpan.style.display = target.hideUnit ? 'none' : 'inline-flex';
+            if (eyeIcon) {
                 eyeIcon.className = `fas ${target.hideUnit ? 'fa-eye-slash' : 'fa-eye'}`;
                 eyeIcon.style.color = target.hideUnit ? '#C7C7CC' : 'var(--primary)';
             }
         }
+    };
+
+    /* 工程單位一鍵換算：換算數量的同時，反向換算單價，確保項目小計金額不變 */
+    window.convertItemUnit = function(qId, targetUnit) {
+        const target = quoteList.find(q => q.id === qId);
+        if (!target) return;
+        const dbItem = engineeringDB.find(db => db.id === target.dbId);
+        if (!dbItem) return;
+        const currentUnit = target.unit || dbItem.unit;
+        if (currentUnit === targetUnit) return;
+        const ratio = getConversionRatio(currentUnit, targetUnit);
+        if (ratio === null) return;
+        target.qty = roundSmart(target.qty * ratio);
+        target.price = roundSmart(target.price / ratio);
+        target.unit = targetUnit;
+        renderFrontView();
     };
 
     window.handleInput = function(qId, field, value) {
@@ -1906,7 +2045,7 @@
         if (!target) return;
         const dbItem = engineeringDB.find(db => db.id === target.dbId);
         if (!dbItem) return;
-        let subtotal = Math.max(0, (target.price * target.qty * (dbItem.hasDays ? target.days : 1)) - target.discount);
+        let subtotal = Math.max(0, Math.round(target.price * target.qty * (dbItem.hasDays ? target.days : 1)) - target.discount);
         const subtotalEl = document.getElementById(`subtotal-${qId}`);
         if (subtotalEl) subtotalEl.innerText = subtotal.toLocaleString();
         calculateTotal();
@@ -1926,7 +2065,7 @@
         let newTotal = 0;
         quoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId);
-            if (dbItem) newTotal += Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - qItem.discount);
+            if (dbItem) newTotal += Math.max(0, Math.round(qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - qItem.discount);
         });
         if (newTotal !== currentGrandTotal) {
             currentGrandTotal = newTotal;
@@ -1976,7 +2115,7 @@
             let isEven = true;
             groupedList[cat].forEach(data => {
                 const { q, db } = data;
-                let subtotal = Math.max(0, (q.price * q.qty * (db.hasDays ? q.days : 1)) - q.discount);
+                let subtotal = Math.max(0, Math.round(q.price * q.qty * (db.hasDays ? q.days : 1)) - q.discount);
                 const row = document.createElement('div');
                 row.className = 'quote-item-row';
                 row.id = `quote-row-${q.id}`;
@@ -1992,15 +2131,21 @@
                         <div class="unit-box"><span style="font-weight:900; color:#8E8E9E; font-size:1.15rem;">天</span></div>
                     </div>` : `<div style="text-align:center; font-size:2rem; color:#D1D1D6; font-weight:900; width:100%;">—</div>`;
 
-                const hasUnit = db.unit && db.unit.trim() !== '';
+                const displayUnit = q.unit || db.unit;
+                const hasUnit = displayUnit && displayUnit.trim() !== '';
                 const hideUnitDisplay = q.hideUnit || !hasUnit;
                 const eyeColor = q.hideUnit ? '#C7C7CC' : 'var(--primary)';
                 const eyeClass = q.hideUnit ? 'fa-eye-slash' : 'fa-eye';
-                const unitStr = hideUnitDisplay ? '' : db.unit;
                 const toggleBtnHtml = hasUnit ? `
                     <button onclick="toggleUnit('${q.id}')">
                         <i id="unit-toggle-icon-${q.id}" class="fas ${eyeClass}" style="color:${eyeColor}; font-size:1.1rem;"></i>
                     </button>` : '';
+                const convertOpts = hasUnit ? getUnitConvertOptions(displayUnit) : null;
+                const unitValueHtml = convertOpts
+                    ? `<select onchange="convertItemUnit('${q.id}', this.value)" title="一鍵換算單位" style="border:none; background:transparent; font-weight:900; color:#8E8E9E; font-size:1.05rem; max-width:112px; min-width:32px; cursor:pointer; -webkit-appearance:none; appearance:none; text-align-last:right; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">
+                        ${convertOpts.map(u => `<option value="${u}" ${u === displayUnit ? 'selected' : ''}>${u}</option>`).join('')}
+                       </select>`
+                    : (hasUnit ? displayUnit : '');
 
                 const discountVal = q.discount > 0 ? q.discount : 0;
                 row.innerHTML = `
@@ -2017,7 +2162,7 @@
                             <input type="number" id="input-qty-${q.id}" value="${q.qty}" min="1" onfocus="if(this.value==='0') this.value='';" onblur="if(this.value==='') { this.value='1'; handleInput('${q.id}', 'qty', 1); }" oninput="handleInput('${q.id}', 'qty', this.value)">
                             <button class="qty-btn" onclick="changeQuoteQty('${q.id}', 'qty', 1)"><i class="fas fa-plus"></i></button>
                             <div class="unit-box">
-                                <span id="unit-display-${q.id}">${unitStr}</span>
+                                <span id="unit-display-${q.id}" style="display:${hideUnitDisplay ? 'none' : 'inline-flex'}; align-items:center;">${unitValueHtml}</span>
                                 ${toggleBtnHtml}
                             </div>
                         </div>
@@ -2112,6 +2257,7 @@
             container.appendChild(catBody);
         });
         document.getElementById('admin-setting-show-title').checked = systemSettings.defaultShowTitle;
+        document.getElementById('admin-setting-allow-duplicate').checked = !!systemSettings.allowDuplicateItems;
     };
 
     window.addNewItem = async function() {
@@ -2263,6 +2409,10 @@
         const showTitle = document.getElementById('show-title-cb').checked;
         const customTitleInput = document.getElementById('quote-title-input').value.trim();
         const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
+        const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientTaxId = document.getElementById('client-taxid-input').value.trim();
+        const projectName = document.getElementById('project-name-input').value.trim();
+        const taxExcluded = document.getElementById('tax-excluded-cb').checked;
 
         const saveResult = await window.recordQuoteHistory();
         if (saveResult.status === 'error') return;
@@ -2287,11 +2437,12 @@
         });
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
-            let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
+            let subtotal = Math.max(0, Math.round(qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
             const bg = isEvenRow ? '#FFFFFF' : '#F2F2F7'; isEvenRow = !isEvenRow;
-            const hasUnit = dbItem.unit && dbItem.unit.trim() !== '';
+            const itemUnit = qItem.unit || dbItem.unit;
+            const hasUnit = itemUnit && itemUnit.trim() !== '';
             const hideUnitDisplay = qItem.hideUnit || !hasUnit;
-            const unitDisplay = hideUnitDisplay ? '' : ` ${dbItem.unit}`;
+            const unitDisplay = hideUnitDisplay ? '' : ` ${itemUnit}`;
             const discountBadge = (qItem.discount && qItem.discount > 0) ? `<br><span style="display:inline-block; margin-top:5px; background:#FFF0F0; color:#FF3B30; padding:3px 7px; border-radius:5px; font-size:13px; font-weight:900; border:1px solid rgba(255,59,48,0.2);">✨ 優惠折抵: -$${qItem.discount.toLocaleString()}</span>` : '';
             tbody += `<tr style="background-color:${bg}; border-bottom:2px solid #E5E5EA;">
                 <td style="padding:16px; font-weight:900; color:#0A7AFF; font-size:17px;">${dbItem.category}</td>
@@ -2304,6 +2455,30 @@
         });
 
         const headerHtml = showTitle ? `<div class="r-header"><h1>${displayTitle}</h1></div>` : '';
+        const leftInfoLines = [`客戶名稱：${clientName}`];
+        if (clientAddress) leftInfoLines.push(`客戶地址：${clientAddress}`);
+        if (clientTaxId) leftInfoLines.push(`統一編號：${clientTaxId}`);
+        const leftInfoHtml = leftInfoLines.map(l => `<div>${l}</div>`).join('');
+        const projectHtml = projectName ? `<div class="r-project">工程名稱：${projectName}</div>` : '';
+
+        let totalsHtml;
+        if (taxExcluded) {
+            const taxAmount = Math.round(currentGrandTotal * 0.05);
+            const grandWithTax = currentGrandTotal + taxAmount;
+            totalsHtml = `
+                <div class="r-tax-note">以上金額皆為未稅</div>
+                <table class="r-totals-table">
+                    <tr><td>總計：</td><td>NT$ ${currentGrandTotal.toLocaleString()}</td></tr>
+                    <tr><td>稅額：</td><td>NT$ ${taxAmount.toLocaleString()}</td></tr>
+                    <tr class="r-final-row"><td>總計金額：</td><td>NT$ ${grandWithTax.toLocaleString()}</td></tr>
+                </table>
+                <div class="r-chinese-total">總計新台幣${numberToChineseUpper(grandWithTax)}元整</div>`;
+        } else {
+            totalsHtml = `
+                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
+                <div class="r-chinese-total">總計新台幣${numberToChineseUpper(currentGrandTotal)}元整</div>`;
+        }
+
         newWin.document.write(`<!DOCTYPE html>
         <html lang="zh-TW">
         <head>
@@ -2326,12 +2501,19 @@
                 #receipt-wrap { position:absolute; left:-9999px; top:-9999px; width:950px; background:white; padding:55px; z-index:-9999; }
                 .r-header { text-align:center; margin-bottom:36px; border-bottom:5px solid #1A1A2E; padding-bottom:22px; }
                 .r-header h1 { font-size:44px; margin:0 0 12px 0; color:#1A1A2E; font-weight:900; letter-spacing:3px; }
-                .r-info { display:flex; justify-content:space-between; font-size:19px; font-weight:900; color:#333; margin-bottom:32px; }
+                .r-info { display:flex; justify-content:space-between; align-items:flex-start; font-size:19px; font-weight:900; color:#333; margin-bottom:20px; gap:24px; }
+                .r-info-col { display:flex; flex-direction:column; gap:7px; text-align:left; }
+                .r-project { font-size:19px; font-weight:900; color:#333; margin:0 0 28px 0; padding-top:14px; border-top:2px solid #E5E5EA; }
                 table { width:100%; border-collapse:collapse; text-align:center; font-size:17px; border:3px solid #1A1A2E; }
                 th { background:#1A1A2E; color:white; padding:18px; border:3px solid #1A1A2E; font-size:20px; font-weight:900; white-space:nowrap; }
                 td { border:2px solid #C7C7CC; }
                 td:nth-child(1),td:nth-child(3),td:nth-child(4),td:nth-child(5),td:nth-child(6) { white-space:nowrap; }
                 .r-total { text-align:right; font-size:40px; font-weight:900; color:#FF3B30; margin-top:40px; letter-spacing:-1px; font-family:Arial,sans-serif; }
+                .r-tax-note { text-align:right; font-size:17px; font-weight:900; color:#666; margin-top:34px; }
+                .r-totals-table { margin-left:auto; margin-top:12px; border-collapse:collapse; min-width:340px; border:none; width:auto; }
+                .r-totals-table td { border:1.5px solid #C7C7CC; padding:12px 24px; font-size:19px; font-weight:900; text-align:right; }
+                .r-totals-table tr.r-final-row td { color:#FF3B30; font-size:23px; border-bottom:4px double #FF3B30; font-family:Arial,sans-serif; }
+                .r-chinese-total { text-align:right; font-size:18px; font-weight:900; color:#1A1A2E; margin-top:16px; }
             </style>
         </head>
         <body>
@@ -2349,17 +2531,18 @@
             <div id="receipt-wrap">
                 ${headerHtml}
                 <div class="r-info">
-                    <div>客戶名稱：${clientName}</div>
-                    <div style="display:flex; flex-direction:column; gap:5px; text-align:left;">
+                    <div class="r-info-col">${leftInfoHtml}</div>
+                    <div class="r-info-col">
                         <div>報價單號：${currentQuoteNo}</div>
                         <div>報價日期：${dateStr}</div>
                     </div>
                 </div>
+                ${projectHtml}
                 <table>
                     <thead><tr><th>類別</th><th style="text-align:left;">項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
                     <tbody>${tbody}</tbody>
                 </table>
-                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
+                ${totalsHtml}
             </div>
             <script>
                 document.getElementById('btn-capture').addEventListener('click', function() {
@@ -2398,6 +2581,10 @@
         const showTitle = document.getElementById('show-title-cb').checked;
         const customTitleInput = document.getElementById('quote-title-input').value.trim();
         const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
+        const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientTaxId = document.getElementById('client-taxid-input').value.trim();
+        const projectName = document.getElementById('project-name-input').value.trim();
+        const taxExcluded = document.getElementById('tax-excluded-cb').checked;
 
         const saveResult = await window.recordQuoteHistory();
         if (saveResult.status === 'error') return;
@@ -2425,21 +2612,37 @@
         }
         ws.addRow([]);
 
-        const infoRow1 = ws.addRow([]);
-        const infoRow2 = ws.addRow([]);
-        ws.mergeCells(`A${infoRow1.number}:D${infoRow2.number}`);
-        ws.getCell(`A${infoRow1.number}`).value = `客戶名稱：${clientName}`;
-        ws.getCell(`A${infoRow1.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell(`A${infoRow1.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
-        ws.mergeCells(`E${infoRow1.number}:F${infoRow1.number}`);
-        ws.getCell(`E${infoRow1.number}`).value = `報價單號：${currentQuoteNo}`;
-        ws.getCell(`E${infoRow1.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell(`E${infoRow1.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
         const d = new Date();
-        ws.mergeCells(`E${infoRow2.number}:F${infoRow2.number}`);
-        ws.getCell(`E${infoRow2.number}`).value = `報價日期：${d.toLocaleDateString('zh-TW')}`;
-        ws.getCell(`E${infoRow2.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell(`E${infoRow2.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+        const leftInfoLines = [`客戶名稱：${clientName}`];
+        if (clientAddress) leftInfoLines.push(`客戶地址：${clientAddress}`);
+        if (clientTaxId) leftInfoLines.push(`統一編號：${clientTaxId}`);
+        const rightInfoLines = [`報價單號：${currentQuoteNo}`, `報價日期：${d.toLocaleDateString('zh-TW')}`];
+        const infoRowCount = Math.max(leftInfoLines.length, rightInfoLines.length);
+        const infoRows = [];
+        for (let i = 0; i < infoRowCount; i++) infoRows.push(ws.addRow([]));
+        ws.mergeCells(`A${infoRows[0].number}:D${infoRows[infoRowCount - 1].number}`);
+        ws.getCell(`A${infoRows[0].number}`).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+        ws.getCell(`A${infoRows[0].number}`).value = leftInfoLines.join('\n');
+        ws.getCell(`A${infoRows[0].number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+        infoRows.forEach((row, i) => {
+            if (rightInfoLines[i]) {
+                ws.mergeCells(`E${row.number}:F${row.number}`);
+                ws.getCell(`E${row.number}`).value = rightInfoLines[i];
+                ws.getCell(`E${row.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+                ws.getCell(`E${row.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+            }
+        });
+        if (infoRowCount > 1) infoRows[0].height = 22 * leftInfoLines.length;
+
+        if (projectName) {
+            const projRow = ws.addRow([]);
+            ws.mergeCells(`A${projRow.number}:F${projRow.number}`);
+            ws.getCell(`A${projRow.number}`).value = `工程名稱：${projectName}`;
+            ws.getCell(`A${projRow.number}`).font = { name: '微軟正黑體', size: 15, bold: true, color: { argb: 'FF1A1A2E' } };
+            ws.getCell(`A${projRow.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+            ws.getCell(`A${projRow.number}`).border = { top: { style: 'thin', color: { argb: 'FFC7C7CC' } } };
+            projRow.height = 24;
+        }
         ws.addRow([]);
 
         const headerRow = ws.addRow(['類別', '項目明細', '單價', '數量', '天數', '項目小計']);
@@ -2463,10 +2666,11 @@
         let isEvenRow = true;
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
-            let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
-            const hasUnit = dbItem.unit && dbItem.unit.trim() !== '';
+            let subtotal = Math.max(0, Math.round(qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
+            const itemUnit = qItem.unit || dbItem.unit;
+            const hasUnit = itemUnit && itemUnit.trim() !== '';
             const hideUnitDisplay = qItem.hideUnit || !hasUnit;
-            const unitStr = hideUnitDisplay ? `${qItem.qty}` : `${qItem.qty} ${dbItem.unit}`;
+            const unitStr = hideUnitDisplay ? `${qItem.qty}` : `${qItem.qty} ${itemUnit}`;
             let itemNameText = dbItem.name;
             if (qItem.discount && qItem.discount > 0) itemNameText += `\n(優惠折抵: -$${qItem.discount.toLocaleString()})`;
             const row = ws.addRow([dbItem.category, itemNameText, qItem.price, unitStr, dbItem.hasDays ? `${qItem.days} 天` : '-', subtotal]);
@@ -2483,17 +2687,60 @@
         });
 
         ws.addRow([]);
-        const tRow = ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal]);
-        tRow.height = 50;
-        ws.mergeCells(`A${tRow.number}:E${tRow.number}`);
-        tRow.getCell(1).font = { name: '微軟正黑體', size: 20, bold: true };
-        tRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
-        tRow.getCell(6).font = { name: 'Arial', size: 24, bold: true, color: { argb: 'FFFF3B30' } };
-        tRow.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
-        tRow.getCell(6).numFmt = '"NT$" #,##0';
-        const borderStyle = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color:{argb:'FFFF3B30'}}, right: {style:'thin'} };
-        tRow.getCell(1).border = borderStyle;
-        tRow.getCell(6).border = borderStyle;
+        let finalGrandTotal = currentGrandTotal;
+
+        if (taxExcluded) {
+            const taxAmount = Math.round(currentGrandTotal * 0.05);
+            finalGrandTotal = currentGrandTotal + taxAmount;
+
+            const noteRow = ws.addRow(['以上金額皆為未稅']);
+            ws.mergeCells(`A${noteRow.number}:F${noteRow.number}`);
+            noteRow.getCell(1).font = { name: '微軟正黑體', size: 13, bold: true, color: { argb: 'FF8E8E9E' } };
+            noteRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+
+            const subRow = ws.addRow(['總計：', '', '', '', '', currentGrandTotal]);
+            const taxRow = ws.addRow(['稅額：', '', '', '', '', taxAmount]);
+            const finalRow = ws.addRow(['總計金額：', '', '', '', '', finalGrandTotal]);
+            [subRow, taxRow].forEach(r => {
+                r.height = 32;
+                ws.mergeCells(`A${r.number}:E${r.number}`);
+                r.getCell(1).font = { name: '微軟正黑體', size: 15, bold: true };
+                r.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+                r.getCell(6).font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFF3B30' } };
+                r.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
+                r.getCell(6).numFmt = '"NT$" #,##0';
+                const bs = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                r.getCell(1).border = bs; r.getCell(6).border = bs;
+            });
+            finalRow.height = 50;
+            ws.mergeCells(`A${finalRow.number}:E${finalRow.number}`);
+            finalRow.getCell(1).font = { name: '微軟正黑體', size: 20, bold: true };
+            finalRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+            finalRow.getCell(6).font = { name: 'Arial', size: 24, bold: true, color: { argb: 'FFFF3B30' } };
+            finalRow.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
+            finalRow.getCell(6).numFmt = '"NT$" #,##0';
+            const borderStyleFinal = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color:{argb:'FFFF3B30'}}, right: {style:'thin'} };
+            finalRow.getCell(1).border = borderStyleFinal;
+            finalRow.getCell(6).border = borderStyleFinal;
+        } else {
+            const tRow = ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal]);
+            tRow.height = 50;
+            ws.mergeCells(`A${tRow.number}:E${tRow.number}`);
+            tRow.getCell(1).font = { name: '微軟正黑體', size: 20, bold: true };
+            tRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+            tRow.getCell(6).font = { name: 'Arial', size: 24, bold: true, color: { argb: 'FFFF3B30' } };
+            tRow.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
+            tRow.getCell(6).numFmt = '"NT$" #,##0';
+            const borderStyle = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color:{argb:'FFFF3B30'}}, right: {style:'thin'} };
+            tRow.getCell(1).border = borderStyle;
+            tRow.getCell(6).border = borderStyle;
+        }
+
+        const chineseRow = ws.addRow([`總計新台幣${numberToChineseUpper(finalGrandTotal)}元整`]);
+        ws.mergeCells(`A${chineseRow.number}:F${chineseRow.number}`);
+        chineseRow.getCell(1).font = { name: '微軟正黑體', size: 15, bold: true, color: { argb: 'FF1A1A2E' } };
+        chineseRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+        chineseRow.height = 30;
 
         const buf = await workbook.xlsx.writeBuffer();
         saveAs(new Blob([buf]), `${currentQuoteNo}_${clientName}.xlsx`);
