@@ -869,6 +869,10 @@
                         <input type="text" id="client-address-input" placeholder="例：南投縣草屯鎮富寮里富昌路103號">
                     </div>
                     <div class="form-group" style="text-align:left;">
+                        <label>客戶電話 (選填)</label>
+                        <input type="text" id="client-phone-input" placeholder="例：0912-345-678">
+                    </div>
+                    <div class="form-group" style="text-align:left;">
                         <label>統一編號 (選填)</label>
                         <input type="text" id="client-taxid-input" placeholder="例：95846393">
                     </div>
@@ -1020,6 +1024,28 @@
                     <select id="admin-history-month" onchange="renderAdminHistoryList()" style="flex:1;"></select>
                 </div>
                 <div id="admin-history-list-container"></div>
+            </div>
+
+            <div class="card animate-card delay-3">
+                <div class="card-title" style="align-items:center;">
+                    <i class="fas fa-ruler-combined"></i> 單位自動換算管理
+                </div>
+                <div style="background:#F0F2F8; padding:20px; border-radius:var(--radius-lg); margin-bottom:24px; border:1px solid rgba(0,0,0,0.04); font-size:1rem; color:#5A5A7A; font-weight:800; line-height:1.7;">
+                    <i class="fas fa-circle-info" style="color:var(--primary);"></i>
+                    可自行新增、修改、刪除單位換算群組與公式。同一群組內的單位前台才可互相換算。
+                    公式請以 <b>x</b> 代表輸入數值，例如「公尺」相對於「公分」：換算為基準值公式填 <b>x*100</b>，由基準值換算回本單位公式填 <b>x/100</b>；
+                    群組內第一個作為基準的單位，兩個公式都直接填 <b>x</b> 即可。設定完成後，前台選到群組內任一單位時，將自動顯示可換算的其他單位並正確換算數量。
+                </div>
+
+                <div style="background:#F0F2F8; padding:22px; border-radius:var(--radius-lg); margin-bottom:24px; border:1px solid rgba(0,0,0,0.04);">
+                    <h4 style="margin-top:0; margin-bottom:18px; font-size:1.3rem; color:var(--text-main); font-weight:900;"><i class="fas fa-plus" style="color:var(--primary);"></i> 新增單位換算群組</h4>
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="new-unit-group-name" placeholder="輸入群組名稱，例如：長度" style="flex:1; min-width:180px; padding:15px; border-radius:12px; border:1.5px solid rgba(0,0,0,0.08); font-weight:900;">
+                        <button onclick="addUnitConversionGroup()" class="btn-text" style="background:#EBF4FF; color:var(--primary); border:1.5px solid rgba(10,122,255,0.2); border-radius:12px; padding:13px 20px;"><i class="fas fa-plus"></i> 新增群組</button>
+                    </div>
+                </div>
+
+                <div id="unit-conversion-groups-container"></div>
             </div>
         </div>
     </div>
@@ -1253,31 +1279,85 @@
         { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true, defaultHideUnit: false }
     ];
 
-    /* ══ 工程常用單位換算表 (以群組內第一個單位換算基準值) ══ */
-    const UNIT_GROUP_FACTORS = [
-        { '毫米': 0.1, '公分': 1, '公尺': 100, '公里': 100000, '台尺': 30.3, '尺': 30.3, '台寸': 3.03, '寸': 3.03, '英吋': 2.54, '吋': 2.54, '英呎': 30.48, '呎': 30.48, '碼': 91.44 },
-        { '平方公分': 1, '平方公尺': 10000, '坪': 33057.85, '才': 918.09 },
-        { '公克': 1, '公斤': 1000, '台斤': 600, '斤': 600, '公噸': 1000000, '噸': 1000000 },
-        { '毫升': 1, 'CC': 1, '立方公分': 1, '公升': 1000, '立方公尺': 1000000 }
-    ];
-    const UNIT_GROUP_DISPLAY = [
-        ['公分', '公尺', '公里', '毫米', '台尺', '台寸', '英吋', '英呎', '碼'],
-        ['平方公分', '平方公尺', '坪', '才'],
-        ['公克', '公斤', '台斤', '公噸'],
-        ['毫升', '公升', '立方公分', '立方公尺']
-    ];
+    /* ══ 工程常用單位換算表 (可由後台管理者自行新增/修改/刪除群組、單位與換算公式) ══ */
+    /* 每個群組(group)內含多個單位(unit)，每個單位以「換算為群組基準值的公式」(toBase)
+       與「由群組基準值換算回本單位的公式」(fromBase) 表示，公式中請以 x 代表數值，
+       例如公尺相對於公分(基準)：toBase = "x*100"，fromBase = "x/100"。
+       visible:false 的單位僅用於相容比對舊資料，不會出現在前台換算選單中。 */
+    function makeUnitEntry(unit, toBase, fromBase, visible = true) {
+        return { id: 'u_' + unit + '_' + Math.random().toString(36).substr(2, 6), unit, toBase, fromBase, visible };
+    }
+    function getDefaultUnitConversionGroups() {
+        return [
+            {
+                id: 'grp_length', name: '長度', units: [
+                    makeUnitEntry('公分', 'x', 'x'),
+                    makeUnitEntry('公尺', 'x*100', 'x/100'),
+                    makeUnitEntry('公里', 'x*100000', 'x/100000'),
+                    makeUnitEntry('毫米', 'x*0.1', 'x/0.1'),
+                    makeUnitEntry('台尺', 'x*30.3', 'x/30.3'),
+                    makeUnitEntry('台寸', 'x*3.03', 'x/3.03'),
+                    makeUnitEntry('英吋', 'x*2.54', 'x/2.54'),
+                    makeUnitEntry('英呎', 'x*30.48', 'x/30.48'),
+                    makeUnitEntry('碼', 'x*91.44', 'x/91.44'),
+                    makeUnitEntry('尺', 'x*30.3', 'x/30.3', false),
+                    makeUnitEntry('寸', 'x*3.03', 'x/3.03', false),
+                    makeUnitEntry('吋', 'x*2.54', 'x/2.54', false),
+                    makeUnitEntry('呎', 'x*30.48', 'x/30.48', false)
+                ]
+            },
+            {
+                id: 'grp_area', name: '面積', units: [
+                    makeUnitEntry('平方公分', 'x', 'x'),
+                    makeUnitEntry('平方公尺', 'x*10000', 'x/10000'),
+                    makeUnitEntry('坪', 'x*33057.85', 'x/33057.85'),
+                    makeUnitEntry('才', 'x*918.09', 'x/918.09')
+                ]
+            },
+            {
+                id: 'grp_weight', name: '重量', units: [
+                    makeUnitEntry('公克', 'x', 'x'),
+                    makeUnitEntry('公斤', 'x*1000', 'x/1000'),
+                    makeUnitEntry('台斤', 'x*600', 'x/600'),
+                    makeUnitEntry('公噸', 'x*1000000', 'x/1000000'),
+                    makeUnitEntry('斤', 'x*600', 'x/600', false)
+                ]
+            },
+            {
+                id: 'grp_volume', name: '容積', units: [
+                    makeUnitEntry('毫升', 'x', 'x'),
+                    makeUnitEntry('公升', 'x*1000', 'x/1000'),
+                    makeUnitEntry('立方公分', 'x', 'x'),
+                    makeUnitEntry('立方公尺', 'x*1000000', 'x/1000000'),
+                    makeUnitEntry('CC', 'x', 'x', false)
+                ]
+            }
+        ];
+    }
+    let unitConversionGroups = [];
+    function evalUnitFormula(formula, xVal) {
+        try {
+            const fn = new Function('x', `"use strict"; return (${formula});`);
+            const r = fn(Number(xVal));
+            return (typeof r === 'number' && isFinite(r)) ? r : null;
+        } catch (e) { return null; }
+    }
     function findUnitInfo(unitStr) {
         if (!unitStr) return null;
         const u = String(unitStr).trim();
-        for (let i = 0; i < UNIT_GROUP_FACTORS.length; i++) {
-            if (UNIT_GROUP_FACTORS[i][u] !== undefined) return { groupIndex: i, factor: UNIT_GROUP_FACTORS[i][u] };
+        for (let i = 0; i < unitConversionGroups.length; i++) {
+            const group = unitConversionGroups[i];
+            const entry = (group.units || []).find(uu => uu.unit === u);
+            if (entry) return { groupIndex: i, groupId: group.id, entry };
         }
         return null;
     }
-    function getConversionRatio(fromUnit, toUnit) {
+    function convertUnitValue(fromUnit, toUnit, value) {
         const from = findUnitInfo(fromUnit), to = findUnitInfo(toUnit);
-        if (!from || !to || from.groupIndex !== to.groupIndex) return null;
-        return from.factor / to.factor;
+        if (!from || !to || from.groupId !== to.groupId) return null;
+        const baseVal = evalUnitFormula(from.entry.toBase, value);
+        if (baseVal === null) return null;
+        return evalUnitFormula(to.entry.fromBase, baseVal);
     }
     function roundSmart(n) {
         if (!isFinite(n)) return 0;
@@ -1286,7 +1366,8 @@
     function getUnitConvertOptions(currentUnit) {
         const info = findUnitInfo(currentUnit);
         if (!info) return null;
-        let opts = [...UNIT_GROUP_DISPLAY[info.groupIndex]];
+        const group = unitConversionGroups[info.groupIndex];
+        let opts = (group.units || []).filter(u => u.visible !== false).map(u => u.unit);
         if (!opts.includes(currentUnit)) opts.unshift(currentUnit);
         return opts;
     }
@@ -1353,6 +1434,7 @@
             systemCategories = data.categories || Array.from(new Set(engineeringDB.map(item => item.category)));
             systemSettings = data.settings || { defaultShowTitle: true, allowDuplicateItems: false };
             categorySettings = data.categorySettings || {};
+            unitConversionGroups = data.unitConversionGroups || getDefaultUnitConversionGroups();
 
             let daliIndex = quoteHistory.findIndex(h => h.quoteNo === '20260529-001' || h.quoteNo === '20260529001');
             let daliItems = [
@@ -1397,6 +1479,7 @@
             systemCategories = Array.from(new Set(defaultDB.map(item => item.category)));
             systemSettings = { defaultShowTitle: true, allowDuplicateItems: false };
             categorySettings = {};
+            unitConversionGroups = getDefaultUnitConversionGroups();
             window.saveDBToFirebase(true);
         }
 
@@ -1405,6 +1488,7 @@
         updateHistoryFilters('admin-history-year', 'admin-history-month');
         renderHistoryList();
         renderAdminHistoryList();
+        renderUnitConversionAdmin();
 
         if (!document.getElementById('view-back').classList.contains('hidden')) {
             renderAdminView();
@@ -1417,6 +1501,7 @@
             engineeringDB = defaultDB;
             systemCategories = Array.from(new Set(defaultDB.map(item => item.category)));
         }
+        if (!unitConversionGroups || unitConversionGroups.length === 0) unitConversionGroups = getDefaultUnitConversionGroups();
         updateCategoryUI();
     });
 
@@ -1428,7 +1513,8 @@
                     const cleanHistory = JSON.parse(JSON.stringify(quoteHistory, (k, v) => v === undefined ? null : v));
                     const cleanCategories = JSON.parse(JSON.stringify(systemCategories));
                     const cleanCatSettings = JSON.parse(JSON.stringify(categorySettings));
-                    const payload = { items: cleanItems, history: cleanHistory, categories: cleanCategories, settings: systemSettings, categorySettings: cleanCatSettings };
+                    const cleanUnitGroups = JSON.parse(JSON.stringify(unitConversionGroups, (k, v) => v === undefined ? null : v));
+                    const payload = { items: cleanItems, history: cleanHistory, categories: cleanCategories, settings: systemSettings, categorySettings: cleanCatSettings, unitConversionGroups: cleanUnitGroups };
                     const currentStr = JSON.stringify(payload);
                     if (currentStr === lastSavedDataStr) return resolve();
                     await setDoc(dbRef, JSON.parse(currentStr), { merge: true });
@@ -1502,9 +1588,12 @@
         const todayNoStr = dateStr.replace(/-/g, '');
         const timeStr = d.toLocaleTimeString('zh-TW', { hour12: false });
         const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientPhone = document.getElementById('client-phone-input').value.trim();
         const clientTaxId = document.getElementById('client-taxid-input').value.trim();
         const projectName = document.getElementById('project-name-input').value.trim();
         const taxExcluded = document.getElementById('tax-excluded-cb').checked;
+        const showTitle = document.getElementById('show-title-cb').checked;
+        const quoteTitle = document.getElementById('quote-title-input').value.trim();
         const mappedItems = quoteList.map(q => {
             const dbItem = engineeringDB.find(db => db.id === q.dbId);
             return {
@@ -1535,9 +1624,12 @@
             time: timeStr,
             client: clientName,
             clientAddress: clientAddress || '',
+            clientPhone: clientPhone || '',
             clientTaxId: clientTaxId || '',
             projectName: projectName || '',
             taxExcluded: taxExcluded || false,
+            showTitle: showTitle,
+            quoteTitle: quoteTitle || '',
             total: currentGrandTotal,
             items: mappedItems
         };
@@ -1585,10 +1677,10 @@
         const record = quoteHistory.find(q => q.id === id);
         if (!record) return;
         let rowsHtml = record.items.map((i, idx) => {
-            let sub = Math.max(0, (i.price * i.qty * (i.days || 1)) - (i.discount || 0));
+            let sub = Math.max(0, Math.round(i.price * i.qty * (i.days || 1)) - (i.discount || 0));
             let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
-            let daysDisplay = i.days ? `${i.days}` : '-';
-            let optTag = i.discount > 0 ? `<br><span style="color:var(--danger); font-size:0.9rem;">(折抵$${i.discount})</span>` : '';
+            let daysDisplay = i.days ? `${i.days} 天` : '-';
+            let optTag = i.discount > 0 ? `<br><span style="color:var(--danger); font-size:0.9rem;">(優惠折抵: -$${i.discount.toLocaleString()})</span>` : '';
             let bg = idx % 2 === 0 ? '#FFFFFF' : '#F7F8FC';
             let catColor = '#0A7AFF';
             return `
@@ -1601,15 +1693,48 @@
                 <td style="padding:10px 7px; border:1px solid #C7C7CC; font-weight:900; white-space:nowrap;">${sub.toLocaleString()}</td>
             </tr>`;
         }).join('');
+
+        const displayTitle = record.quoteTitle ? record.quoteTitle : '劉氏工程 — 完工報價單';
+        const titleHtml = record.showTitle !== false ? `<div style="text-align:center; font-weight:900; font-size:1.6rem; color:var(--text-main); margin-bottom:18px; padding-bottom:16px; border-bottom:3px solid #1A1A2E;">${displayTitle}</div>` : '';
+
+        const leftInfoLines = [`客戶名稱：${record.client}`];
+        if (record.clientAddress) leftInfoLines.push(`客戶地址：${record.clientAddress}`);
+        if (record.clientPhone) leftInfoLines.push(`客戶電話：${record.clientPhone}`);
+        if (record.clientTaxId) leftInfoLines.push(`統一編號：${record.clientTaxId}`);
+        const leftInfoHtml = leftInfoLines.map(l => `<div>${l}</div>`).join('');
+        const projectHtml = record.projectName ? `<div style="font-size:1.05rem; font-weight:900; color:var(--text-main); margin:0 0 18px 0; padding-top:12px; border-top:2px solid #E5E5EA;">工程名稱：${record.projectName}</div>` : '';
+
+        let totalsHtml;
+        if (record.taxExcluded) {
+            const taxAmount = Math.round(record.total * 0.05);
+            const grandWithTax = record.total + taxAmount;
+            totalsHtml = `
+                <div style="text-align:right; font-size:1rem; font-weight:900; color:#8E8E9E; margin-top:14px;">以上金額皆為未稅</div>
+                <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+                    <table style="border-collapse:collapse; min-width:280px;">
+                        <tr><td style="padding:9px 18px; font-weight:900; text-align:right; border:1.5px solid #C7C7CC;">總計：</td><td style="padding:9px 18px; font-weight:900; text-align:right; border:1.5px solid #C7C7CC; font-family:Arial,sans-serif;">NT$ ${record.total.toLocaleString()}</td></tr>
+                        <tr><td style="padding:9px 18px; font-weight:900; text-align:right; border:1.5px solid #C7C7CC;">稅額：</td><td style="padding:9px 18px; font-weight:900; text-align:right; border:1.5px solid #C7C7CC; font-family:Arial,sans-serif;">NT$ ${taxAmount.toLocaleString()}</td></tr>
+                        <tr><td style="padding:9px 18px; font-weight:900; text-align:right; border:1.5px solid #C7C7CC; color:var(--danger); font-size:1.15rem;">總計金額：</td><td style="padding:9px 18px; font-weight:900; text-align:right; border-bottom:3px double var(--danger); border-top:1.5px solid #C7C7CC; border-left:1.5px solid #C7C7CC; border-right:1.5px solid #C7C7CC; color:var(--danger); font-size:1.3rem; font-family:Arial,sans-serif;">NT$ ${grandWithTax.toLocaleString()}</td></tr>
+                    </table>
+                </div>
+                <div style="text-align:right; font-size:1rem; font-weight:900; color:var(--text-main); margin-top:12px;">總計新台幣${numberToChineseUpper(grandWithTax)}元整</div>`;
+        } else {
+            totalsHtml = `
+                <div class="history-detail-total-box">總計金額：NT$ ${record.total.toLocaleString()}</div>
+                <div style="text-align:right; font-size:1rem; font-weight:900; color:var(--text-main); margin-top:2px; margin-bottom:10px;">總計新台幣${numberToChineseUpper(record.total)}元整</div>`;
+        }
+
         document.getElementById('history-detail-content').innerHTML = `
             <div style="padding:14px;">
+                ${titleHtml}
                 <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-weight:900; font-size:1.1rem; color:var(--text-main); flex-wrap:wrap; gap:10px;">
-                    <div style="font-size:1.4rem;">客戶：${record.client}</div>
+                    <div style="display:flex; flex-direction:column; gap:5px; text-align:left; font-size:1.05rem;">${leftInfoHtml}</div>
                     <div style="display:flex; flex-direction:column; gap:5px; text-align:left; color:#5A5A7A; font-size:1rem;">
-                        <div>單號：${record.quoteNo || ''}</div>
-                        <div>日期：${record.date.replace(/-/g,'/')}</div>
+                        <div>報價單號：${record.quoteNo || ''}</div>
+                        <div>報價日期：${record.date.replace(/-/g,'/')}</div>
                     </div>
                 </div>
+                ${projectHtml}
                 <div class="table-responsive-wrapper" style="margin-bottom:20px; padding-bottom:0;">
                     <table class="detail-table" style="width:100%; border-collapse:collapse; text-align:center; border:2px solid #1A1A2E; font-size:1.05rem; background:white;">
                         <thead>
@@ -1625,7 +1750,7 @@
                         <tbody>${rowsHtml}</tbody>
                     </table>
                 </div>
-                <div class="history-detail-total-box">總計金額：NT$ ${record.total.toLocaleString()}</div>
+                ${totalsHtml}
             </div>
         `;
         openModal('history-detail-modal');
@@ -2013,10 +2138,13 @@
         if (!dbItem) return;
         const currentUnit = target.unit || dbItem.unit;
         if (currentUnit === targetUnit) return;
-        const ratio = getConversionRatio(currentUnit, targetUnit);
-        if (ratio === null) return;
-        target.qty = roundSmart(target.qty * ratio);
-        target.price = roundSmart(target.price / ratio);
+        const newQty = convertUnitValue(currentUnit, targetUnit, target.qty);
+        if (newQty === null || !isFinite(newQty) || newQty === 0) {
+            alert('⚠️ 單位換算公式錯誤或換算結果無效，請至後台「單位自動換算管理」確認公式設定！');
+            return;
+        }
+        target.price = roundSmart((target.price * target.qty) / newQty);
+        target.qty = roundSmart(newQty);
         target.unit = targetUnit;
         renderFrontView();
     };
@@ -2258,6 +2386,127 @@
         });
         document.getElementById('admin-setting-show-title').checked = systemSettings.defaultShowTitle;
         document.getElementById('admin-setting-allow-duplicate').checked = !!systemSettings.allowDuplicateItems;
+        renderUnitConversionAdmin();
+    };
+
+    /* ══ 單位自動換算管理 (後台) ══ */
+    window.renderUnitConversionAdmin = function() {
+        const container = document.getElementById('unit-conversion-groups-container');
+        if (!container) return;
+        if (!unitConversionGroups || unitConversionGroups.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:32px; color:#8E8E9E; font-size:1.15rem; font-weight:900; border:1.5px dashed var(--border-light); border-radius:var(--radius-lg);">目前尚無任何單位換算群組，請於上方新增。</div>`;
+            return;
+        }
+        container.innerHTML = unitConversionGroups.map((group, gIdx) => {
+            const unitsHtml = (group.units || []).map(u => `
+                <div class="admin-row" style="background-color:${(group.units.indexOf(u) % 2 === 0) ? '#FFFFFF' : '#F7F8FC'}; border-radius:10px;">
+                    <div class="admin-col"><label>單位名稱</label><input type="text" id="uc-unit-${u.id}" value="${u.unit}"></div>
+                    <div class="admin-col"><label>換算為基準值公式 (toBase)</label><input type="text" id="uc-tobase-${u.id}" value="${u.toBase}" placeholder="例：x*100"></div>
+                    <div class="admin-col"><label>由基準值換算回本單位公式 (fromBase)</label><input type="text" id="uc-frombase-${u.id}" value="${u.fromBase}" placeholder="例：x/100"></div>
+                    <div class="admin-col checkbox-col"><label style="font-weight:900; font-size:1.05rem; cursor:pointer; display:flex; align-items:center; gap:9px; margin:0; white-space:nowrap;"><input type="checkbox" id="uc-visible-${u.id}" style="width:20px; height:20px; accent-color:var(--primary);" ${u.visible !== false ? 'checked' : ''}> <span style="line-height:1.2;">顯示於<br>前台選單</span></label></div>
+                    <div class="admin-col admin-actions">
+                        <button class="btn-text" style="background:var(--primary); color:white; border-radius:10px; font-size:1.02rem; padding:12px;" onclick="updateUnitConversionEntry('${group.id}', '${u.id}')"><i class="fas fa-save"></i> 儲存</button>
+                        <button class="btn-text" style="background:rgba(255,59,48,0.1); color:var(--danger); border-radius:10px; font-size:1.02rem; padding:12px; box-shadow:none;" onclick="deleteUnitConversionEntry('${group.id}', '${u.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+            <div style="background:#F0F2F8; padding:22px; border-radius:var(--radius-lg); margin-bottom:20px; border:1px solid rgba(0,0,0,0.04);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+                    <h4 style="margin:0; font-size:1.3rem; color:var(--text-main); font-weight:900;"><i class="fas fa-layer-group" style="color:var(--primary);"></i> ${group.name || '(未命名群組)'}</h4>
+                    <button class="btn-text" style="background:rgba(255,59,48,0.1); color:var(--danger); border:1.5px solid rgba(255,59,48,0.2); padding:9px 16px; font-size:0.98rem;" onclick="deleteUnitConversionGroup('${group.id}')"><i class="fas fa-trash-alt"></i> 刪除整個群組</button>
+                </div>
+                ${unitsHtml || '<div style="text-align:center; padding:20px; color:#8E8E9E; font-weight:900;">此群組目前無任何單位</div>'}
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:14px; margin-top:16px; padding-top:16px; border-top:1.5px dashed rgba(0,0,0,0.08);">
+                    <div>
+                        <label style="display:block; margin-bottom:8px; font-weight:900; color:#8E8E9E; font-size:0.98rem;">新單位名稱</label>
+                        <input type="text" id="new-unit-name-${group.id}" placeholder="例：公尺" style="padding:13px; border-radius:10px; width:100%; border:1.5px solid rgba(0,0,0,0.08);">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:8px; font-weight:900; color:#8E8E9E; font-size:0.98rem;">換算為基準值公式</label>
+                        <input type="text" id="new-unit-tobase-${group.id}" placeholder="例：x*100" style="padding:13px; border-radius:10px; width:100%; border:1.5px solid rgba(0,0,0,0.08);">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:8px; font-weight:900; color:#8E8E9E; font-size:0.98rem;">由基準值換算回本單位公式</label>
+                        <input type="text" id="new-unit-frombase-${group.id}" placeholder="例：x/100" style="padding:13px; border-radius:10px; width:100%; border:1.5px solid rgba(0,0,0,0.08);">
+                    </div>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button class="btn-text" style="width:100%; background:#1A1A2E; color:white; padding:13px; border-radius:10px;" onclick="addUnitToConversionGroup('${group.id}')"><i class="fas fa-plus"></i> 新增單位</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    window.addUnitConversionGroup = async function() {
+        const input = document.getElementById('new-unit-group-name');
+        const name = input.value.trim();
+        if (!name) return alert('請輸入群組名稱！');
+        unitConversionGroups.push({ id: 'grp_' + Date.now() + Math.random().toString(36).substr(2, 5), name: name, units: [] });
+        input.value = '';
+        await window.saveDBToFirebase(true);
+        renderUnitConversionAdmin();
+    };
+
+    window.deleteUnitConversionGroup = async function(groupId) {
+        if (!confirm('確定要刪除整個單位換算群組嗎？\n\n⚠️ 警告：此動作將無法復原，群組內所有換算公式將一併刪除！')) return;
+        unitConversionGroups = unitConversionGroups.filter(g => g.id !== groupId);
+        await window.saveDBToFirebase(true);
+        renderUnitConversionAdmin();
+    };
+
+    window.addUnitToConversionGroup = async function(groupId) {
+        const group = unitConversionGroups.find(g => g.id === groupId);
+        if (!group) return;
+        const nameEl = document.getElementById(`new-unit-name-${groupId}`);
+        const toBaseEl = document.getElementById(`new-unit-tobase-${groupId}`);
+        const fromBaseEl = document.getElementById(`new-unit-frombase-${groupId}`);
+        const unitName = nameEl.value.trim();
+        const toBase = toBaseEl.value.trim();
+        const fromBase = fromBaseEl.value.trim();
+        if (!unitName) return alert('請輸入單位名稱！');
+        if (!toBase || !fromBase) return alert('請輸入換算公式！(基準單位本身請填 x)');
+        if (evalUnitFormula(toBase, 1) === null || evalUnitFormula(fromBase, 1) === null) return alert('⚠️ 公式格式錯誤，請確認公式僅使用 x 與運算符號（例如 x*100）！');
+        if ((group.units || []).some(u => u.unit === unitName)) return alert('此群組內已存在相同名稱的單位！');
+        group.units = group.units || [];
+        group.units.push({ id: 'u_' + Date.now() + Math.random().toString(36).substr(2, 5), unit: unitName, toBase: toBase, fromBase: fromBase, visible: true });
+        await window.saveDBToFirebase(true);
+        renderUnitConversionAdmin();
+    };
+
+    window.updateUnitConversionEntry = async function(groupId, unitId) {
+        const group = unitConversionGroups.find(g => g.id === groupId);
+        if (!group) return;
+        const entry = (group.units || []).find(u => u.id === unitId);
+        if (!entry) return;
+        const nameEl = document.getElementById(`uc-unit-${unitId}`);
+        const toBaseEl = document.getElementById(`uc-tobase-${unitId}`);
+        const fromBaseEl = document.getElementById(`uc-frombase-${unitId}`);
+        const visibleEl = document.getElementById(`uc-visible-${unitId}`);
+        const unitName = nameEl.value.trim();
+        const toBase = toBaseEl.value.trim();
+        const fromBase = fromBaseEl.value.trim();
+        if (!unitName) return alert('請輸入單位名稱！');
+        if (!toBase || !fromBase) return alert('請輸入換算公式！');
+        if (evalUnitFormula(toBase, 1) === null || evalUnitFormula(fromBase, 1) === null) return alert('⚠️ 公式格式錯誤，請確認公式僅使用 x 與運算符號（例如 x*100）！');
+        if ((group.units || []).some(u => u.id !== unitId && u.unit === unitName)) return alert('此群組內已存在相同名稱的單位！');
+        entry.unit = unitName;
+        entry.toBase = toBase;
+        entry.fromBase = fromBase;
+        entry.visible = visibleEl.checked;
+        await window.saveDBToFirebase(true);
+        alert(`✅ 單位「${unitName}」換算設定已成功儲存！`);
+        renderUnitConversionAdmin();
+    };
+
+    window.deleteUnitConversionEntry = async function(groupId, unitId) {
+        const group = unitConversionGroups.find(g => g.id === groupId);
+        if (!group) return;
+        if (!confirm('確定要刪除此單位的自動換算設定嗎？')) return;
+        group.units = (group.units || []).filter(u => u.id !== unitId);
+        await window.saveDBToFirebase(true);
+        renderUnitConversionAdmin();
     };
 
     window.addNewItem = async function() {
@@ -2410,6 +2659,7 @@
         const customTitleInput = document.getElementById('quote-title-input').value.trim();
         const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
         const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientPhone = document.getElementById('client-phone-input').value.trim();
         const clientTaxId = document.getElementById('client-taxid-input').value.trim();
         const projectName = document.getElementById('project-name-input').value.trim();
         const taxExcluded = document.getElementById('tax-excluded-cb').checked;
@@ -2457,6 +2707,7 @@
         const headerHtml = showTitle ? `<div class="r-header"><h1>${displayTitle}</h1></div>` : '';
         const leftInfoLines = [`客戶名稱：${clientName}`];
         if (clientAddress) leftInfoLines.push(`客戶地址：${clientAddress}`);
+        if (clientPhone) leftInfoLines.push(`客戶電話：${clientPhone}`);
         if (clientTaxId) leftInfoLines.push(`統一編號：${clientTaxId}`);
         const leftInfoHtml = leftInfoLines.map(l => `<div>${l}</div>`).join('');
         const projectHtml = projectName ? `<div class="r-project">工程名稱：${projectName}</div>` : '';
@@ -2582,6 +2833,7 @@
         const customTitleInput = document.getElementById('quote-title-input').value.trim();
         const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
         const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientPhone = document.getElementById('client-phone-input').value.trim();
         const clientTaxId = document.getElementById('client-taxid-input').value.trim();
         const projectName = document.getElementById('project-name-input').value.trim();
         const taxExcluded = document.getElementById('tax-excluded-cb').checked;
@@ -2615,6 +2867,7 @@
         const d = new Date();
         const leftInfoLines = [`客戶名稱：${clientName}`];
         if (clientAddress) leftInfoLines.push(`客戶地址：${clientAddress}`);
+        if (clientPhone) leftInfoLines.push(`客戶電話：${clientPhone}`);
         if (clientTaxId) leftInfoLines.push(`統一編號：${clientTaxId}`);
         const rightInfoLines = [`報價單號：${currentQuoteNo}`, `報價日期：${d.toLocaleDateString('zh-TW')}`];
         const infoRowCount = Math.max(leftInfoLines.length, rightInfoLines.length);
