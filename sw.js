@@ -1,55 +1,68 @@
-const CACHE_NAME = 'liu-engineering-quote-v1';
+// v2：網頁本體永遠「網路優先」並同步更新快取，避免離線/弱網時載入到舊版 index.html 而寫入舊資料
+const CACHE_NAME = 'liu-engineering-quote-v2';
 
-const urlsToCache = [
-  './',
-  // 注意：強烈建議將您的主網頁檔案命名為 index.html，若您使用的是「報價系統.html」，請更改成您的檔名
-  './index.html', 
-  './manifest.json',
+const CORE = ['./', './index.html', './manifest.json'];
+const CDN = [
   'https://cdn-icons-png.flaticon.com/512/1005/1005141.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'
 ];
 
-// 安裝 Service Worker 並快取基本資源
 self.addEventListener('install', event => {
+  self.skipWaiting(); // 新版 SW 立即接手
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache successfully');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache =>
+      // 逐一快取：任一項失敗不會讓整個安裝失敗
+      Promise.all(
+        [...CORE, ...CDN].map(url =>
+          fetch(url, { cache: 'reload' })
+            .then(res => { if (res && (res.ok || res.type === 'opaque')) return cache.put(url, res); })
+            .catch(() => {})
+        )
+      )
+    )
   );
 });
 
-// 攔截請求，優先使用網路，網路失敗時使用快取 (Network First Strategy)
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(names => Promise.all(names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n))))
+      .then(() => self.clients.claim())
+  );
+});
+
 self.addEventListener('fetch', event => {
-  // 忽略 Firebase/Google API 請求，避免干擾即時資料庫運作
-  if (event.request.url.includes('firestore.googleapis.com') || 
-      event.request.url.includes('identitytoolkit.googleapis.com')) {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const url = req.url;
+  // 資料庫相關請求完全不攔截
+  if (url.includes('firestore.googleapis.com') ||
+      url.includes('identitytoolkit.googleapis.com') ||
+      url.includes('securetoken.googleapis.com') ||
+      url.includes('firebaseinstallations.googleapis.com')) {
     return;
   }
 
+  // 網路優先；成功就更新快取；失敗才用快取（頁面導覽失敗時回退到 index.html）
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
-  );
-});
-
-// 清理舊的快取
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    fetch(req, req.mode === 'navigate' || url.endsWith('.html') || url.endsWith('/') ? { cache: 'no-cache' } : undefined)
+      .then(res => {
+        if (res && (res.ok || res.type === 'opaque')) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(req, copy)).catch(() => {});
+        }
+        return res;
+      })
+      .catch(() =>
+        caches.match(req, { ignoreSearch: true }).then(hit =>
+          hit || (req.mode === 'navigate' ? caches.match('./index.html') : undefined)
+        )
+      )
   );
 });
