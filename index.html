@@ -458,6 +458,13 @@
             .detail-table th, .detail-table td { padding: 8px 4px !important; white-space: nowrap !important; }
             .detail-table th:nth-child(2), .detail-table td:nth-child(2) { white-space: normal !important; word-break: break-all; min-width: 100px; text-align: left !important; }
         }
+        .item-remark { grid-column: 1 / -1; grid-row: 2; }
+        .item-remark input[type="text"] { padding: 14px 18px; font-size: 1.2rem; border: 2px dashed rgba(0,0,0,0.15); background: rgba(255,255,255,0.8); }
+        .item-remark-label { display:none; }
+        @media (max-width: 900px) {
+            .item-remark { grid-row: auto; display:flex; flex-direction:column; gap:8px; }
+            .item-remark-label { display:block; font-weight:900; color:#8E8E93; font-size:1.1rem; }
+        }
     </style>
 </head>
 <body>
@@ -510,6 +517,25 @@
                         <label>客戶名稱 (必填)</label>
                         <input type="text" id="client-name-input" placeholder="例：蘇先生">
                     </div>
+                    <div class="form-group" style="text-align: left;">
+                        <label>客戶地址 (選填)</label>
+                        <input type="text" id="client-address-input" placeholder="例：南投縣草屯鎮富寮里富昌路103號">
+                    </div>
+                    <div class="form-group" style="text-align: left;">
+                        <label>統一編號 (選填)</label>
+                        <input type="text" id="client-taxid-input" placeholder="例：95846393">
+                    </div>
+                    <div class="form-group" style="text-align: left;">
+                        <label>工程名稱 (選填)</label>
+                        <input type="text" id="project-name-input" placeholder="例：設置樓梯扶手工程">
+                    </div>
+                    <div class="form-group" style="text-align: left; margin-bottom: 0;">
+                        <label>稅務設定</label>
+                        <label style="font-size:1.05rem; color:var(--text-main); display:flex; align-items:center; gap:10px; margin-top:4px; cursor:pointer; background:#F0F2F8; padding:14px 16px; border-radius:12px; line-height:1.5;">
+                            <input type="checkbox" id="tax-excluded-cb" style="width:20px; height:20px; flex-shrink:0; accent-color:var(--primary);">
+                            本報價金額皆為未稅（匯出時將自動加計 5% 營業稅並列出稅額與總計金額）
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -557,6 +583,18 @@
                         <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
                             <label class="switch" style="margin: 0;">
                                 <input type="checkbox" id="admin-setting-show-title" onchange="updateSystemSetting('defaultShowTitle', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; background:white; padding: 24px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.03); margin-top:16px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: clamp(1.15rem, 4vw, 1.4rem); font-weight: 900; color: var(--text-main);">允許重複加入相同項目</div>
+                            <div style="font-size: 1.1rem; color: #8E8E93; margin-top: 8px; word-break: break-word;">開啟後，前台可將同一個工程項目重複加入報價明細清單（各自獨立計價）</div>
+                        </div>
+                        <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                            <label class="switch" style="margin: 0;">
+                                <input type="checkbox" id="admin-setting-allow-duplicate" onchange="updateSystemSetting('allowDuplicateItems', this.checked)">
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -887,10 +925,89 @@
         { id: 'def_d1', category: "拆除工程", name: "室內磚牆/輕隔間拆除", unit: "坪", hasDays: true, defaultHideUnit: false }
     ];
 
+
+    // ===== 通用工具：HTML 跳脫、小計計算、單位換算 =====
+    const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    // 小計：四捨五入（單位換算後單價可能含小數），前台/紀錄/匯出共用同一公式，避免金額不一致
+    function calcSubtotal(q, db) { return Math.max(0, Math.round((q.price || 0) * (q.qty || 0) * (db && db.hasDays ? (q.days || 1) : 1)) - (q.discount || 0)); }
+    function calcHistSubtotal(i) { return Math.max(0, Math.round((i.price || 0) * (i.qty || 0) * (i.days || 1)) - (i.discount || 0)); }
+    const hasAmount = (price) => Number(price) > 0;   // 沒有填單價 → 匯出/明細只顯示項目名稱
+
+    const UNIT_GROUP_FACTORS = [
+        { '毫米': 0.1, '公分': 1, '公尺': 100, '公里': 100000, '台尺': 30.3, '尺': 30.3, '台寸': 3.03, '寸': 3.03, '英吋': 2.54, '吋': 2.54, '英呎': 30.48, '呎': 30.48, '碼': 91.44 },
+        { '平方公分': 1, '平方公尺': 10000, '坪': 33057.85, '才': 918.09 },
+        { '公克': 1, '公斤': 1000, '台斤': 600, '斤': 600, '公噸': 1000000, '噸': 1000000 },
+        { '毫升': 1, 'CC': 1, '立方公分': 1, '公升': 1000, '立方公尺': 1000000 }
+    ];
+    const UNIT_GROUP_DISPLAY = [
+        ['公分', '公尺', '公里', '毫米', '台尺', '台寸', '英吋', '英呎', '碼'],
+        ['平方公分', '平方公尺', '坪', '才'],
+        ['公克', '公斤', '台斤', '公噸'],
+        ['毫升', '公升', '立方公分', '立方公尺']
+    ];
+    function findUnitInfo(unitStr) {
+        if (!unitStr) return null;
+        const u = String(unitStr).trim();
+        for (let i = 0; i < UNIT_GROUP_FACTORS.length; i++) {
+            if (Object.prototype.hasOwnProperty.call(UNIT_GROUP_FACTORS[i], u)) return { groupIndex: i, factor: UNIT_GROUP_FACTORS[i][u] };
+        }
+        return null;
+    }
+    function getConversionRatio(fromUnit, toUnit) {
+        const from = findUnitInfo(fromUnit), to = findUnitInfo(toUnit);
+        if (!from || !to || from.groupIndex !== to.groupIndex) return null;
+        return from.factor / to.factor;
+    }
+    function roundSmart(n) { return isFinite(n) ? Math.round(n * 10000) / 10000 : 0; }
+    function getUnitConvertOptions(currentUnit) {
+        const info = findUnitInfo(currentUnit);
+        if (!info) return null;
+        const opts = [...UNIT_GROUP_DISPLAY[info.groupIndex]];
+        if (!opts.includes(currentUnit)) opts.unshift(currentUnit);
+        return opts;
+    }
+    // 目前生效的單位：只有在「資料庫單位沒被改過」時才採用換算後的單位，避免後台改單位後數量/單位錯配
+    function getItemUnit(q, db) {
+        if (q && q.unit && q.unitBase === (db ? db.unit : '')) return q.unit;
+        return db ? (db.unit || '') : '';
+    }
+
+    // 數字轉中文大寫金額（壹貳參…，含「零」的正確補位規則）
+    function numberToChineseUpper(num) {
+        num = Math.round(Math.max(0, Number(num) || 0));
+        if (num === 0) return '零';
+        const digits = ['零','壹','貳','參','肆','伍','陸','柒','捌','玖'];
+        const units = ['', '拾', '佰', '仟'];
+        const bigUnits = ['', '萬', '億', '兆', '京'];
+        const str = String(num);
+        const groups = [];
+        for (let e = str.length; e > 0; e -= 4) groups.unshift(str.slice(Math.max(0, e - 4), e));
+        let result = '';
+        let pendingZero = false;
+        groups.forEach((g, gi) => {
+            const bigIdx = groups.length - 1 - gi;
+            if (/^0+$/.test(g)) { if (result) pendingZero = true; return; }
+            let part = '';
+            let zero = false;
+            for (let i = 0; i < g.length; i++) {
+                const d = parseInt(g[i], 10), u = g.length - 1 - i;
+                if (d === 0) { zero = true; continue; }
+                if (zero && part) part += '零';
+                zero = false;
+                part += digits[d] + units[u];
+            }
+            // 前一段為 0 或本段不足四位（開頭有 0）需補「零」
+            if (result && (pendingZero || g.length < 4 || g[0] === '0')) result += '零';
+            pendingZero = false;
+            result += part + bigUnits[bigIdx];
+        });
+        return result;
+    }
+
     let systemCategories = [];
     let engineeringDB = [];
     let quoteHistory = []; 
-    let systemSettings = { defaultShowTitle: true };
+    let systemSettings = { defaultShowTitle: true, allowDuplicateItems: false };
     let quoteList = [];
     let currentGrandTotal = 0;
     let lastSavedDataStr = ""; 
@@ -918,7 +1035,7 @@
             items,
             history: Array.isArray(data.history) ? data.history : [],
             categories: Array.isArray(data.categories) ? data.categories : Array.from(new Set(items.map(i => i.category))),
-            settings: data.settings || { defaultShowTitle: true },
+            settings: Object.assign({ defaultShowTitle: true, allowDuplicateItems: false }, (data.settings && typeof data.settings === 'object') ? data.settings : {}),
             categorySettings: data.categorySettings || {},
             migrations: data.migrations || {}
         };
@@ -1079,6 +1196,7 @@
             isFirstLoad = false;
         }
         document.getElementById('admin-setting-show-title').checked = systemSettings.defaultShowTitle;
+        document.getElementById('admin-setting-allow-duplicate').checked = !!systemSettings.allowDuplicateItems;
 
         renderAfterSnapshot();
         runMigrations();
@@ -1159,15 +1277,22 @@
         const todayNoStr = dateStr.replace(/-/g, '');
         const timeStr = d.toLocaleTimeString('zh-TW', { hour12: false });
         const total = currentGrandTotal;
+        const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientTaxId = document.getElementById('client-taxid-input').value.trim();
+        const projectName = document.getElementById('project-name-input').value.trim();
+        const taxExcluded = document.getElementById('tax-excluded-cb').checked;
 
         const mappedItems = quoteList.map(q => {
             const dbItem = engineeringDB.find(db => db.id === q.dbId);
-            return {
+            const m = {
                 cat: dbItem ? dbItem.category : '', name: dbItem ? dbItem.name : '未知',
-                price: q.price, qty: q.qty, unit: dbItem ? dbItem.unit : '',
+                price: q.price, qty: q.qty, unit: getItemUnit(q, dbItem),
                 days: dbItem && dbItem.hasDays ? q.days : null, discount: q.discount || 0,
                 hideUnit: q.hideUnit || false
             };
+            const rk = (q.remark || '').trim();
+            if (rk) m.remark = rk;   // 有備註才寫入，舊紀錄比對不受影響
+            return m;
         });
 
         let result = null;
@@ -1176,7 +1301,10 @@
             const hist = state.history;
             if (hist.length > 0) {
                 const last = hist[0];
-                if (last.client === clientName && last.total === total && JSON.stringify(last.items) === JSON.stringify(mappedItems)) {
+                if (last.client === clientName && last.total === total
+                    && (last.clientAddress || '') === clientAddress && (last.clientTaxId || '') === clientTaxId
+                    && (last.projectName || '') === projectName && !!last.taxExcluded === taxExcluded
+                    && JSON.stringify(last.items) === JSON.stringify(mappedItems)) {
                     result = { status: 'duplicate', quoteNo: last.quoteNo || `${todayNoStr}001` };
                     return ABORT;
                 }
@@ -1191,7 +1319,8 @@
             const quoteNo = `${todayNoStr}${String(maxNum + 1).padStart(3, '0')}`;
             hist.unshift({
                 id: 'R_' + Date.now(), quoteNo, date: dateStr, time: timeStr,
-                client: clientName, total, items: mappedItems
+                client: clientName, clientAddress, clientTaxId, projectName, taxExcluded,
+                total, items: mappedItems
             });
             if (hist.length > 1000) state.history = hist.slice(0, 1000);
             // 【修正④】Firestore 單一文件上限 1MiB：依容量再保護一次，超過就移除最舊紀錄，避免寫入失敗
@@ -1240,12 +1369,14 @@
         if(!record) return;
         
         let rowsHtml = record.items.map((i, idx) => {
-            let sub = Math.max(0, (i.price * i.qty * (i.days || 1)) - (i.discount || 0));
+            const amt = hasAmount(i.price);
+            let sub = calcHistSubtotal(i);
             let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
             let daysDisplay = i.days ? `${i.days}` : '-';
             let optText = [];
-            if(i.discount > 0) optText.push(`(折抵$${i.discount})`);
+            if(amt && i.discount > 0) optText.push(`(折抵$${i.discount})`);
             let optTag = optText.length > 0 ? `<br><span style="color:var(--danger); font-size:0.95rem;">${optText.join(' ')}</span>` : '';
+            if (i.remark) optTag += `<br><span style="color:#6B6B70; font-size:0.95rem; white-space:pre-wrap;">備註：${esc(i.remark)}</span>`;
             
             let bg = idx % 2 === 0 ? '#FFFFFF' : '#F9F9FB';
             let catColor = i.cat.includes('油漆') ? '#007AFF' : '#0A7AFF';
@@ -1253,18 +1384,18 @@
             return `
             <tr style="background:${bg}; border-bottom: 1px solid #E5E5EA;">
                 <td style="padding:12px 8px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900; white-space:nowrap;">${i.cat}</td>
-                <td style="padding:12px 8px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main); word-break: break-all; min-width: 110px;">${i.name}${optTag}</td>
-                <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.price.toLocaleString()}</td>
+                <td ${amt ? '' : 'colspan="5"'} style="padding:12px 8px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main); word-break: break-all; min-width: 110px;">${i.name}${optTag}</td>
+                ${amt ? `<td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.price.toLocaleString()}</td>
                 <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.qty}${unitDisplay}</td>
                 <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${daysDisplay}</td>
-                <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${sub.toLocaleString()}</td>
+                <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${sub.toLocaleString()}</td>` : ''}
             </tr>`;
         }).join('');
         
         document.getElementById('history-detail-content').innerHTML = `
             <div style="padding: 16px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 20px; font-weight:900; font-size:1.15rem; color:var(--text-main);">
-                    <div style="font-size: 1.5rem;">客戶：${record.client}</div>
+                    <div style="font-size: 1.5rem;">客戶：${esc(record.client)}${record.clientAddress ? `<div style="font-size:1.05rem; margin-top:6px;">地址：${esc(record.clientAddress)}</div>` : ''}${record.clientTaxId ? `<div style="font-size:1.05rem; margin-top:4px;">統編：${esc(record.clientTaxId)}</div>` : ''}${record.projectName ? `<div style="font-size:1.05rem; margin-top:4px;">工程：${esc(record.projectName)}</div>` : ''}</div>
                     <div style="display:flex; flex-direction:column; gap:6px; text-align:left; color:#3A3A3C; font-size:1.05rem;">
                         <div>單號：${record.quoteNo || ''}</div>
                         <div>日期：${record.date.replace(/-/g, '/')}</div>
@@ -1288,7 +1419,8 @@
                 </div>
                 
                 <div class="history-detail-total-box">
-                    總計金額：NT$ ${record.total.toLocaleString()}
+                    ${record.taxExcluded ? `<div style="font-size:1rem; color:#6B6B70; margin-bottom:6px;">以上金額皆為未稅　稅額(5%)：NT$ ${Math.round(record.total*0.05).toLocaleString()}</div>` : ''}
+                    總計金額：NT$ ${(record.taxExcluded ? record.total + Math.round(record.total*0.05) : record.total).toLocaleString()}
                 </div>
             </div>
         `;
@@ -1300,17 +1432,18 @@
         
         return records.map(r => {
             let itemsHtml = r.items.map(i => {
-                let sub = Math.max(0, (i.price * i.qty * (i.days || 1)) - (i.discount || 0));
+                const amt = hasAmount(i.price);
+                let sub = calcHistSubtotal(i);
                 let optText = [];
-                if(i.days) optText.push(`${i.days}天`);
-                if(i.discount > 0) optText.push(`折抵$${i.discount}`);
+                if(amt && i.days) optText.push(`${i.days}天`);
+                if(amt && i.discount > 0) optText.push(`折抵$${i.discount}`);
                 let optTag = optText.length > 0 ? `<span style="color:var(--text-muted); font-size:1.1rem; margin-left:10px;">(${optText.join(', ')})</span>` : '';
                 
                 let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
                 return `
                 <div class="history-item-row">
-                    <span style="flex:1;">${i.name} <span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}</span>
-                    <span>$${sub.toLocaleString()}</span>
+                    <span style="flex:1;">${i.name} ${amt ? `<span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}` : ''}${i.remark ? `<div style="font-size:1rem; color:#6B6B70; margin-top:4px; white-space:pre-wrap;">備註：${esc(i.remark)}</div>` : ''}</span>
+                    ${amt ? `<span>$${sub.toLocaleString()}</span>` : ''}
                 </div>`;
             }).join('');
 
@@ -1321,7 +1454,7 @@
             <div class="history-card">
                 <div class="history-card-header">
                     <div>
-                        <div class="history-client"><i class="fas fa-user-circle" style="color:var(--primary); margin-right:14px; font-size:2.2rem;"></i>${r.client}</div>
+                        <div class="history-client"><i class="fas fa-user-circle" style="color:var(--primary); margin-right:14px; font-size:2.2rem;"></i>${esc(r.client)}</div>
                         <div class="history-time">${r.date} ${r.time} ${quoteBadge}</div>
                     </div>
                     <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end;">
@@ -1378,7 +1511,12 @@
                 { header: '數量', key: 'qty', width: 10 },
                 { header: '單位', key: 'unit', width: 10 },
                 { header: '天數', key: 'days', width: 10 },
-                { header: '折抵', key: 'discount', width: 12 }
+                { header: '折抵', key: 'discount', width: 12 },
+                { header: '備註', key: 'remark', width: 30 },
+                { header: '客戶地址', key: 'addr', width: 32 },
+                { header: '統一編號', key: 'taxid', width: 14 },
+                { header: '工程名稱', key: 'proj', width: 26 },
+                { header: '稅別', key: 'tax', width: 10 }
             ];
             
             ws.getRow(1).eachCell(cell => {
@@ -1403,11 +1541,16 @@
                         total: index === 0 ? record.total : '',
                         cat: item.cat,
                         name: item.name,
-                        price: item.price,
-                        qty: item.qty,
-                        unit: item.hideUnit ? '' : item.unit,
-                        days: item.days || '-',
-                        discount: item.discount || 0
+                        price: hasAmount(item.price) ? item.price : '',
+                        qty: hasAmount(item.price) ? item.qty : '',
+                        unit: (hasAmount(item.price) && !item.hideUnit) ? item.unit : '',
+                        days: hasAmount(item.price) ? (item.days || '-') : '',
+                        discount: hasAmount(item.price) ? (item.discount || 0) : '',
+                        remark: item.remark || '',
+                        addr: index === 0 ? (record.clientAddress || '') : '',
+                        taxid: index === 0 ? (record.clientTaxId || '') : '',
+                        proj: index === 0 ? (record.projectName || '') : '',
+                        tax: index === 0 ? (record.taxExcluded ? '未稅' : '') : ''
                     });
                     
                     row.height = 20;
@@ -1653,12 +1796,14 @@
             listContainer.innerHTML = quoteList.map(q => {
                 const dbItem = engineeringDB.find(db => db.id === q.dbId);
                 if(!dbItem) return '';
-                let subtotal = Math.max(0, (q.price * q.qty * (dbItem.hasDays ? q.days : 1)) - q.discount);
+                let subtotal = calcSubtotal(q, dbItem);
+                const cu = getItemUnit(q, dbItem);
                 return `
                 <div style="padding: 20px; border: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
                     <div style="flex:1; padding-right:14px;">
                         <div style="font-weight: 900; font-size: 1.4rem; color: var(--text-main); line-height:1.4;">${dbItem.name}</div>
-                        <div style="font-size: 1.15rem; color: var(--primary); font-weight:800; margin-top: 8px;">單價: $${q.price.toLocaleString()} &nbsp;|&nbsp; 數量: ${q.qty}</div>
+                        <div style="font-size: 1.15rem; color: var(--primary); font-weight:800; margin-top: 8px;">單價: $${q.price.toLocaleString()} &nbsp;|&nbsp; 數量: ${q.qty}${(!q.hideUnit && cu) ? ' ' + esc(cu) : ''}</div>
+                        ${q.remark ? `<div style="font-size:1.05rem; color:#6B6B70; margin-top:6px; white-space:pre-wrap;">備註：${esc(q.remark)}</div>` : ''}
                     </div>
                     <div style="text-align: right;">
                         <div style="font-weight: 900; font-size: 1.6rem; color: var(--danger);">$${subtotal.toLocaleString()}</div>
@@ -1671,12 +1816,12 @@
     };
 
     window.addItemToQuote = function(dbId) {
-        if (quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
+        if (!systemSettings.allowDuplicateItems && quoteList.some(q => q.dbId === dbId)) return alert('已經添加請勿重複添加！');
         const dbItem = engineeringDB.find(db => db.id === dbId);
         const defaultHide = dbItem ? (dbItem.defaultHideUnit || false) : false;
         
-        const newId = 'q_' + Date.now();
-        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: defaultHide });
+        const newId = 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);   // 允許重複項目時避免 id 撞號
+        quoteList.push({ id: newId, dbId: dbId, price: 0, qty: 1, days: 1, discount: 0, hideUnit: defaultHide, unit: dbItem ? dbItem.unit : '', unitBase: dbItem ? dbItem.unit : '', remark: '' });
         renderFrontView();
         
         setTimeout(() => { 
@@ -1697,18 +1842,43 @@
         const target = quoteList.find(q => q.id === qId);
         if (target) {
             const dbItem = engineeringDB.find(db => db.id === target.dbId);
-            const hasUnit = dbItem && dbItem.unit && dbItem.unit.trim() !== '';
+            const curUnit = getItemUnit(target, dbItem);
+            const hasUnit = curUnit && curUnit.trim() !== '';
             if (!hasUnit) return; 
             
             target.hideUnit = !target.hideUnit;
             const unitSpan = document.getElementById(`unit-display-${qId}`);
             const eyeIcon = document.getElementById(`unit-toggle-icon-${qId}`);
             if (unitSpan && eyeIcon) {
-                unitSpan.innerText = target.hideUnit ? '' : dbItem.unit;
+                unitSpan.style.display = target.hideUnit ? 'none' : 'inline-flex';
                 eyeIcon.className = `fas ${target.hideUnit ? 'fa-eye-slash' : 'fa-eye'}`;
                 eyeIcon.style.color = target.hideUnit ? '#C7C7CC' : 'var(--primary)';
             }
         }
+    };
+
+    /* 單位一鍵換算：數量依比例換算，單價反向換算，確保 數量×單價 不變（小計金額不變） */
+    window.convertItemUnit = function(qId, targetUnit) {
+        const target = quoteList.find(q => q.id === qId);
+        if (!target) return;
+        const dbItem = engineeringDB.find(db => db.id === target.dbId);
+        if (!dbItem) return;
+        const currentUnit = getItemUnit(target, dbItem);
+        if (currentUnit === targetUnit) return;
+        const ratio = getConversionRatio(currentUnit, targetUnit);
+        if (ratio === null || !(ratio > 0)) { renderFrontView(); return; }
+        const product = (target.price || 0) * (target.qty || 0);
+        const newQty = roundSmart((target.qty || 0) * ratio);
+        target.qty = newQty;
+        target.price = newQty > 0 ? roundSmart(product / newQty) : target.price;
+        target.unit = targetUnit;
+        target.unitBase = dbItem.unit;
+        renderFrontView();
+    };
+
+    window.handleRemark = function(qId, value) {
+        const target = quoteList.find(q => q.id === qId);
+        if (target) target.remark = String(value || '');
     };
 
     window.handleInput = function(qId, field, value) {
@@ -1720,7 +1890,7 @@
     window.changeQuoteQty = function(qId, field, delta) {
         const target = quoteList.find(q => q.id === qId);
         if (target) {
-            let newVal = target[field] + delta;
+            let newVal = roundSmart((Number(target[field]) || 0) + delta);
             if(field === 'qty' || field === 'days') newVal = Math.max(1, newVal);
             else newVal = Math.max(0, newVal);
             target[field] = newVal;
@@ -1734,7 +1904,8 @@
         const target = quoteList.find(q => q.id === qId);
         if(!target) return;
         const dbItem = engineeringDB.find(db => db.id === target.dbId);
-        let subtotal = Math.max(0, (target.price * target.qty * (dbItem.hasDays ? target.days : 1)) - target.discount);
+        if(!dbItem) return;
+        let subtotal = calcSubtotal(target, dbItem);
         const subtotalEl = document.getElementById(`subtotal-${qId}`);
         if(subtotalEl) subtotalEl.innerText = subtotal.toLocaleString();
         calculateTotal();
@@ -1754,7 +1925,7 @@
         let newTotal = 0;
         quoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId);
-            if (dbItem) newTotal += Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - qItem.discount);
+            if (dbItem) newTotal += calcSubtotal(qItem, dbItem);
         });
         if (newTotal !== currentGrandTotal) {
             currentGrandTotal = newTotal;
@@ -1795,7 +1966,9 @@
             if (db) { const cat = db.category || '未分類'; if(!groupedList[cat]) groupedList[cat] = []; groupedList[cat].push({ q, db }); }
         });
 
-        systemCategories.forEach((cat) => {
+        // 不在分類清單內的項目（分類被刪除/改名）也要顯示，否則會「計入總額卻看不到」
+        const catOrderFront = [...systemCategories, ...Object.keys(groupedList).filter(c => !systemCategories.includes(c))];
+        catOrderFront.forEach((cat) => {
             if(!groupedList[cat]) return;
             const style = getCatStyle(cat);
             
@@ -1808,7 +1981,7 @@
             let isEven = true;
             groupedList[cat].forEach(data => {
                 const { q, db } = data;
-                let subtotal = Math.max(0, (q.price * q.qty * (db.hasDays ? q.days : 1)) - q.discount);
+                let subtotal = calcSubtotal(q, db);
                 
                 const row = document.createElement('div');
                 row.className = 'quote-item-row';
@@ -1828,11 +2001,17 @@
                         </div>
                     </div>` : `<div style="text-align:center; font-size:2.4rem; color:#D1D1D6; font-weight:900; width: 100%;"> - </div>`;
 
-                const hasUnit = db.unit && db.unit.trim() !== '';
+                const displayUnit = getItemUnit(q, db);
+                const hasUnit = displayUnit && displayUnit.trim() !== '';
                 const hideUnitDisplay = q.hideUnit || !hasUnit;
                 const eyeColor = q.hideUnit ? '#C7C7CC' : 'var(--primary)';
                 const eyeClass = q.hideUnit ? 'fa-eye-slash' : 'fa-eye';
-                const unitStr = hideUnitDisplay ? '' : db.unit;
+                const convertOpts = hasUnit ? getUnitConvertOptions(displayUnit) : null;
+                const unitValueHtml = convertOpts
+                    ? `<select onchange="convertItemUnit('${q.id}', this.value)" title="一鍵換算單位" style="border:none; background:transparent; box-shadow:none; padding:0; width:auto; font-weight:900; color:#8E8E93; font-size:1.2rem; max-width:112px; min-width:32px; cursor:pointer; -webkit-appearance:none; appearance:none; text-align-last:right; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">
+                        ${convertOpts.map(u => `<option value="${u}" ${u === displayUnit ? 'selected' : ''}>${u}</option>`).join('')}
+                       </select>`
+                    : (hasUnit ? esc(displayUnit) : '');
                 
                 const toggleBtnHtml = hasUnit ? `
                     <button onclick="toggleUnit('${q.id}')">
@@ -1857,10 +2036,10 @@
                     <div class="mobile-field" data-label="數量">
                         <div class="qty-control-group w-full">
                             <button class="qty-btn" onclick="changeQuoteQty('${q.id}', 'qty', -1)"><i class="fas fa-minus"></i></button>
-                            <input type="number" id="input-qty-${q.id}" value="${q.qty}" min="1" onfocus="if(this.value==='0') this.value='';" onblur="if(this.value==='') { this.value='1'; handleInput('${q.id}', 'qty', 1); }" oninput="handleInput('${q.id}', 'qty', this.value)">
+                            <input type="number" id="input-qty-${q.id}" value="${q.qty}" min="1" step="any" onfocus="if(this.value==='0') this.value='';" onblur="if(this.value==='') { this.value='1'; handleInput('${q.id}', 'qty', 1); }" oninput="handleInput('${q.id}', 'qty', this.value)">
                             <button class="qty-btn" onclick="changeQuoteQty('${q.id}', 'qty', 1)"><i class="fas fa-plus"></i></button>
                             <div class="unit-box">
-                                <span id="unit-display-${q.id}">${unitStr}</span>
+                                <span id="unit-display-${q.id}" style="display:${hideUnitDisplay ? 'none' : 'inline-flex'}; align-items:center;">${unitValueHtml}</span>
                                 ${toggleBtnHtml}
                             </div>
                         </div>
@@ -1877,6 +2056,10 @@
                         </div>
                     </div>
                     
+                    <div class="item-remark">
+                        <span class="item-remark-label">備註</span>
+                        <input type="text" id="input-remark-${q.id}" value="${esc(q.remark || '')}" placeholder="備註（選填，有填才會顯示在報價單項目下方）" oninput="handleRemark('${q.id}', this.value)">
+                    </div>
                     <div class="subtotal-display">$ <span id="subtotal-${q.id}">${subtotal.toLocaleString()}</span></div>
                     
                     <button class="delete-btn" onclick="removeQuoteItem('${q.id}')"><i class="fas fa-trash"></i></button>
@@ -1961,6 +2144,7 @@
         });
         
         document.getElementById('admin-setting-show-title').checked = systemSettings.defaultShowTitle;
+        document.getElementById('admin-setting-allow-duplicate').checked = !!systemSettings.allowDuplicateItems;
     };
 
     window.addNewItem = async function() {
@@ -2143,6 +2327,10 @@
         const showTitle = document.getElementById('show-title-cb').checked;
         const customTitleInput = document.getElementById('quote-title-input').value.trim();
         const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
+        const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientTaxId = document.getElementById('client-taxid-input').value.trim();
+        const projectName = document.getElementById('project-name-input').value.trim();
+        const taxExcluded = document.getElementById('tax-excluded-cb').checked;
         
         // 【修正⑤】window.open 必須在任何 await 之前（保留使用者點擊手勢），否則 iPhone Safari 會當成彈出視窗擋掉
         const newWin = window.open('', '_blank');
@@ -2172,28 +2360,54 @@
 
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
-            let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
+            let subtotal = calcSubtotal(qItem, dbItem);
+            const amt = hasAmount(qItem.price);
             
-            const displayCat = dbItem.category; 
+            const displayCat = esc(dbItem.category); 
             const bg = isEvenRow ? '#FFFFFF' : '#F2F2F7'; isEvenRow = !isEvenRow;
             
-            const hasUnit = dbItem.unit && dbItem.unit.trim() !== '';
+            const itemUnit = getItemUnit(qItem, dbItem);
+            const hasUnit = itemUnit && itemUnit.trim() !== '';
             const hideUnitDisplay = qItem.hideUnit || !hasUnit;
-            const unitDisplay = hideUnitDisplay ? '' : ` ${dbItem.unit}`;
+            const unitDisplay = hideUnitDisplay ? '' : ` ${esc(itemUnit)}`;
+            const remarkText = (qItem.remark || '').trim();
+            const remarkHtml = remarkText ? `<div style="margin-top:8px; font-size:15px; font-weight:700; color:#6B6B70; text-align:left; white-space:pre-wrap; line-height:1.5;">備註：${esc(remarkText)}</div>` : '';
             
-            const discountBadge = (qItem.discount && qItem.discount > 0) ? `<br><span style="display:inline-block; margin-top:6px; background:#FFF0F0; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:14px; font-weight:900; border:1px solid rgba(255,59,48,0.2);">✨ 優惠折抵: -$${qItem.discount.toLocaleString()}</span>` : '';
+            const discountBadge = (amt && qItem.discount && qItem.discount > 0) ? `<br><span style="display:inline-block; margin-top:6px; background:#FFF0F0; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:14px; font-weight:900; border:1px solid rgba(255,59,48,0.2);">✨ 優惠折抵: -$${qItem.discount.toLocaleString()}</span>` : '';
 
             tbody += `<tr style="background-color: ${bg}; border-bottom: 2px solid #E5E5EA;">
                 <td style="padding:18px; font-weight:900; color:#0A7AFF; font-size:18px;">${displayCat}</td>
-                <td style="padding:18px; text-align:left; font-weight:900; font-size:18px;">${dbItem.name}${discountBadge}</td>
-                <td style="padding:18px; font-weight:800; font-size:18px;">${qItem.price.toLocaleString()}</td>
+                <td ${amt ? '' : 'colspan="5"'} style="padding:18px; text-align:left; font-weight:900; font-size:18px;">${esc(dbItem.name)}${discountBadge}${remarkHtml}</td>
+                ${amt ? `<td style="padding:18px; font-weight:800; font-size:18px;">${qItem.price.toLocaleString()}</td>
                 <td style="padding:18px; font-weight:800; font-size:18px;">${qItem.qty}${unitDisplay}</td>
                 <td style="padding:18px; font-weight:800; font-size:18px;">${dbItem.hasDays ? qItem.days + ' 天' : '-'}</td>
-                <td style="padding:18px; font-weight:900; font-size:20px;">${subtotal.toLocaleString()}</td>
+                <td style="padding:18px; font-weight:900; font-size:20px;">${subtotal.toLocaleString()}</td>` : ''}
             </tr>`;
         });
 
-        const headerHtml = showTitle ? `<div class="r-header"><h1>${displayTitle}</h1></div>` : '';
+        const headerHtml = showTitle ? `<div class="r-header"><h1>${esc(displayTitle)}</h1></div>` : '';
+        const leftInfoLines = [`客戶名稱：${clientName}`];
+        if (clientAddress) leftInfoLines.push(`客戶地址：${clientAddress}`);
+        if (clientTaxId) leftInfoLines.push(`統一編號：${clientTaxId}`);
+        const leftInfoHtml = leftInfoLines.map(l => `<div>${esc(l)}</div>`).join('');
+        const projectHtml = projectName ? `<div class="r-project">工程名稱：${esc(projectName)}</div>` : '';
+        let totalsHtml;
+        if (taxExcluded) {
+            const taxAmount = Math.round(currentGrandTotal * 0.05);
+            const grandWithTax = currentGrandTotal + taxAmount;
+            totalsHtml = `
+                <div class="r-tax-note">以上金額皆為未稅</div>
+                <table class="r-totals-table">
+                    <tr><td>總計：</td><td>NT$ ${currentGrandTotal.toLocaleString()}</td></tr>
+                    <tr><td>稅額：</td><td>NT$ ${taxAmount.toLocaleString()}</td></tr>
+                    <tr class="r-final-row"><td>總計金額：</td><td>NT$ ${grandWithTax.toLocaleString()}</td></tr>
+                </table>
+                <div class="r-chinese-total">總計新台幣${numberToChineseUpper(grandWithTax)}元整</div>`;
+        } else {
+            totalsHtml = `<div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
+                <div class="r-chinese-total">總計新台幣${numberToChineseUpper(currentGrandTotal)}元整</div>`;
+        }
+        const safeFileName = `${currentQuoteNo}_${clientName}`.replace(/[\\\/:*?"<>|'`$]/g, '_');
 
         newWin.document.open();
         newWin.document.write(`<!DOCTYPE html>
@@ -2221,12 +2435,19 @@
                 #receipt-wrap { position: absolute; left: -9999px; top: -9999px; width: 950px; background: white; padding: 60px; z-index: -9999; }
                 .r-header { text-align: center; margin-bottom: 40px; border-bottom: 6px solid #1C1C1E; padding-bottom: 25px; }
                 .r-header h1 { font-size: 46px; margin: 0 0 14px 0; color: #1C1C1E; font-weight: 900; letter-spacing: 4px; }
-                .r-info { display: flex; justify-content: space-between; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 35px; }
+                .r-info { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 35px; }
                 table { width: 100%; border-collapse: collapse; text-align: center; font-size: 18px; border: 4px solid #1C1C1E; table-layout: auto; }
                 th { background: #1C1C1E; color: white; padding: 20px; border: 4px solid #1C1C1E; font-size: 22px; font-weight: 900; white-space: nowrap; }
                 td { border: 2.5px solid #C7C7CC; }
                 td:nth-child(1), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6) { white-space: nowrap; }
                 .r-total { text-align: right; font-size: 42px; font-weight: 900; color: #FF3B30; margin-top: 45px; letter-spacing: -1px; font-family: Arial, sans-serif; }
+                .r-info-col { display: flex; flex-direction: column; gap: 7px; text-align: left; }
+                .r-project { font-size: 20px; font-weight: 900; color: #333; margin: -15px 0 30px 0; padding-top: 14px; border-top: 2px solid #E5E5EA; }
+                .r-chinese-total { text-align: right; font-size: 20px; font-weight: 900; color: #1C1C1E; margin-top: 16px; }
+                .r-tax-note { text-align: right; font-size: 18px; font-weight: 900; color: #666; margin-top: 34px; }
+                .r-totals-table { margin-left: auto; margin-top: 12px; border-collapse: collapse; min-width: 340px; border: none; width: auto; }
+                .r-totals-table td { border: 1.5px solid #C7C7CC; padding: 12px 24px; font-size: 20px; font-weight: 900; text-align: right; white-space: nowrap; }
+                .r-totals-table tr.r-final-row td { color: #FF3B30; font-size: 24px; border-bottom: 4px double #FF3B30; font-family: Arial, sans-serif; }
             </style>
         </head>
         <body>
@@ -2245,17 +2466,18 @@
             <div id="receipt-wrap">
                 ${headerHtml}
                 <div class="r-info">
-                    <div>客戶名稱：${clientName}</div>
-                    <div style="display:flex; flex-direction:column; gap:6px; text-align:left;">
-                        <div>報價單號：${currentQuoteNo}</div>
+                    <div class="r-info-col">${leftInfoHtml}</div>
+                    <div class="r-info-col">
+                        <div>報價單號：${esc(currentQuoteNo)}</div>
                         <div>報價日期：${dateStr}</div>
                     </div>
                 </div>
+                ${projectHtml}
                 <table>
                     <thead><tr><th>類別</th><th style="text-align:left;">項目明細</th><th>單價</th><th>數量</th><th>天數</th><th>項目小計</th></tr></thead>
                     <tbody>${tbody}</tbody>
                 </table>
-                <div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
+                ${totalsHtml}
             </div>
             
             <script>
@@ -2274,7 +2496,7 @@
                                 dlBtn.onclick = () => {
                                     const a = document.createElement('a');
                                     a.href = imgData;
-                                    a.download = '${currentQuoteNo}_${clientName}.png';
+                                    a.download = '${safeFileName}.png';
                                     a.click();
                                 };
                             }
@@ -2295,6 +2517,10 @@
         const showTitle = document.getElementById('show-title-cb').checked;
         const customTitleInput = document.getElementById('quote-title-input').value.trim();
         const displayTitle = customTitleInput !== '' ? customTitleInput : '劉氏工程 — 完工報價單';
+        const clientAddress = document.getElementById('client-address-input').value.trim();
+        const clientTaxId = document.getElementById('client-taxid-input').value.trim();
+        const projectName = document.getElementById('project-name-input').value.trim();
+        const taxExcluded = document.getElementById('tax-excluded-cb').checked;
 
         const saveResult = await window.recordQuoteHistory();
         if (saveResult.status === 'error') return;
@@ -2332,24 +2558,37 @@
 
         ws.addRow([]); 
         
-        const infoRow1 = ws.addRow([]);
-        const infoRow2 = ws.addRow([]);
-        
-        ws.mergeCells(`A${infoRow1.number}:D${infoRow2.number}`);
-        ws.getCell(`A${infoRow1.number}`).value = `客戶名稱：${clientName}`; 
-        ws.getCell(`A${infoRow1.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell(`A${infoRow1.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
-
-        ws.mergeCells(`E${infoRow1.number}:F${infoRow1.number}`);
-        ws.getCell(`E${infoRow1.number}`).value = `報價單號：${currentQuoteNo}`;
-        ws.getCell(`E${infoRow1.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell(`E${infoRow1.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
-
         const d = new Date();
-        ws.mergeCells(`E${infoRow2.number}:F${infoRow2.number}`);
-        ws.getCell(`E${infoRow2.number}`).value = `報價日期：${d.toLocaleDateString('zh-TW')}`;
-        ws.getCell(`E${infoRow2.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
-        ws.getCell(`E${infoRow2.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+        const leftInfoLines = [`客戶名稱：${clientName}`];
+        if (clientAddress) leftInfoLines.push(`客戶地址：${clientAddress}`);
+        if (clientTaxId) leftInfoLines.push(`統一編號：${clientTaxId}`);
+        const rightInfoLines = [`報價單號：${currentQuoteNo}`, `報價日期：${d.toLocaleDateString('zh-TW')}`];
+        const infoRowCount = Math.max(leftInfoLines.length, rightInfoLines.length);
+        const infoRows = [];
+        for (let i = 0; i < infoRowCount; i++) infoRows.push(ws.addRow([]));
+        ws.mergeCells(`A${infoRows[0].number}:D${infoRows[infoRowCount - 1].number}`);
+        ws.getCell(`A${infoRows[0].number}`).value = leftInfoLines.join('\n');
+        ws.getCell(`A${infoRows[0].number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+        ws.getCell(`A${infoRows[0].number}`).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+        infoRows.forEach((row, i) => {
+            row.height = 24;
+            if (rightInfoLines[i]) {
+                ws.mergeCells(`E${row.number}:F${row.number}`);
+                ws.getCell(`E${row.number}`).value = rightInfoLines[i];
+                ws.getCell(`E${row.number}`).font = { name: '微軟正黑體', size: 15, bold: true };
+                ws.getCell(`E${row.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+            }
+        });
+
+        if (projectName) {
+            const projRow = ws.addRow([]);
+            ws.mergeCells(`A${projRow.number}:F${projRow.number}`);
+            ws.getCell(`A${projRow.number}`).value = `工程名稱：${projectName}`;
+            ws.getCell(`A${projRow.number}`).font = { name: '微軟正黑體', size: 15, bold: true, color: { argb: 'FF1C1C1E' } };
+            ws.getCell(`A${projRow.number}`).alignment = { vertical: 'middle', horizontal: 'left' };
+            ws.getCell(`A${projRow.number}`).border = { top: { style: 'thin', color: { argb: 'FFC7C7CC' } } };
+            projRow.height = 26;
+        }
 
         ws.addRow([]);
 
@@ -2374,20 +2613,33 @@
         let isEvenRow = true;
         sortedQuoteList.forEach(qItem => {
             const dbItem = engineeringDB.find(db => db.id === qItem.dbId); if (!dbItem) return;
-            let subtotal = Math.max(0, (qItem.price * qItem.qty * (dbItem.hasDays ? qItem.days : 1)) - (qItem.discount || 0));
+            let subtotal = calcSubtotal(qItem, dbItem);
+            const amt = hasAmount(qItem.price);
             
-            const hasUnit = dbItem.unit && dbItem.unit.trim() !== '';
+            const itemUnit = getItemUnit(qItem, dbItem);
+            const hasUnit = itemUnit && itemUnit.trim() !== '';
             const hideUnitDisplay = qItem.hideUnit || !hasUnit;
-            const unitStr = hideUnitDisplay ? `${qItem.qty}` : `${qItem.qty} ${dbItem.unit}`;
+            const unitStr = hideUnitDisplay ? `${qItem.qty}` : `${qItem.qty} ${itemUnit}`;
             
             let itemNameText = dbItem.name;
-            if (qItem.discount && qItem.discount > 0) {
+            let extraLines = 0;
+            if (amt && qItem.discount && qItem.discount > 0) {
                 itemNameText += `\n(優惠折抵: -$${qItem.discount.toLocaleString()})`;
+                extraLines += 1;
+            }
+            const remarkText = (qItem.remark || '').trim();
+            if (remarkText) {
+                itemNameText += `\n備註：${remarkText}`;
+                // 估算備註換行數（欄寬約 32 個中文字一行）
+                extraLines += ('備註：' + remarkText).split(/\r?\n/).reduce((n, ln) => n + Math.max(1, Math.ceil(ln.length / 32)), 0);
             }
             
-            const row = ws.addRow([ dbItem.category, itemNameText, qItem.price, unitStr, dbItem.hasDays ? `${qItem.days} 天` : '-', subtotal ]);
+            const row = amt
+                ? ws.addRow([ dbItem.category, itemNameText, qItem.price, unitStr, dbItem.hasDays ? `${qItem.days} 天` : '-', subtotal ])
+                : ws.addRow([ dbItem.category, itemNameText, '', '', '', '' ]);   // 沒有金額：只顯示項目名稱
+            if (!amt) ws.mergeCells(`B${row.number}:F${row.number}`);
             
-            row.height = (qItem.discount && qItem.discount > 0) ? 48 : 36;
+            row.height = Math.max(36, 24 + extraLines * 22);
             const bg = isEvenRow ? 'FFFFFFFF' : 'FFF2F2F7'; isEvenRow = !isEvenRow;
 
             row.eachCell({ includeEmpty: true }, (cell, colIdx) => {
@@ -2401,22 +2653,41 @@
         });
 
         ws.addRow([]); 
-        const tRow = ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal]); 
-        tRow.height = 50;
-        
-        ws.mergeCells(`A${tRow.number}:E${tRow.number}`);
-        tRow.getCell(1).font = { name: '微軟正黑體', size: 20, bold: true }; 
-        tRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
-        tRow.getCell(6).font = { name: 'Arial', size: 24, bold: true, color: { argb: 'FFFF3B30' } }; 
-        tRow.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
-        tRow.getCell(6).numFmt = '"NT$" #,##0';
-
-        const borderStyle = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color: { argb: 'FFFF3B30' }}, right: {style:'thin'} };
-        tRow.getCell(1).border = borderStyle;
-        tRow.getCell(6).border = borderStyle;
+        const styleTotalRow = (row, labelSize, numSize, isFinal) => {
+            row.height = isFinal ? 50 : 32;
+            ws.mergeCells(`A${row.number}:E${row.number}`);
+            row.getCell(1).font = { name: '微軟正黑體', size: labelSize, bold: true };
+            row.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+            row.getCell(6).font = { name: 'Arial', size: numSize, bold: true, color: { argb: 'FFFF3B30' } };
+            row.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
+            row.getCell(6).numFmt = '"NT$" #,##0';
+            const bs = isFinal
+                ? { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color: { argb: 'FFFF3B30' }}, right: {style:'thin'} }
+                : { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+            row.getCell(1).border = bs;
+            row.getCell(6).border = bs;
+        };
+        if (taxExcluded) {
+            const taxAmount = Math.round(currentGrandTotal * 0.05);
+            const noteRow = ws.addRow(['以上金額皆為未稅']);
+            ws.mergeCells(`A${noteRow.number}:F${noteRow.number}`);
+            noteRow.getCell(1).font = { name: '微軟正黑體', size: 13, bold: true, color: { argb: 'FF8E8E93' } };
+            noteRow.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
+            styleTotalRow(ws.addRow(['總計：', '', '', '', '', currentGrandTotal]), 15, 16, false);
+            styleTotalRow(ws.addRow(['稅額：', '', '', '', '', taxAmount]), 15, 16, false);
+            styleTotalRow(ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal + taxAmount]), 20, 24, true);
+        } else {
+            styleTotalRow(ws.addRow(['總計金額：', '', '', '', '', currentGrandTotal]), 20, 24, true);
+        }
+        const finalAmount = taxExcluded ? currentGrandTotal + Math.round(currentGrandTotal * 0.05) : currentGrandTotal;
+        const chineseRow = ws.addRow([`總計新台幣${numberToChineseUpper(finalAmount)}元整`]);
+        ws.mergeCells(`A${chineseRow.number}:F${chineseRow.number}`);
+        chineseRow.getCell(1).font = { name: '微軟正黑體', size: 15, bold: true, color: { argb: 'FF1C1C1E' } };
+        chineseRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+        chineseRow.height = 30;
 
         const buf = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buf]), `${currentQuoteNo}_${clientName}.xlsx`);
+        saveAs(new Blob([buf]), `${currentQuoteNo}_${clientName}.xlsx`.replace(/[\\\/:*?"<>|]/g, '_'));
     };
 
     let secretClickCount = 0; let secretTimer;
