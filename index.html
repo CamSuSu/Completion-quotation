@@ -2335,13 +2335,7 @@
         // 【修正⑤】window.open 必須在任何 await 之前（保留使用者點擊手勢），否則 iPhone Safari 會當成彈出視窗擋掉
         const newWin = window.open('', '_blank');
         if (!newWin) return alert('⚠️ 彈出視窗被瀏覽器封鎖，請允許開啟新分頁！');
-        newWin.document.write('<p style="font:20px sans-serif;padding:24px">處理中…</p>');
 
-        const saveResult = await window.recordQuoteHistory();
-        if (saveResult.status === 'error') { newWin.close(); return; }
-        if (saveResult.status === 'duplicate') alert('系統提示：此筆報價明細已成功儲存過，將直接為您匯出圖片！\n(單號：' + saveResult.quoteNo + ')');
-        
-        const currentQuoteNo = saveResult.quoteNo;
         const d = new Date();
         const dateStr = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2407,9 +2401,9 @@
             totalsHtml = `<div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
                 <div class="r-chinese-total">總計新台幣${numberToChineseUpper(currentGrandTotal)}元整</div>`;
         }
-        const safeFileName = `${currentQuoteNo}_${clientName}`.replace(/[\\\/:*?"<>|'`$]/g, '_');
 
-        newWin.document.open();
+        // 與「點餐明細」相同流程：先一次寫入完整頁面（按鈕立即可用），單號待雲端儲存完成後再回填，
+        // 不再先寫「處理中…」再 document.open() 重寫（手機瀏覽器會卡在處理中）。
         newWin.document.write(`<!DOCTYPE html>
         <html lang="zh-TW">
         <head>
@@ -2432,7 +2426,7 @@
                 .hint { background: rgba(10, 122, 255, 0.1); border: 2.5px solid rgba(10, 122, 255, 0.3); color: #0A7AFF; padding: 18px 28px; border-radius: 18px; font-weight: 900; font-size: 1.35rem; margin-bottom: 10px; }
                 
                 /* 防止行動裝置截圖時版面被撐破，改用絕對負空間與 z-index 防護 */
-                #receipt-wrap { position: absolute; left: -9999px; top: -9999px; width: 950px; background: white; padding: 60px; z-index: -9999; }
+                #receipt-wrap { position: absolute; left: -9999px; top: 0; width: 950px; background: white; padding: 60px; }
                 .r-header { text-align: center; margin-bottom: 40px; border-bottom: 6px solid #1C1C1E; padding-bottom: 25px; }
                 .r-header h1 { font-size: 46px; margin: 0 0 14px 0; color: #1C1C1E; font-weight: 900; letter-spacing: 4px; }
                 .r-info { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; font-size: 20px; font-weight: 900; color: #333; margin-bottom: 35px; }
@@ -2452,7 +2446,7 @@
         </head>
         <body>
             <div id="action-center">
-                <button class="btn" id="btn-capture" style="background:#0A7AFF; color:white;"><i class="fa-solid fa-image"></i> 產出並儲存圖片</button>
+                <button class="btn" id="btn-capture" disabled style="background:#0A7AFF; color:white; opacity:.6;"><i class="fa-solid fa-image"></i> <span id="btn-capture-text">正在儲存報價單…</span></button>
                 <button class="btn" onclick="window.close()" style="background:white; color:#1C1C1E;"><i class="fa-solid fa-xmark"></i> 關閉</button>
             </div>
             <div id="loading"><div class="spinner"></div><div>正在產生高清晰圖片...</div></div>
@@ -2468,7 +2462,7 @@
                 <div class="r-info">
                     <div class="r-info-col">${leftInfoHtml}</div>
                     <div class="r-info-col">
-                        <div>報價單號：${esc(currentQuoteNo)}</div>
+                        <div>報價單號：<span id="r-quoteno">儲存中…</span></div>
                         <div>報價日期：${dateStr}</div>
                     </div>
                 </div>
@@ -2481,31 +2475,72 @@
             </div>
             
             <script>
-                document.getElementById('btn-capture').addEventListener('click', function() {
-                    const target = document.getElementById('receipt-wrap');
-                    document.getElementById('loading').style.display = 'flex';
-                    setTimeout(() => {
-                        html2canvas(target, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-                            const imgData = canvas.toDataURL('image/png');
-                            document.getElementById('loading').style.display = 'none';
-                            document.getElementById('action-center').style.display = 'none';
-                            document.getElementById('result-area').style.display = 'flex';
-                            document.getElementById('result-img').src = imgData;
-                            const dlBtn = document.getElementById('btn-download');
-                            if(dlBtn) {
-                                dlBtn.onclick = () => {
-                                    const a = document.createElement('a');
-                                    a.href = imgData;
-                                    a.download = '${safeFileName}.png';
-                                    a.click();
-                                };
-                            }
-                        });
-                    }, 600);
-                });
+                (function() {
+                    var fileName = 'quote';
+                    window.__setQuoteNo = function(no, fname) {
+                        fileName = fname || no;
+                        document.getElementById('r-quoteno').textContent = no;
+                        var btn = document.getElementById('btn-capture');
+                        btn.disabled = false; btn.style.opacity = '1';
+                        document.getElementById('btn-capture-text').textContent = '產出並儲存圖片';
+                    };
+                    document.getElementById('btn-capture').addEventListener('click', function() {
+                        var target = document.getElementById('receipt-wrap');
+                        var loading = document.getElementById('loading');
+                        loading.style.display = 'flex';
+                        function fail(msg) { loading.style.display = 'none'; alert('圖片產生失敗：' + msg); }
+                        setTimeout(function() {
+                            if (typeof html2canvas !== 'function') return fail('圖片元件尚未載入完成，請檢查網路後重新點擊');
+                            // 手機畫布像素上限保護：太大就自動降低縮放比，避免卡住或產出空白
+                            var w = target.offsetWidth || 950, h = target.offsetHeight || 1200;
+                            var scale = Math.min(2, Math.sqrt(12000000 / (w * h)));
+                            if (!(scale > 0.5)) scale = 0.5;
+                            var done = false;
+                            var guard = setTimeout(function() { if (!done) { done = true; fail('逾時，請重新整理後再試'); } }, 45000);
+                            html2canvas(target, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0 }).then(function(canvas) {
+                                if (done) return; done = true; clearTimeout(guard);
+                                var imgData = canvas.toDataURL('image/png');
+                                loading.style.display = 'none';
+                                document.getElementById('action-center').style.display = 'none';
+                                target.style.display = 'none';
+                                document.getElementById('result-area').style.display = 'flex';
+                                document.getElementById('result-img').src = imgData;
+                                window.scrollTo(0, 0);
+                                var dlBtn = document.getElementById('btn-download');
+                                if (dlBtn) {
+                                    dlBtn.onclick = function() {
+                                        var a = document.createElement('a');
+                                        a.href = imgData;
+                                        a.download = fileName + '.png';
+                                        a.click();
+                                    };
+                                }
+                            }).catch(function(err) {
+                                if (done) return; done = true; clearTimeout(guard);
+                                fail((err && err.message) || err);
+                            });
+                        }, 500);
+                    });
+                })();
             <\/script>
         </body></html>`);
         newWin.document.close();
+
+        // 雲端儲存（含逾時保護：離線/網路卡住時不會無限等待）
+        let saveResult;
+        try {
+            saveResult = await Promise.race([
+                window.recordQuoteHistory(),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 20000))
+            ]);
+        } catch (e) {
+            try { newWin.close(); } catch (_) {}
+            return alert('❌ 報價紀錄儲存逾時或失敗，請確認網路後重試。');
+        }
+        if (!saveResult || saveResult.status === 'error') { try { newWin.close(); } catch (_) {} return; }
+        if (saveResult.status === 'duplicate') alert('系統提示：此筆報價明細已成功儲存過，將直接為您匯出圖片！\n(單號：' + saveResult.quoteNo + ')');
+        const fname = `${saveResult.quoteNo}_${clientName}`.replace(/[\\\/:*?"<>|'`$]/g, '_');
+        try { newWin.__setQuoteNo(saveResult.quoteNo, fname); } catch (e) { console.warn('回填單號失敗', e); }
     };
 
     window.exportToExcelFormatted = async function() {
