@@ -813,8 +813,90 @@
         .bottom-total-amount { letter-spacing: .5px; }
         .subtotal-display { background: linear-gradient(180deg, #0E1220, #26304F); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         #floating-cart:hover, #floating-add:hover { box-shadow: 0 16px 34px rgba(10,132,255,.35), inset 0 1px 0 rgba(255,255,255,.3); }
-        @media (max-width: 900px) { body::before { animation-duration: 40s; } .header > .fx-dot { display: none; } }
+        @media (max-width: 900px) { body::before { animation-duration: 40s; } }
         @media (prefers-reduced-motion: reduce) { body::before, .card-title i, .header > .fx-dot { animation: none !important; } }
+        /* ================================================================
+           UI v7：手機排版修正 + 神秘未來感標頭 + iOS 液態玻璃質感
+           ================================================================ */
+        :root { --spring: cubic-bezier(.34,1.56,.64,1); --blur: blur(30px) saturate(190%); }
+        @keyframes spin360 { to { transform: rotate(360deg); } }
+        @keyframes orbA { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(90px,40px,0) scale(1.25); } }
+        @keyframes orbB { from { transform: translate3d(0,0,0) scale(1.1); } to { transform: translate3d(-110px,-30px,0) scale(.9); } }
+        @keyframes orbC { from { transform: translate3d(-60px,0,0) scale(.9); opacity: .35; } to { transform: translate3d(80px,20px,0) scale(1.2); opacity: .7; } }
+        @keyframes scanY { 0% { transform: translateY(-110%); opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { transform: translateY(330%); opacity: 0; } }
+        @keyframes textShine { to { background-position: -220% 0; } }
+        @keyframes sheetUp { from { transform: translate3d(0, 100%, 0); } to { transform: none; } }
+
+        /* ── 快速新增視窗標題列（手機/平板直立不跑版） ── */
+        .quick-header { gap: 12px; flex-wrap: nowrap; }
+        .quick-title-wrap { min-width: 0; flex: 1 1 auto; }
+        .quick-title-wrap h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; gap: 10px; display: block; }
+        .quick-title-wrap h3 i { margin-right: 8px; }
+        .quick-count { display: inline-flex; align-items: center; margin-top: 8px; padding: 4px 12px; border-radius: 999px; font-size: .9rem; font-weight: 900; color: var(--primary); background: rgba(10,132,255,.12); border: 1px solid rgba(10,132,255,.25); }
+        .quick-count:empty { display: none; }
+        .quick-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        #quick-lock-wrap { display: flex; align-items: center; gap: 6px; font-size: .92rem; font-weight: 900; color: var(--text-muted); white-space: nowrap; padding: 4px 6px 4px 12px; border-radius: 999px; background: rgba(20,23,31,.05); }
+        @media (max-width: 700px) {
+            .quick-title-wrap h3 { font-size: 1.25rem; }
+            #quick-lock-text { display: none; }
+            #quick-lock-wrap { padding: 2px 4px 2px 10px; gap: 2px; }
+            .quick-actions .close-modal { font-size: 2rem; }
+        }
+
+        /* ── iOS 底部彈出式面板（手機/直立裝置）＋抓取把手 ── */
+        .modal-content { position: relative; }
+        .modal-content::after { content: ""; position: absolute; top: 8px; left: 50%; width: 42px; height: 5px; margin-left: -21px; border-radius: 3px; background: rgba(60,60,67,.28); z-index: 5; pointer-events: none; }
+        @media (max-width: 700px) {
+            .modal-overlay { align-items: flex-end; }
+            .modal-content { width: 100% !important; max-width: 100% !important; max-height: 90vh; border-radius: 30px 30px 0 0 !important; padding-bottom: env(safe-area-inset-bottom, 0px); }
+            .modal-header { padding: 26px 20px 16px; }
+            .modal-overlay.active .modal-content { animation: sheetUp .55s var(--ease) both; }
+        }
+
+        /* ── 神秘未來感標頭：極光 + 軌道環 + 掃描線 + 彗星邊框 + 光球 ── */
+        .header { background: radial-gradient(420px 240px at var(--mx, 85%) var(--my, 0%), rgba(196,181,253,.22), transparent 70%),
+                              linear-gradient(90deg, transparent, #22D3EE, #8B5CF6, #F5B301, transparent) bottom / 100% 3px no-repeat,
+                              radial-gradient(560px 240px at 92% 0%, rgba(139,92,246,.6), transparent 70%),
+                              radial-gradient(440px 220px at 6% 100%, rgba(34,211,238,.4), transparent 70%),
+                              linear-gradient(135deg, #070B18, #0E1530 55%, #1B1553) !important;
+                  border: 1px solid rgba(167,139,250,.28) !important; box-shadow: 0 26px 60px rgba(30,20,90,.45), 0 0 40px rgba(99,102,241,.18), inset 0 1px 0 rgba(255,255,255,.18); }
+        .header::before { opacity: .95; filter: blur(30px) saturate(1.4); }
+        .header::after { background: repeating-linear-gradient(90deg, transparent 0 30px, rgba(34,211,238,.3) 52px, rgba(167,139,250,.28) 72px, transparent 98px, transparent 128px); }
+        .header > .fx-orb { position: absolute; border-radius: 50%; filter: blur(32px); opacity: .62; pointer-events: none; z-index: 1; will-change: transform; }
+        .fx-orb-a { width: 260px; height: 260px; left: -70px; top: -100px; background: radial-gradient(circle, rgba(34,211,238,.9), transparent 70%); animation: orbA 11s ease-in-out infinite alternate; }
+        .fx-orb-b { width: 300px; height: 300px; right: -90px; bottom: -150px; background: radial-gradient(circle, rgba(139,92,246,.95), transparent 70%); animation: orbB 13s ease-in-out infinite alternate; }
+        .fx-orb-c { width: 190px; height: 190px; left: 42%; top: -80px; background: radial-gradient(circle, rgba(236,72,153,.6), transparent 70%); animation: orbC 9s ease-in-out infinite alternate; }
+        .header > .fx-ring { position: absolute; right: -36px; top: 50%; width: 210px; height: 210px; margin-top: -105px; border-radius: 50%; z-index: 1; pointer-events: none; border: 1px solid rgba(186,230,253,.38);
+            box-shadow: inset 0 0 36px rgba(34,211,238,.16), 0 0 34px rgba(99,102,241,.25); animation: spin360 26s linear infinite; will-change: transform; }
+        .header > .fx-ring::before { content: ""; position: absolute; top: -4px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #7DD3FC; box-shadow: 0 0 14px 4px rgba(125,211,252,.85); }
+        .header > .fx-ring-2 { width: 136px; height: 136px; right: 1px; margin-top: -68px; border-style: dashed; border-color: rgba(196,181,253,.55); animation: spin360 17s linear infinite reverse; }
+        .header > .fx-ring-2::before { background: #E9D5FF; box-shadow: 0 0 14px 4px rgba(216,180,254,.85); }
+        .header > .fx-scan { position: absolute; left: 0; right: 0; top: 0; height: 64px; z-index: 1; pointer-events: none; will-change: transform;
+            background: linear-gradient(180deg, transparent, rgba(34,211,238,.18) 40%, rgba(255,255,255,.34) 50%, rgba(167,139,250,.18) 60%, transparent); animation: scanY 5.8s ease-in-out infinite; }
+        .header > .fx-edge { position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; z-index: 3; pointer-events: none; overflow: hidden;
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+        .header > .fx-edge::before { content: ""; position: absolute; inset: -120%; background: conic-gradient(from 0deg, transparent 0 58%, rgba(34,211,238,.95) 70%, rgba(167,139,250,.95) 80%, rgba(244,114,182,.8) 88%, transparent 96%); animation: spin360 5.5s linear infinite; will-change: transform; }
+        .brand-section h1 { background: linear-gradient(100deg, #fff 0%, #BAE6FD 22%, #C4B5FD 44%, #FDE68A 64%, #fff 84%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: textShine 7s linear infinite; }
+        .brand-icon { box-shadow: 0 0 0 4px rgba(245,179,1,.2), 0 0 30px rgba(245,179,1,.55), 0 10px 28px rgba(245,179,1,.45) !important; }
+        @media (max-width: 700px) {
+            .header > .fx-ring { width: 150px; height: 150px; margin-top: -75px; right: -64px; opacity: .8; }
+            .header > .fx-ring-2 { width: 96px; height: 96px; margin-top: -48px; right: -38px; }
+            .fx-orb-a { width: 190px; height: 190px; } .fx-orb-b { width: 220px; height: 220px; } .fx-orb-c { display: none; }
+        }
+
+        /* ── iOS 液態玻璃：高光邊緣 + 鏡面反射 ── */
+        .card { isolation: isolate; box-shadow: 0 2px 6px rgba(20,23,31,.05), 0 20px 48px rgba(52,70,120,.16), inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.5); }
+        .card::before { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; pointer-events: none;
+            background: linear-gradient(135deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.14) 26%, transparent 52%), linear-gradient(315deg, rgba(180,200,255,.2), transparent 38%); }
+        .modal-content::before { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 0; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0) 30%); }
+        .modal-header, .modal-body { position: relative; z-index: 1; }
+        .nav-tabs, .top-action-btn { box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.5); }
+        .bottom-bar-inner { background-image: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0) 45%) !important; }
+        .top-action-btn, .btn-text, .action-circle-btn, .tab-btn { transition-timing-function: var(--spring); }
+        .top-action-btn:active, .btn-text:active, .action-circle-btn:active, .cat-btn:active { transform: scale(.94); }
+        .quote-item-row { box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.9); }
+        @media (max-width: 900px) { :root { --blur: blur(18px) saturate(180%); } }
+        @media (prefers-reduced-motion: reduce) { .header > .fx-orb, .header > .fx-ring, .header > .fx-scan, .header > .fx-edge::before, .brand-section h1 { animation: none !important; } }
     </style>
 </head>
 <body>
@@ -1069,10 +1151,13 @@
 
 <div class="modal-overlay" id="quick-add-modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-plus-circle" style="color: var(--primary);"></i> 快速新增項目 <span id="quick-add-count" style="font-size:1rem; color:var(--text-muted); margin-left:8px;"></span></h3>
-            <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
-                <div id="quick-lock-wrap" title="開啟鎖定：加入項目後此視窗不會自動關閉，可連續加入" style="display:flex; align-items:center; gap:6px; font-size:.95rem; font-weight:900; color:var(--text-muted); white-space:nowrap;">
+        <div class="modal-header quick-header">
+            <div class="quick-title-wrap">
+                <h3><i class="fas fa-plus-circle" style="color: var(--primary);"></i>快速新增項目</h3>
+                <div id="quick-add-count" class="quick-count"></div>
+            </div>
+            <div class="quick-actions">
+                <div id="quick-lock-wrap" title="開啟鎖定：加入項目後此視窗不會自動關閉，可連續加入">
                     <i class="fas fa-lock-open" id="quick-lock-icon"></i><span id="quick-lock-text">鎖定</span>
                     <label class="switch" style="margin:0; transform:scale(.82); transform-origin:right center;">
                         <input type="checkbox" id="quick-lock-cb" onchange="setQuickAddLock(this.checked)">
@@ -2214,7 +2299,7 @@
     };
     function updateQuickAddCount() {
         const el = document.getElementById('quick-add-count');
-        if (el) el.textContent = quoteList.length > 0 ? `（已選 ${quoteList.length} 項）` : '';
+        if (el) el.textContent = quoteList.length > 0 ? `已選 ${quoteList.length} 項` : '';
     }
     window.openQuickAddModal = function() {
         const g = document.getElementById('quick-category-grid');
@@ -3259,8 +3344,12 @@ ${esc(q.remark || '')}</textarea>
         // ── v6 動態：標頭光點 + 總金額數字滾動（純視覺，不改任何資料；失敗不影響功能）
         try {
             var hd = document.querySelector('.header');
-            if (hd && window.innerWidth >= 700) {
-                for (var di = 0; di < 14; di++) {
+            if (hd) {
+                ['fx-orb fx-orb-a', 'fx-orb fx-orb-b', 'fx-orb fx-orb-c', 'fx-ring', 'fx-ring fx-ring-2', 'fx-scan', 'fx-edge'].forEach(function (c) {
+                    var el = document.createElement('span'); el.className = c; hd.appendChild(el);
+                });
+                var dn = window.innerWidth >= 700 ? 18 : 9;
+                for (var di = 0; di < dn; di++) {
                     var dot = document.createElement('span');
                     dot.className = 'fx-dot';
                     var sz = 2 + Math.random() * 4;
