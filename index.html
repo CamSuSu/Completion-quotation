@@ -2620,7 +2620,7 @@
                     
                     <div class="item-remark">
                         <span class="item-remark-label">備註</span>
-                        <textarea id="input-remark-${q.id}" rows="1" placeholder="備註（選填，可按 Enter 換行；有填才會顯示在報價單項目下方）" oninput="handleRemark('${q.id}', this.value); autoGrowRemark(this)">
+                        <textarea id="input-remark-${q.id}" rows="1" placeholder="備註（選填）" oninput="handleRemark('${q.id}', this.value); autoGrowRemark(this)">
 ${esc(q.remark || '')}</textarea>
                     </div>
                     <div class="subtotal-display">$ <span id="subtotal-${q.id}">${subtotal.toLocaleString()}</span></div>
