@@ -6,7 +6,7 @@
     <title>劉氏工程 報價系統</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#F2F2F7">
+    <meta name="theme-color" content="#0B1B33">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="劉氏報價">
@@ -897,6 +897,111 @@
         .quote-item-row { box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.9); }
         @media (max-width: 900px) { :root { --blur: blur(18px) saturate(180%); } }
         @media (prefers-reduced-motion: reduce) { .header > .fx-orb, .header > .fx-ring, .header > .fx-scan, .header > .fx-edge::before, .brand-section h1 { animation: none !important; } }
+        /* ================================================================
+           UI v8：專業工程報價系統大改版（版面 / 色彩 / 質感 / 動態；功能不變）
+           設計語言：深海軍藍 + 鋼藍 + 琥珀金；清楚的資訊層級；手機直立卡片式明細
+           ================================================================ */
+        :root {
+            --bg-body: #E9EFF6; --text-main: #0F1B2D; --text-muted: #5B6B85;
+            --primary: #1456D6; --indigo: #0B3A75; --danger: #E5484D; --ok: #0E9F6E; --accent: #F2A516;
+            --navy: #0F2747; --navy-deep: #0B1B33; --line: #D9E2EE; --surface: #FFFFFF; --field: #F4F7FB;
+            --graphite: #0B1B33; --graphite-2: #12294A;
+            --radius-xl: 22px; --radius-lg: 18px; --radius-md: 14px;
+            --shadow-sm: 0 1px 2px rgba(11,27,51,.06), 0 4px 12px rgba(11,27,51,.05);
+            --shadow-md: 0 1px 3px rgba(11,27,51,.06), 0 14px 34px rgba(11,27,51,.09);
+        }
+        body { background-color: var(--bg-body); background-image: linear-gradient(rgba(20,86,214,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(20,86,214,.035) 1px, transparent 1px); background-size: 30px 30px; }
+        body::before { opacity: .55; background: radial-gradient(520px 420px at 15% 18%, rgba(20,86,214,.2), transparent 70%), radial-gradient(520px 420px at 85% 10%, rgba(34,211,238,.16), transparent 70%), radial-gradient(480px 400px at 60% 95%, rgba(242,165,22,.1), transparent 70%); }
+
+        /* ── 標頭：保留神秘光效，色彩收斂為海軍藍/青/琥珀 ── */
+        .fx-orb-b { background: radial-gradient(circle, rgba(59,130,246,.95), transparent 70%) !important; }
+        .fx-orb-c { background: radial-gradient(circle, rgba(242,165,22,.55), transparent 70%) !important; }
+        .header > .fx-edge::before { background: conic-gradient(from 0deg, transparent 0 58%, rgba(34,211,238,.95) 70%, rgba(96,165,250,.95) 80%, rgba(242,165,22,.9) 90%, transparent 97%); }
+        .header { background: radial-gradient(420px 240px at var(--mx, 85%) var(--my, 0%), rgba(147,197,253,.2), transparent 70%), linear-gradient(90deg, transparent, #22D3EE, #3B82F6, #F2A516, transparent) bottom / 100% 3px no-repeat, radial-gradient(560px 240px at 92% 0%, rgba(37,99,235,.55), transparent 70%), radial-gradient(440px 220px at 6% 100%, rgba(34,211,238,.35), transparent 70%), linear-gradient(135deg, #060E1F, #0B1B33 55%, #12294A) !important; border: 1px solid rgba(96,165,250,.25) !important; box-shadow: 0 22px 50px rgba(6,14,31,.4), inset 0 1px 0 rgba(255,255,255,.14); }
+
+        /* ── 區塊卡片：清晰白底 + 頂部品牌色條 ── */
+        .card { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid var(--line); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); isolation: isolate; }
+        .card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; border-radius: 22px 22px 0 0; z-index: 1; background: linear-gradient(90deg, #0B3A75, #2F7BF5 62%, #F2A516); pointer-events: none; }
+        .card-title { color: var(--navy-deep); font-weight: 900; border-bottom: 1px solid var(--line); }
+        .card-title i { background: linear-gradient(145deg, #2F7BF5, #0B3A75) !important; box-shadow: 0 6px 14px rgba(20,86,214,.3), inset 0 1px 0 rgba(255,255,255,.35); animation: none; }
+        #view-front > .card > .card-title::before { background: var(--navy-deep); color: #fff; box-shadow: 0 4px 10px rgba(11,27,51,.3); }
+        .form-group label { color: #1B2B44; font-weight: 800; }
+
+        /* ── 欄位：高對比、好點擊、16px 以上避免 iOS 自動放大 ── */
+        input[type="text"], input[type="number"]:not(.qty-input-center), select, textarea { background: var(--field); border: 1.5px solid #D2DCE9; border-radius: 14px; min-height: 52px; font-size: max(16px, 1rem); box-shadow: inset 0 1px 2px rgba(11,27,51,.04); }
+        input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(20,86,214,.15); }
+        #client-name-input { border-color: rgba(20,86,214,.5); background: #F0F6FF; }
+        .info-grid .tax-box { background: #EEF4FF !important; border: 1.5px dashed rgba(20,86,214,.45) !important; border-radius: 16px !important; }
+
+        /* ── 按鈕：主要(海軍藍) / 次要(白底描邊) / 危險 ── */
+        .top-action-btn { background: #fff; border: 1.5px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); min-height: 46px; }
+        .btn-history { color: var(--primary); } .btn-clear { color: var(--danger); }
+        .btn-png { background: linear-gradient(110deg, transparent 32%, rgba(255,255,255,.4) 50%, transparent 68%) 160% 0 / 260% 100% no-repeat, linear-gradient(145deg, #2F7BF5, #0B3A75); }
+        .btn-excel { background: linear-gradient(110deg, transparent 32%, rgba(255,255,255,.4) 50%, transparent 68%) 160% 0 / 260% 100% no-repeat, linear-gradient(145deg, #19B37F, #0B7A55); }
+        .cat-btn { background: #fff; border-width: 1.5px; border-radius: 16px; box-shadow: var(--shadow-sm); }
+        .cat-btn:hover { box-shadow: 0 14px 28px rgba(20,86,214,.16); }
+
+        /* ── 報價明細（桌面）：像工程報價單的明細表 ── */
+        .global-header-row { background: linear-gradient(180deg, #12294A, #0B1B33); color: #E1EAF7; border-radius: 14px; letter-spacing: 1.5px; }
+        .category-header { border-radius: 14px; border-left: 0; letter-spacing: 1.5px; }
+        .quote-item-row { border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); }
+        .quote-item-row:focus-within { border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(20,86,214,.14), 0 12px 28px rgba(11,27,51,.12); }
+        .qty-control-group, .input-wrapper { border: 1.5px solid #D2DCE9; background: #fff; border-radius: 14px; }
+        .qty-btn { background: #EEF3FA; color: var(--navy-deep); }
+        .qty-btn:hover { background: var(--primary); color: #fff; }
+        .subtotal-display { font-weight: 900; }
+        .delete-btn { background: #FDECEC; color: var(--danger); border-radius: 12px; }
+        .item-remark textarea { background: #FFFBEA; border: 1.5px dashed #E6C46A; border-radius: 14px; }
+
+        /* ── 底部結算列：深海軍藍膠囊 ── */
+        .bottom-bar-inner { background-color: rgba(11,27,51,.95) !important; background-image: linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,0) 45%) !important; border: 1px solid rgba(255,255,255,.14) !important; border-radius: 26px !important; }
+        .bottom-total-amount { color: #FCD34D !important; text-shadow: 0 0 22px rgba(252,211,77,.28) !important; }
+        #floating-cart, #floating-add, #scrollTopBtn { background-color: rgba(11,27,51,.82); }
+
+        /* ── 彈窗 / 歷史 / 後台 ── */
+        .modal-content { background: #F4F7FB; }
+        .modal-header { background: #fff; border-bottom: 1px solid var(--line); }
+        .modal-header::after { background: linear-gradient(90deg, #0B3A75, #2F7BF5, #F2A516); }
+        .selectable-item { background: #fff; border: 1.5px solid var(--line); border-radius: 16px; }
+        .history-card { background: #fff; border: 1px solid var(--line); border-left: 5px solid #0B3A75; border-radius: 16px; }
+        .history-total { color: var(--navy); }
+        .admin-category-header, .admin-row { background: #fff; border-color: var(--line); }
+
+        /* ── 總計金額：深色底 + 白/金字，列印與截圖都清晰 ── */
+        .history-detail-total-box { background: linear-gradient(135deg, #0F2747, #1B3E6F) !important; color: #fff !important; border: none !important; border-radius: 14px !important; padding: 18px 22px !important; box-shadow: 0 10px 24px rgba(15,39,71,.28) !important; text-align: right; }
+        .history-detail-total-box .tb-note { font-size: 1rem; color: #C9D8F0; margin-bottom: 10px; font-weight: 800; text-align: right; }
+        .history-detail-total-box .tb-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+        .history-detail-total-box .tb-row span:first-child { font-size: 1.15rem; color: #C9D8F0; }
+        .history-detail-total-box .tb-row span:last-child { color: #FCD34D; font-size: 2.2rem; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: -.5px; }
+        .history-detail-cn { margin-top: 12px; padding: 12px 16px; text-align: right; border-radius: 12px; background: #FFF7E0; border: 1.5px solid #E8B04A; color: #5B3A00; font-weight: 900; font-size: 1.05rem; }
+
+        /* ================= 手機 / 平板直立：卡片式明細 + 易點擊配置 ================= */
+        @media (max-width: 900px) {
+            .container { padding: 12px 12px 120px; }
+            .header { padding: 18px 16px !important; border-radius: 22px; margin-bottom: 14px; }
+            .brand-icon { width: 52px; height: 52px; font-size: 1.6rem; border-radius: 16px; }
+            .card { padding: 20px 16px; margin-bottom: 16px; border-radius: 20px; }
+            .card-title { font-size: 1.2rem !important; margin-bottom: 16px; padding-bottom: 12px; }
+            .top-action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0; margin-bottom: 16px; }
+            .top-action-btn { justify-content: center; min-height: 50px; font-size: 1.05rem; }
+
+            .quote-item-row { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px !important; border-radius: 18px; position: relative; margin-bottom: 14px; }
+            .quote-item-row > .item-name { grid-column: 1 / -1; font-size: 1.2rem; line-height: 1.4; padding: 0 52px 12px 0; margin: 0; border-bottom: 1px solid var(--line); }
+            .mobile-field { flex-direction: column; align-items: stretch; gap: 6px; min-width: 0; }
+            .mobile-field::before { min-width: 0; font-size: .85rem; letter-spacing: .5px; color: var(--text-muted); font-weight: 800; }
+            .mobile-field[data-label="單價"] { order: 1; } .mobile-field[data-label="優惠折抵"] { order: 2; }
+            .mobile-field[data-label="數量"] { order: 3; grid-column: 1 / -1; } .mobile-field[data-label="天數"] { order: 4; grid-column: 1 / -1; }
+            .qty-control-group, .input-wrapper { height: 50px; width: 100%; }
+            .qty-btn { width: 46px; height: 100%; }
+            .item-remark { order: 5; grid-column: 1 / -1; }
+            .subtotal-display { order: 6; grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin: 2px 0 0; padding: 12px 16px; border: 0; border-radius: 14px; font-size: 1.45rem; background: linear-gradient(135deg, #0F2747, #1B3E6F); -webkit-background-clip: border-box; background-clip: border-box; color: #FCD34D; -webkit-text-fill-color: #FCD34D; }
+            .subtotal-display::before { content: "小計"; font-size: .95rem; color: #C9D8F0; -webkit-text-fill-color: #C9D8F0; letter-spacing: 1px; }
+            .delete-btn { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; margin: 0; font-size: 1rem; border-radius: 12px; order: 0; }
+            .selectable-item { padding: 16px 18px; }
+            .history-detail-total-box .tb-row span:last-child { font-size: 1.8rem; }
+        }
+        @media (max-width: 380px) { .quote-item-row { grid-template-columns: 1fr; } .mobile-field[data-label="單價"], .mobile-field[data-label="優惠折抵"] { grid-column: 1 / -1; } }
+        @media (max-width: 900px) { .history-detail-total-box { white-space: normal !important; text-align: right !important; font-size: 1rem !important; } }
     </style>
 </head>
 <body>
@@ -1885,9 +1990,10 @@
                 </div>
                 
                 <div class="history-detail-total-box">
-                    ${record.taxExcluded ? `<div style="font-size:1rem; color:#6B6B70; margin-bottom:6px;">以上金額皆為未稅　稅額(5%)：NT$ ${Math.round(record.total*0.05).toLocaleString()}</div>` : ''}
-                    總計金額：NT$ ${(record.taxExcluded ? record.total + Math.round(record.total*0.05) : record.total).toLocaleString()}
+                    ${record.taxExcluded ? `<div class="tb-note">以上金額皆為未稅　未稅小計 NT$ ${record.total.toLocaleString()}　稅額(5%) NT$ ${Math.round(record.total*0.05).toLocaleString()}</div>` : ''}
+                    <div class="tb-row"><span>總計金額</span><span>NT$ ${(record.taxExcluded ? record.total + Math.round(record.total*0.05) : record.total).toLocaleString()}</span></div>
                 </div>
+                <div class="history-detail-cn">總計新台幣${numberToChineseUpper(record.taxExcluded ? record.total + Math.round(record.total*0.05) : record.total)}元整</div>
             </div>
         `;
         renderHistoryDetailAsImage(record, detailHtml);
@@ -2957,13 +3063,13 @@ ${esc(q.remark || '')}</textarea>
             totalsHtml = `
                 <div class="r-tax-note">以上金額皆為未稅</div>
                 <table class="r-totals-table">
-                    <tr><td>總計：</td><td>NT$ ${currentGrandTotal.toLocaleString()}</td></tr>
-                    <tr><td>稅額：</td><td>NT$ ${taxAmount.toLocaleString()}</td></tr>
-                    <tr class="r-final-row"><td>總計金額：</td><td>NT$ ${grandWithTax.toLocaleString()}</td></tr>
+                    <tr><td>總計</td><td>NT$ ${currentGrandTotal.toLocaleString()}</td></tr>
+                    <tr><td>稅額 (5%)</td><td>NT$ ${taxAmount.toLocaleString()}</td></tr>
+                    <tr class="r-final-row"><td>總計金額</td><td>NT$ ${grandWithTax.toLocaleString()}</td></tr>
                 </table>
                 <div class="r-chinese-total">總計新台幣${numberToChineseUpper(grandWithTax)}元整</div>`;
         } else {
-            totalsHtml = `<div class="r-total">總計金額：NT$ ${currentGrandTotal.toLocaleString()}</div>
+            totalsHtml = `<div class="r-total"><span>總計金額</span><span>NT$ ${currentGrandTotal.toLocaleString()}</span></div>
                 <div class="r-chinese-total">總計新台幣${numberToChineseUpper(currentGrandTotal)}元整</div>`;
         }
 
@@ -2999,14 +3105,18 @@ ${esc(q.remark || '')}</textarea>
                 th { background: #1C1C1E; color: white; padding: 20px; border: 4px solid #1C1C1E; font-size: 22px; font-weight: 900; white-space: nowrap; }
                 td { border: 2.5px solid #C7C7CC; }
                 td:nth-child(1), td:nth-child(3), td:nth-child(4), td:nth-child(5), td:nth-child(6) { white-space: nowrap; }
-                .r-total { text-align: right; font-size: 42px; font-weight: 900; color: #FF3B30; margin-top: 45px; letter-spacing: -1px; font-family: Arial, sans-serif; }
+                .r-total { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding: 26px 36px; border-radius: 16px; color: #FFFFFF; background: linear-gradient(135deg, #0F2747, #1B3E6F); font-family: Arial, 'PingFang TC', sans-serif; }
+                .r-total span:first-child { font-size: 26px; font-weight: 900; letter-spacing: 3px; color: #D6E2F5; }
+                .r-total span:last-child { font-size: 46px; font-weight: 900; letter-spacing: -1px; color: #FCD34D; }
+                .r-chinese-total { text-align: right; font-size: 21px; font-weight: 900; color: #5B3A00; margin-top: 18px; padding: 14px 24px; border-radius: 12px; background: #FFF7E0; border: 2px solid #E8B04A; }
+                .r-tax-note { text-align: right; font-size: 18px; font-weight: 900; color: #44546A; margin-top: 34px; }
+                .r-totals-table { margin-left: auto; margin-top: 12px; border-collapse: separate; border-spacing: 0; min-width: 420px; border: none; width: auto; border-radius: 14px; overflow: hidden; }
+                .r-totals-table td { padding: 14px 28px; font-size: 21px; font-weight: 900; text-align: right; white-space: nowrap; background: #EEF3FA; color: #1B2B44; border: none; border-bottom: 1.5px solid #D2DCE9; }
+                .r-totals-table td:first-child { text-align: left; color: #44546A; letter-spacing: 2px; }
+                .r-totals-table tr.r-final-row td { background: linear-gradient(135deg, #0F2747, #1B3E6F); color: #FCD34D; font-size: 30px; border-bottom: none; font-family: Arial, 'PingFang TC', sans-serif; }
+                .r-totals-table tr.r-final-row td:first-child { color: #FFFFFF; font-size: 23px; letter-spacing: 3px; }
                 .r-info-col { display: flex; flex-direction: column; gap: 7px; text-align: left; }
                 .r-project { font-size: 20px; font-weight: 900; color: #333; margin: -15px 0 30px 0; padding-top: 14px; border-top: 2px solid #E5E5EA; }
-                .r-chinese-total { text-align: right; font-size: 20px; font-weight: 900; color: #1C1C1E; margin-top: 16px; }
-                .r-tax-note { text-align: right; font-size: 18px; font-weight: 900; color: #666; margin-top: 34px; }
-                .r-totals-table { margin-left: auto; margin-top: 12px; border-collapse: collapse; min-width: 340px; border: none; width: auto; }
-                .r-totals-table td { border: 1.5px solid #C7C7CC; padding: 12px 24px; font-size: 20px; font-weight: 900; text-align: right; white-space: nowrap; }
-                .r-totals-table tr.r-final-row td { color: #FF3B30; font-size: 24px; border-bottom: 4px double #FF3B30; font-family: Arial, sans-serif; }
             </style>
         </head>
         <body>
@@ -3257,13 +3367,16 @@ ${esc(q.remark || '')}</textarea>
         const styleTotalRow = (row, labelSize, numSize, isFinal) => {
             row.height = isFinal ? 50 : 32;
             ws.mergeCells(`A${row.number}:E${row.number}`);
-            row.getCell(1).font = { name: '微軟正黑體', size: labelSize, bold: true };
+            row.getCell(1).font = { name: '微軟正黑體', size: labelSize, bold: true, color: { argb: isFinal ? 'FFFFFFFF' : 'FF1B2B44' } };
             row.getCell(1).alignment = { horizontal: 'right', vertical: 'middle' };
-            row.getCell(6).font = { name: 'Arial', size: numSize, bold: true, color: { argb: 'FFFF3B30' } };
+            const fillArgb = isFinal ? 'FF0F2747' : 'FFEEF3FA';
+            row.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillArgb } };
+            row.getCell(6).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillArgb } };
+            row.getCell(6).font = { name: 'Arial', size: numSize, bold: true, color: { argb: isFinal ? 'FFFCD34D' : 'FF1B2B44' } };
             row.getCell(6).alignment = { horizontal: 'right', vertical: 'middle' };
             row.getCell(6).numFmt = '"NT$" #,##0';
             const bs = isFinal
-                ? { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color: { argb: 'FFFF3B30' }}, right: {style:'thin'} }
+                ? { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'double', color: { argb: 'FFFCD34D' }}, right: {style:'thin'} }
                 : { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
             row.getCell(1).border = bs;
             row.getCell(6).border = bs;
@@ -3283,7 +3396,8 @@ ${esc(q.remark || '')}</textarea>
         const finalAmount = taxExcluded ? currentGrandTotal + Math.round(currentGrandTotal * 0.05) : currentGrandTotal;
         const chineseRow = ws.addRow([`總計新台幣${numberToChineseUpper(finalAmount)}元整`]);
         ws.mergeCells(`A${chineseRow.number}:F${chineseRow.number}`);
-        chineseRow.getCell(1).font = { name: '微軟正黑體', size: 15, bold: true, color: { argb: 'FF1C1C1E' } };
+        chineseRow.getCell(1).font = { name: '微軟正黑體', size: 15, bold: true, color: { argb: 'FF5B3A00' } };
+        chineseRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF7E0' } };
         chineseRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
         chineseRow.height = 30;
 
