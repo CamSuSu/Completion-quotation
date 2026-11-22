@@ -731,6 +731,90 @@
             background: rgba(255,248,225,.8); border: 1px dashed rgba(232,176,74,.7); border-radius: 16px; box-sizing: border-box; white-space: pre-wrap; word-break: break-word; transition: border-color .2s, box-shadow .2s; }
         .item-remark textarea:focus { outline: none; border-style: solid; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(232,176,74,.25); }
         .item-remark textarea::placeholder { color: #A8A29A; font-weight: 600; }
+
+        /* ── 縮小「選擇項目加入明細清單」卡片 ── */
+        #view-front > .card.delay-2 { padding: 18px 22px !important; }
+        #view-front > .card.delay-2 .card-title { font-size: 1.15rem; padding-bottom: 10px; margin-bottom: 14px; gap: 10px; }
+        #view-front > .card.delay-2 .card-title i { width: 32px; height: 32px; font-size: .95rem !important; border-radius: 11px; }
+        #category-buttons-container { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; margin-bottom: 0; }
+        #category-buttons-container .cat-btn { padding: 12px 8px; gap: 8px; border-radius: 16px; }
+        #category-buttons-container .cat-btn i { font-size: 1.5rem; }
+        #category-buttons-container .cat-btn span { font-size: 1rem; }
+        @media (max-width: 900px) { #category-buttons-container { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; } #category-buttons-container .cat-btn { padding: 10px 6px; } #category-buttons-container .cat-btn i { font-size: 1.3rem; } #category-buttons-container .cat-btn span { font-size: .92rem; } }
+
+        /* ── 購物車下方：半透明「＋」快速新增按鈕 ── */
+        #floating-add { position: fixed; right: 20px; top: calc(max(20px, env(safe-area-inset-top)) + 66px); width: 50px; height: 50px; border-radius: 50%; z-index: 1400; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff;
+            background: rgba(21,25,37,.55); backdrop-filter: blur(14px) saturate(170%); -webkit-backdrop-filter: blur(14px) saturate(170%);
+            border: 1px solid rgba(255,255,255,.4); box-shadow: 0 10px 24px rgba(20,23,31,.28), inset 0 1px 0 rgba(255,255,255,.3);
+            transition: top .45s var(--ease), transform .35s var(--ease), opacity .35s, background .25s, box-shadow .3s; -webkit-tap-highlight-color: transparent; }
+        #floating-add i { transition: transform .45s var(--ease); }
+        #floating-add:hover { background: rgba(21,25,37,.85); transform: scale(1.08); }
+        #floating-add:hover i { transform: rotate(90deg); }
+        #floating-add:active { transform: scale(.92); }
+        #floating-add.idle { opacity: .35; box-shadow: none; }
+        #floating-add.idle:hover { opacity: 1; }
+        #floating-cart[style*="none"] ~ #floating-add { top: max(20px, env(safe-area-inset-top)); }   /* 購物車隱藏時，＋ 移到購物車位置 */
+        @media (max-width: 900px) {
+            #floating-add { right: 15px; width: 44px; height: 44px; font-size: 1.2rem; top: calc(max(75px, calc(15px + env(safe-area-inset-top))) + 56px); }
+            #floating-cart[style*="none"] ~ #floating-add { top: max(75px, calc(15px + env(safe-area-inset-top))); }
+        }
+
+        /* 歷史明細圖片化的暫存畫布（離屏） */
+        #history-capture-stage { position: absolute; left: -9999px; top: 0; width: 900px; background: #fff; box-sizing: border-box; color: var(--text-main); pointer-events: none; }
+        #history-capture-stage .table-responsive-wrapper { overflow: visible; }
+        #history-detail-img { -webkit-touch-callout: default !important; -webkit-user-select: auto !important; user-select: auto !important; }
+        /* ================================================================
+           UI v6：更清晰、更友善、更高級的動態層（僅外觀/動畫，不影響功能）
+           ================================================================ */
+        :root { --glass: rgba(255,255,255,.78); --glass-strong: rgba(255,255,255,.88); --hair: rgba(20,23,31,.11); --text-main: #0E1220; --text-muted: #5A6479; }
+        @keyframes drift { 0% { transform: translate3d(-3%, -2%, 0) scale(1); } 100% { transform: translate3d(3%, 3%, 0) scale(1.08); } }
+        @keyframes dotUp { 0% { transform: translateY(0) scale(.6); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(-190px) scale(1.1); opacity: 0; } }
+        @keyframes rowPop { 0% { transform: translateY(12px) scale(.965); opacity: 0; box-shadow: 0 0 0 0 rgba(10,132,255,.5); } 55% { opacity: 1; box-shadow: 0 0 0 9px rgba(10,132,255,.14); } 100% { transform: none; box-shadow: 0 0 0 0 rgba(10,132,255,0); } }
+        @keyframes itemIn { from { opacity: 0; transform: translate3d(14px, 0, 0); } to { opacity: 1; transform: none; } }
+        @keyframes labelGlow { 0%, 100% { box-shadow: 0 6px 14px rgba(10,132,255,.35), inset 0 1px 0 rgba(255,255,255,.4); } 50% { box-shadow: 0 8px 22px rgba(94,92,230,.55), inset 0 1px 0 rgba(255,255,255,.5); } }
+
+        /* 背景：緩慢漂移的光暈（GPU 位移，不重繪） */
+        #main-scroll-container { background: transparent !important; }
+        body::before { content: ""; position: fixed; inset: -12%; z-index: -1; pointer-events: none; will-change: transform;
+            background: radial-gradient(520px 420px at 18% 22%, rgba(10,132,255,.22), transparent 70%), radial-gradient(560px 460px at 82% 14%, rgba(94,92,230,.22), transparent 70%), radial-gradient(520px 420px at 62% 88%, rgba(48,182,110,.14), transparent 70%);
+            animation: drift 26s ease-in-out infinite alternate; }
+
+        /* 標頭懸浮光點（由 JS 產生） */
+        .header > .fx-dot { position: absolute; bottom: -8px; border-radius: 50%; z-index: 1; pointer-events: none; opacity: 0;
+            background: radial-gradient(circle, #CFF4FF, rgba(34,211,238,0) 70%); animation: dotUp linear infinite; will-change: transform, opacity; }
+
+        /* 清晰度：欄位標籤、焦點、占位字 */
+        .form-group label { color: #1B2540; font-size: 1rem; letter-spacing: .4px; }
+        input::placeholder, textarea::placeholder { color: #8B95AA; font-weight: 600; }
+        :focus-visible { outline: 3px solid rgba(10,132,255,.55); outline-offset: 3px; border-radius: 12px; }
+        input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
+        .card-title { color: #0E1220; }
+        .card-title i { animation: labelGlow 4.5s ease-in-out infinite; }
+
+        /* 主要按鈕：光澤掃過 */
+        .btn-png { background: linear-gradient(110deg, transparent 32%, rgba(255,255,255,.42) 50%, transparent 68%) 160% 0 / 260% 100% no-repeat, linear-gradient(145deg, #3DA0FF, #5E5CE6); }
+        .btn-excel { background: linear-gradient(110deg, transparent 32%, rgba(255,255,255,.42) 50%, transparent 68%) 160% 0 / 260% 100% no-repeat, linear-gradient(145deg, #3FD28A, #1F9F5F); }
+        .btn-png, .btn-excel { transition: background-position .9s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease); }
+        .btn-png:hover, .btn-excel:hover { background-position: -60% 0, 0 0; transform: translateY(-3px) scale(1.06); box-shadow: 0 14px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.4); }
+        .category-header { position: relative; overflow: hidden; }
+        .category-header::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); transform: translateX(-140%) skewX(-18deg); transition: transform 1s var(--ease); pointer-events: none; }
+        .category-header:hover::after { transform: translateX(380%) skewX(-18deg); }
+
+        /* 列表與彈窗項目：錯開滑入；新增的明細列彈出提示 */
+        .selectable-item { animation: itemIn .45s var(--ease) both; }
+        .selectable-item:nth-child(1) { animation-delay: .02s; } .selectable-item:nth-child(2) { animation-delay: .06s; } .selectable-item:nth-child(3) { animation-delay: .10s; }
+        .selectable-item:nth-child(4) { animation-delay: .14s; } .selectable-item:nth-child(5) { animation-delay: .18s; } .selectable-item:nth-child(6) { animation-delay: .22s; }
+        .selectable-item:nth-child(n+7) { animation-delay: .26s; }
+        .history-card { animation: itemIn .5s var(--ease) both; }
+        .quote-item-row.row-new { animation: rowPop .85s var(--ease) both; border-color: var(--primary) !important; }
+
+        /* 數字與金額：清楚醒目 */
+        .bottom-total-amount { letter-spacing: .5px; }
+        .subtotal-display { background: linear-gradient(180deg, #0E1220, #26304F); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        #floating-cart:hover, #floating-add:hover { box-shadow: 0 16px 34px rgba(10,132,255,.35), inset 0 1px 0 rgba(255,255,255,.3); }
+        @media (max-width: 900px) { body::before { animation-duration: 40s; } .header > .fx-dot { display: none; } }
+        @media (prefers-reduced-motion: reduce) { body::before, .card-title i, .header > .fx-dot { animation: none !important; } }
     </style>
 </head>
 <body>
@@ -739,6 +823,7 @@
     <i class="fas fa-shopping-cart"></i>
     <span id="cart-badge">0</span>
 </div>
+<div id="floating-add" onclick="openQuickAddModal()" title="快速新增工程項目" aria-label="快速新增工程項目"><i class="fas fa-plus"></i></div>
 
 <div id="main-scroll-container">
     <div class="container">
@@ -982,6 +1067,28 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
+<div class="modal-overlay" id="quick-add-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-plus-circle" style="color: var(--primary);"></i> 快速新增項目 <span id="quick-add-count" style="font-size:1rem; color:var(--text-muted); margin-left:8px;"></span></h3>
+            <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                <div id="quick-lock-wrap" title="開啟鎖定：加入項目後此視窗不會自動關閉，可連續加入" style="display:flex; align-items:center; gap:6px; font-size:.95rem; font-weight:900; color:var(--text-muted); white-space:nowrap;">
+                    <i class="fas fa-lock-open" id="quick-lock-icon"></i><span id="quick-lock-text">鎖定</span>
+                    <label class="switch" style="margin:0; transform:scale(.82); transform-origin:right center;">
+                        <input type="checkbox" id="quick-lock-cb" onchange="setQuickAddLock(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="close-modal" onclick="closeModal('quick-add-modal')"><i class="fas fa-times-circle"></i></button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="quick-add-hint" style="font-size:1.05rem; color:var(--text-muted); margin-bottom:16px; font-weight:800;"></div>
+            <div class="category-grid" id="quick-category-grid"></div>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="item-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -1083,6 +1190,7 @@
     const scrollContainerElement = document.getElementById('main-scroll-container');
     const topBtn = document.getElementById('scrollTopBtn');
     const cartBtn = document.getElementById('floating-cart');
+    const addBtn = document.getElementById('floating-add');
 
     // 解決 scroll 事件在移動設備上的資源浪費 (使用 requestAnimationFrame 防抖)
     scrollContainerElement.addEventListener('scroll', () => {
@@ -1096,12 +1204,12 @@
                     topBtn.classList.remove('visible');
                     topBtn.classList.remove('idle');
                 }
-                if (scrollTop > 50) cartBtn.classList.remove('idle');
+                if (scrollTop > 50) { cartBtn.classList.remove('idle'); addBtn.classList.remove('idle'); }
 
                 clearTimeout(scrollIdleTimer);
                 scrollIdleTimer = setTimeout(() => { 
                     topBtn.classList.add('idle'); 
-                    if(scrollTop > 50) cartBtn.classList.add('idle'); 
+                    if(scrollTop > 50) { cartBtn.classList.add('idle'); addBtn.classList.add('idle'); } 
                 }, 1500);
                 scrollTicking = false;
             });
@@ -1665,7 +1773,7 @@
             </tr>`;
         }).join('');
         
-        document.getElementById('history-detail-content').innerHTML = `
+        const detailHtml = `
             <div style="padding: 16px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom: 20px; font-weight:900; font-size:1.15rem; color:var(--text-main);">
                     <div style="font-size: 1.5rem;">客戶：${esc(record.client)}${record.clientAddress ? `<div style="font-size:1.05rem; margin-top:6px;">地址：${esc(record.clientAddress)}</div>` : ''}${record.clientTaxId ? `<div style="font-size:1.05rem; margin-top:4px;">統編：${esc(record.clientTaxId)}</div>` : ''}${record.projectName ? `<div style="font-size:1.05rem; margin-top:4px;">工程：${esc(record.projectName)}</div>` : ''}</div>
@@ -1697,8 +1805,57 @@
                 </div>
             </div>
         `;
+        renderHistoryDetailAsImage(record, detailHtml);
         openModal('history-detail-modal');
     };
+
+    // 歷史明細轉成圖片顯示（與 PNG 結果畫面相同：長按圖片即可儲存/分享；電腦版可按鈕下載）
+    let historyImgToken = 0;
+    function renderHistoryDetailAsImage(record, detailHtml) {
+        const host = document.getElementById('history-detail-content');
+        const token = ++historyImgToken;
+        const stage = (function () {
+            let el = document.getElementById('history-capture-stage');
+            if (!el) { el = document.createElement('div'); el.id = 'history-capture-stage'; document.body.appendChild(el); }
+            return el;
+        })();
+        const showFallback = (msg) => {
+            if (token !== historyImgToken) return;
+            stage.innerHTML = '';
+            host.innerHTML = `<div style="padding:12px 16px 0; color:#8E8E93; font-weight:800; font-size:1rem;">${msg}</div>` + detailHtml;
+        };
+        if (typeof html2canvas !== 'function') return showFallback('圖片元件尚未載入，已顯示文字明細（可自行截圖保存）。');
+
+        host.innerHTML = '<div style="padding:70px 20px; text-align:center; color:#8E8E93; font-weight:900; font-size:1.15rem;"><i class="fas fa-spinner fa-spin" style="font-size:2rem; display:block; margin-bottom:14px; color:var(--primary);"></i>正在產生可長按儲存的圖片…</div>';
+        stage.innerHTML = detailHtml;
+
+        setTimeout(() => {
+            if (token !== historyImgToken) return;
+            const w = stage.offsetWidth || 900, h = stage.offsetHeight || 1200;
+            const scale = Math.max(0.5, Math.min(2, Math.sqrt(12000000 / (w * h))));   // 手機畫布像素上限保護
+            Promise.race([
+                html2canvas(stage, { scale, backgroundColor: '#ffffff', useCORS: true, logging: false, scrollX: 0, scrollY: 0 }),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 30000))
+            ]).then(canvas => {
+                if (token !== historyImgToken) return;
+                const url = canvas.toDataURL('image/png');
+                stage.innerHTML = '';
+                host.innerHTML = `
+                    <div style="padding:16px; text-align:center;">
+                        <div style="margin-bottom:12px; font-weight:900; font-size:1.05rem; color:var(--primary);"><i class="fas fa-hand-pointer"></i> 長按下方圖片即可儲存／分享</div>
+                        <img id="history-detail-img" src="${url}" alt="報價明細圖片" style="width:100%; height:auto; display:block; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.12); -webkit-touch-callout:default; -webkit-user-select:auto; user-select:auto;">
+                        <button type="button" id="history-detail-dl" class="btn-text" style="margin-top:16px; background:var(--text-main); color:#fff; padding:14px 26px; font-size:1.15rem;"><i class="fas fa-download"></i> 下載圖片（電腦版）</button>
+                    </div>`;
+                const dl = document.getElementById('history-detail-dl');
+                if (dl) dl.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${record.quoteNo || 'quote'}_${record.client || ''}`.replace(/[\\\/:*?"<>|]/g, '_') + '.png';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                };
+            }).catch(() => showFallback('圖片產生失敗，已顯示文字明細（可自行截圖保存）。'));
+        }, 80);
+    }
 
     window.buildHistoryHTML = function(records, isAdmin) {
         if(records.length === 0) return '<div style="text-align:center; color:#8E8E93; padding:60px; font-weight:900; font-size:1.6rem; border:2px dashed var(--border-light); border-radius:var(--radius-lg);">目前尚無紀錄</div>';
@@ -1980,23 +2137,32 @@
             document.getElementById('tab-front').classList.add('active');
             document.getElementById('nav-tabs').style.display = 'none';
             if(quoteList.length > 0) document.getElementById('floating-cart').style.display = 'flex';
+            document.getElementById('floating-add').style.display = '';
         } else {
             document.getElementById('tab-front').classList.remove('active');
             document.getElementById('tab-back').classList.add('active');
             document.getElementById('floating-cart').style.display = 'none';
+            document.getElementById('floating-add').style.display = 'none';
         }
 
         if (isBack) renderAdminView(); else { updateCategoryUI(); renderFrontView(); }
     };
     
+    // 前台「選擇項目」與「快速新增 +」共用同一份分類按鈕，資料變動時兩邊一起更新
+    window.buildCategoryButtonsHtml = function() {
+        if (!systemCategories.length) return '<div style="grid-column:1/-1; text-align:center; padding:28px; color:#8E8E93; font-weight:900;">尚未建立工程分類</div>';
+        return systemCategories.map((cat) => {
+            const style = getCatStyle(cat);
+            return `<div class="cat-btn" data-cat="${esc(cat)}" onclick="openModalCategory(this.dataset.cat)" style="border-color: ${style.border}; color: ${style.bg};"><i class="fas ${style.icon}"></i><span>${esc(cat)}</span></div>`;
+        }).join('');
+    };
+
     window.updateCategoryUI = function() {
+        const catHtml = window.buildCategoryButtonsHtml();
         const btnContainer = document.getElementById('category-buttons-container');
-        if(btnContainer) {
-            btnContainer.innerHTML = systemCategories.map((cat) => {
-                const style = getCatStyle(cat); 
-                return `<div class="cat-btn" onclick="openModalCategory('${cat}')" style="border-color: ${style.border}; color: ${style.bg};"><i class="fas ${style.icon}"></i><span>${cat}</span></div>`;
-            }).join('');
-        }
+        if(btnContainer) btnContainer.innerHTML = catHtml;
+        const quickGrid = document.getElementById('quick-category-grid');
+        if(quickGrid) quickGrid.innerHTML = catHtml;
         
         const selectContainer = document.getElementById('new-item-category');
         if(selectContainer) {
@@ -2028,6 +2194,35 @@
         }
     };
 
+    // 快速新增視窗「鎖定」：關閉(預設)＝選好項目自動關閉並回到明細；開啟＝維持在新增畫面可連續加入
+    let quickAddLocked = false;
+    try { quickAddLocked = localStorage.getItem('quickAddLock') === '1'; } catch (e) {}
+    function syncQuickLockUI() {
+        const cb = document.getElementById('quick-lock-cb');
+        if (cb) cb.checked = quickAddLocked;
+        const icon = document.getElementById('quick-lock-icon');
+        if (icon) { icon.className = quickAddLocked ? 'fas fa-lock' : 'fas fa-lock-open'; icon.style.color = quickAddLocked ? 'var(--primary)' : ''; }
+        const txt = document.getElementById('quick-lock-text');
+        if (txt) txt.textContent = quickAddLocked ? '已鎖定' : '鎖定';
+        const hint = document.getElementById('quick-add-hint');
+        if (hint) hint.textContent = quickAddLocked ? '已鎖定：加入項目後會停留在此畫面，可連續加入。' : '點選工程分類，再選擇項目；選好後會自動關閉並回到明細清單。';
+    }
+    window.setQuickAddLock = function(on) {
+        quickAddLocked = !!on;
+        try { localStorage.setItem('quickAddLock', quickAddLocked ? '1' : '0'); } catch (e) {}
+        syncQuickLockUI();
+    };
+    function updateQuickAddCount() {
+        const el = document.getElementById('quick-add-count');
+        if (el) el.textContent = quoteList.length > 0 ? `（已選 ${quoteList.length} 項）` : '';
+    }
+    window.openQuickAddModal = function() {
+        const g = document.getElementById('quick-category-grid');
+        if (g) g.innerHTML = window.buildCategoryButtonsHtml();   // 開啟時再同步一次，確保與最新分類一致
+        updateQuickAddCount();
+        syncQuickLockUI();
+        openModal('quick-add-modal');
+    };
     window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
     window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
 
@@ -2056,7 +2251,7 @@
                 </div>
                 <button class="btn-text" style="background:var(--text-main); color:white; font-size:1.4rem; padding: 16px 30px; border-radius:14px;"><i class="fas fa-plus"></i> 加入</button>
             `;
-            div.onclick = () => { addItemToQuote(item.id); closeModal('item-modal'); };
+            div.onclick = () => { addItemToQuote(item.id); closeModal('item-modal'); if (!quickAddLocked) closeModal('quick-add-modal'); };
             listContainer.appendChild(div);
             displayIndex++;
         });
@@ -2103,6 +2298,7 @@
             const newRowEl = document.getElementById(`quote-row-${newId}`);
             if (newRowEl) {
                 newRowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                newRowEl.classList.add('row-new'); setTimeout(() => newRowEl.classList.remove('row-new'), 1400);
                 const originalBg = newRowEl.style.backgroundColor;
                 newRowEl.style.transition = 'background-color 0.5s ease';
                 newRowEl.style.backgroundColor = 'rgba(10, 122, 255, 0.1)';
@@ -2220,6 +2416,7 @@
         const cartIcon = document.getElementById('floating-cart');
         if (cartBadge && cartIcon) {
             cartBadge.innerText = quoteList.length;
+            updateQuickAddCount();
             if (quoteList.length > 0 && !document.getElementById('view-front').classList.contains('hidden')) {
                 cartIcon.style.display = 'flex';
             } else {
@@ -2338,7 +2535,7 @@
                     
                     <div class="item-remark">
                         <span class="item-remark-label">備註</span>
-                        <textarea id="input-remark-${q.id}" rows="1" placeholder="備註（選填，未填不顯示）" oninput="handleRemark('${q.id}', this.value); autoGrowRemark(this)">
+                        <textarea id="input-remark-${q.id}" rows="1" placeholder="備註（選填，可按 Enter 換行；有填才會顯示在報價單項目下方）" oninput="handleRemark('${q.id}', this.value); autoGrowRemark(this)">
 ${esc(q.remark || '')}</textarea>
                     </div>
                     <div class="subtotal-display">$ <span id="subtotal-${q.id}">${subtotal.toLocaleString()}</span></div>
@@ -3058,6 +3255,42 @@ ${esc(q.remark || '')}</textarea>
             });
         }, { passive: true });
 
+
+        // ── v6 動態：標頭光點 + 總金額數字滾動（純視覺，不改任何資料；失敗不影響功能）
+        try {
+            var hd = document.querySelector('.header');
+            if (hd && window.innerWidth >= 700) {
+                for (var di = 0; di < 14; di++) {
+                    var dot = document.createElement('span');
+                    dot.className = 'fx-dot';
+                    var sz = 2 + Math.random() * 4;
+                    dot.style.left = (Math.random() * 100).toFixed(1) + '%';
+                    dot.style.width = dot.style.height = sz.toFixed(1) + 'px';
+                    dot.style.animationDuration = (7 + Math.random() * 8).toFixed(1) + 's';
+                    dot.style.animationDelay = (-Math.random() * 12).toFixed(1) + 's';
+                    hd.appendChild(dot);
+                }
+            }
+            var tot = document.getElementById('grand-total-display');
+            if (tot && window.MutationObserver) {
+                var num = function () { return parseInt((tot.textContent || '0').replace(/[^0-9]/g, ''), 10) || 0; };
+                var shown = num(), rafId = 0;
+                new MutationObserver(function () {
+                    var target = num();
+                    if (target === shown) return;
+                    var from = shown, t0 = performance.now(), dur = 520;
+                    cancelAnimationFrame(rafId);
+                    (function step(now) {
+                        var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+                        var v = p >= 1 ? target : Math.round(from + (target - from) * e);
+                        tot.textContent = v.toLocaleString();
+                        shown = v;
+                        if (p < 1) rafId = requestAnimationFrame(step);
+                    })(t0);
+                }).observe(tot, { childList: true, characterData: true, subtree: true });
+            }
+        } catch (_) {}
+
         var rippleSel = '.top-action-btn, .cat-btn, .btn-text, .action-circle-btn, .tab-btn, .qty-btn, .selectable-item';
         document.addEventListener('pointerdown', function (e) {
             try {
@@ -3082,10 +3315,12 @@ ${esc(q.remark || '')}</textarea>
         var ticking = false;
         function updateBar() {
             ticking = false;
-            var h = document.documentElement.scrollHeight - window.innerHeight;
-            bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, window.scrollY / h) : 0) + ')';
+            var sc = document.getElementById('main-scroll-container');
+            var h = sc ? sc.scrollHeight - sc.clientHeight : 0;
+            var y = sc ? sc.scrollTop : 0;
+            bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, y / h) : 0) + ')';
         }
-        window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(updateBar); } }, { passive: true });
+        (document.getElementById('main-scroll-container') || window).addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(updateBar); } }, { passive: true });
         updateBar();
     } catch (err) { /* 裝飾效果失敗不影響主功能 */ }
 })();
