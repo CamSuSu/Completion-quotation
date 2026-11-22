@@ -726,6 +726,11 @@
         input[type="number"] { cursor: text; }
         @media (max-width: 900px) { .header::after { animation-duration: 12s; } .info-grid .form-group { margin-bottom: 18px !important; } }
         @media (prefers-reduced-motion: reduce) { .header::after { animation: none !important; } }
+        /* 備註：多行輸入框（Enter 換行、自動長高） */
+        .item-remark textarea { width: 100%; min-height: 52px; max-height: 320px; resize: vertical; overflow-y: auto; padding: 14px 18px; font-family: inherit; font-size: 1.15rem; line-height: 1.55; font-weight: 700; color: var(--text-main);
+            background: rgba(255,248,225,.8); border: 1px dashed rgba(232,176,74,.7); border-radius: 16px; box-sizing: border-box; white-space: pre-wrap; word-break: break-word; transition: border-color .2s, box-shadow .2s; }
+        .item-remark textarea:focus { outline: none; border-style: solid; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(232,176,74,.25); }
+        .item-remark textarea::placeholder { color: #A8A29A; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -1234,6 +1239,13 @@
     }
 
     // 數字轉中文大寫金額（壹貳參…，含「零」的正確補位規則）
+    // 估算文字在指定欄寬（以半形字元計）內會折成幾行：中文字算 2 格，保留使用者的手動換行
+    function estTextLines(text, widthChars) {
+        return String(text || '').split(/\r?\n/).reduce((n, ln) => {
+            let w = 0; for (const ch of ln) w += ch.charCodeAt(0) > 255 ? 2 : 1;
+            return n + Math.max(1, Math.ceil(w / widthChars));
+        }, 0);
+    }
     function numberToChineseUpper(num) {
         num = Math.round(Math.max(0, Number(num) || 0));
         if (num === 0) return '零';
@@ -1773,7 +1785,7 @@
                 { header: '單位', key: 'unit', width: 10 },
                 { header: '天數', key: 'days', width: 10 },
                 { header: '折抵', key: 'discount', width: 12 },
-                { header: '備註', key: 'remark', width: 30 },
+                { header: '備註', key: 'remark', width: 40 },
                 { header: '客戶地址', key: 'addr', width: 32 },
                 { header: '統一編號', key: 'taxid', width: 14 },
                 { header: '工程名稱', key: 'proj', width: 26 },
@@ -1814,7 +1826,8 @@
                         tax: index === 0 ? (record.taxExcluded ? '未稅' : '') : ''
                     });
                     
-                    row.height = 20;
+                    const histLines = Math.max(estTextLines(item.remark, 36), estTextLines(index === 0 ? record.clientAddress : '', 30), estTextLines(index === 0 ? record.projectName : '', 24));
+                    row.height = Math.max(20, histLines * 18 + 4);
 
                     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: recordBgColor } };
@@ -1824,7 +1837,8 @@
                             bottom: {style:'thin', color:{argb:'FFD1D1D6'}}, 
                             right: {style:'thin', color:{argb:'FFD1D1D6'}} 
                         };
-                        cell.alignment = { vertical: 'middle', horizontal: colNumber === 7 ? 'left' : 'center' };
+                        const leftWrapCols = [7, 13, 14, 16];
+                        cell.alignment = { vertical: 'middle', horizontal: leftWrapCols.includes(colNumber) ? 'left' : 'center', wrapText: leftWrapCols.includes(colNumber) };
                         
                         if (index === 0) {
                             cell.border.top = { style: 'medium', color: { argb: 'FF0A7AFF' } };
@@ -2137,6 +2151,11 @@
         renderFrontView();
     };
 
+    window.autoGrowRemark = function(el) {
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight + 2, 320) + 'px';
+    };
     window.handleRemark = function(qId, value) {
         const target = quoteList.find(q => q.id === qId);
         if (target) target.remark = String(value || '');
@@ -2319,7 +2338,8 @@
                     
                     <div class="item-remark">
                         <span class="item-remark-label">備註</span>
-                        <input type="text" id="input-remark-${q.id}" value="${esc(q.remark || '')}" placeholder="備註（選填，有填才會顯示在報價單項目下方）" oninput="handleRemark('${q.id}', this.value)">
+                        <textarea id="input-remark-${q.id}" rows="1" placeholder="備註（選填，未填不顯示）" oninput="handleRemark('${q.id}', this.value); autoGrowRemark(this)">
+${esc(q.remark || '')}</textarea>
                     </div>
                     <div class="subtotal-display">$ <span id="subtotal-${q.id}">${subtotal.toLocaleString()}</span></div>
                     
@@ -2329,6 +2349,8 @@
             });
         });
         calculateTotal();
+        // 備註框依內容自動長高（含已有多行備註的項目）
+        requestAnimationFrame(() => document.querySelectorAll('.item-remark textarea').forEach(window.autoGrowRemark));
     };
 
     window.toggleCategory = function(index) {
@@ -2626,7 +2648,7 @@
             const hideUnitDisplay = qItem.hideUnit || !hasUnit;
             const unitDisplay = hideUnitDisplay ? '' : ` ${esc(itemUnit)}`;
             const remarkText = (qItem.remark || '').trim();
-            const remarkHtml = remarkText ? `<div style="margin-top:8px; font-size:15px; font-weight:700; color:#6B6B70; text-align:left; white-space:pre-wrap; line-height:1.5;">備註：${esc(remarkText)}</div>` : '';
+            const remarkHtml = remarkText ? `<div style="margin-top:8px; font-size:15px; font-weight:700; color:#6B6B70; text-align:left; white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere; line-height:1.6;">備註：${esc(remarkText)}</div>` : '';
             
             const discountBadge = (amt && qItem.discount && qItem.discount > 0) ? `<br><span style="display:inline-block; margin-top:6px; background:#FFF0F0; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:14px; font-weight:900; border:1px solid rgba(255,59,48,0.2);">✨ 優惠折抵: -$${qItem.discount.toLocaleString()}</span>` : '';
 
@@ -2927,7 +2949,7 @@
             if (remarkText) {
                 itemNameText += `\n備註：${remarkText}`;
                 // 估算備註換行數（欄寬約 32 個中文字一行）
-                extraLines += ('備註：' + remarkText).split(/\r?\n/).reduce((n, ln) => n + Math.max(1, Math.ceil(ln.length / 32)), 0);
+                extraLines += estTextLines('備註：' + remarkText, amt ? 60 : 140);
             }
             
             const row = amt
@@ -2935,6 +2957,7 @@
                 : ws.addRow([ dbItem.category, itemNameText, '', '', '', '' ]);   // 沒有金額：只顯示項目名稱
             if (!amt) ws.mergeCells(`B${row.number}:F${row.number}`);
             
+            extraLines += estTextLines(dbItem.name, amt ? 60 : 140) - 1;   // 項目名稱本身過長折行
             row.height = Math.max(36, 24 + extraLines * 22);
             const bg = isEvenRow ? 'FFFFFFFF' : 'FFF2F2F7'; isEvenRow = !isEvenRow;
 
