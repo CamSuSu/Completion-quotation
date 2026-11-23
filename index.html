@@ -291,8 +291,8 @@
         #scrollTopBtn.visible.idle { opacity: 0.35; box-shadow: none; border-color: rgba(255,255,255,0.2); }
         #scrollTopBtn.visible:hover { opacity: 1; transform: translateY(-5px) scale(1.08); background: #0A7AFF; box-shadow: 0 12px 30px rgba(10,122,255,0.4); }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.3s, visibility 0s linear 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity 0.3s, visibility 0s; }
         .modal-content { background: #F2F2F7; border-radius: var(--radius-xl); width: 92%; max-width: 750px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: var(--shadow-float); transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden; border: 1px solid rgba(255,255,255,0.6); }
         .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-header { padding: 32px 40px; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; }
@@ -1689,6 +1689,79 @@ html.fx-off .action-circle-btn::before { display: none !important; }
 
 /* 分頁在背景時暫停所有動畫（回到前景自動恢復，畫面無差異） */
 html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { animation-play-state: paused !important; }
+/* =====================================================================
+   v14 前台精緻化層（僅外觀：排版比例、留白、層次；不改任何功能 / 資料 / DOM）
+   ===================================================================== */
+:root { --q-ink: #0A1F44; --q-line: rgba(27,79,156,.16); --q-gold: #C9A24B; }
+
+/* 1) 底部總計列：改為與內容同寬、置中的浮動膠囊（原本貼齊螢幕邊緣，圓角被裁切） */
+.bottom-bar-fixed { pointer-events: none; padding: 0 14px calc(12px + env(safe-area-inset-bottom, 0px)) !important; }
+.bottom-bar-inner { pointer-events: auto; max-width: 1318px; margin-left: auto; margin-right: auto; border-radius: 28px !important; }
+.bottom-total-amount .currency { opacity: .85; }
+@media (max-width: 900px) {
+  .bottom-bar-fixed { padding: 0 10px calc(10px + env(safe-area-inset-bottom, 0px)) !important; }
+  .bottom-bar-inner { border-radius: 24px !important; }
+  .container { padding-bottom: 132px; }
+}
+
+/* 2) 明細表（桌機）：欄寬重新分配（各欄設最小寬，含「天數」列也不再撐破版面），標題列與資料列精準對齊 */
+@media (min-width: 901px) {
+  .global-header-row { grid-template-columns: minmax(180px, 2.2fr) minmax(118px, 1.3fr) minmax(190px, 1.7fr) minmax(158px, 1.3fr) minmax(108px, 1fr) minmax(130px, 1.2fr) 54px; gap: 12px; padding: 18px 22px 18px 30px; letter-spacing: 1.5px; }
+  .quote-item-row   { grid-template-columns: minmax(180px, 2.2fr) minmax(118px, 1.3fr) minmax(190px, 1.7fr) minmax(158px, 1.3fr) minmax(108px, 1fr) minmax(130px, 1.2fr) 54px; gap: 12px; padding: 22px 20px; align-items: center; }
+  .quote-item-row > * { min-width: 0; }
+  .quote-item-row .item-name, .item-name { font-size: 1.36rem; line-height: 1.5; overflow-wrap: anywhere; word-break: normal; padding-right: 4px; }
+  .quote-item-row .qty-control-group, .quote-item-row .input-wrapper { height: 58px; min-width: 0; }
+  .quote-item-row .input-wrapper input, .quote-item-row .qty-control-group input { font-size: 1.32rem !important; min-width: 36px; }
+  .quote-item-row .unit-box { padding-right: 8px; gap: 4px; }
+  .quote-item-row .unit-box span { font-size: 1.05rem; }
+  .quote-item-row .qty-btn { width: 36px !important; height: 36px !important; min-width: 36px !important; margin: 0 3px !important; }
+  .quote-item-row .qty-btn i { font-size: .8rem; }
+  .quote-item-row .unit-box button { width: 32px; height: 32px; }
+  .quote-item-row .subtotal-display { font-size: 1.6rem; white-space: nowrap; padding-left: 10px; border-left: 1px dashed var(--q-line); }
+  .quote-item-row .delete-btn { width: 50px; height: 50px; border-radius: 15px; font-size: 1.3rem; }
+}
+
+/* 3) 明細列：更乾淨的層次（邊框、陰影、備註欄） */
+.quote-item-row { border-width: 1.5px !important; border-left-width: 9px !important; }
+.quote-item-row .item-remark textarea { min-height: 48px; font-size: 1.08rem; border-radius: 14px !important; }
+.quote-item-row .item-remark-label { color: #6B7A99; }
+.category-header { letter-spacing: 3px; }
+
+/* 4) 區塊標題 / 分類按鈕：呼吸感與對齊 */
+.card-title { margin-bottom: 26px; }
+.category-grid { gap: 16px; }
+.cat-btn { min-height: 108px; justify-content: center; }
+.top-action-bar { gap: 14px; margin-bottom: 22px; }
+.top-action-btn { min-height: 52px; padding-left: 24px; padding-right: 24px; border-radius: 16px !important; }
+
+/* 5) 表單：欄位間距、必填提示、稅務方塊更精緻 */
+.info-grid .form-group { margin-bottom: 4px; }
+.form-group label { margin-bottom: 8px; }
+.tax-box { border-radius: 16px !important; border: 1.5px dashed rgba(27,79,156,.35) !important; transition: background .25s, border-color .25s; }
+.tax-box:hover { background: #E8F0FF !important; border-color: rgba(27,79,156,.6) !important; }
+input[type="checkbox"] { cursor: pointer; }
+
+/* 6) 空狀態、浮動按鈕、回頂部：安全區與觸控面積 */
+#empty-quote-msg { border-radius: 24px !important; border-color: var(--q-line) !important; }
+@media (max-width: 900px) {
+  .quote-item-row { padding: 16px 14px !important; }
+  .mobile-field::before { letter-spacing: 1px; }
+  .top-action-btn { min-height: 52px; }
+}
+
+/* 7) 視窗（項目 / 快速新增 / 購物車 / 歷史）：標題列與關閉鈕更俐落 */
+.modal-header { border-bottom: 1px solid var(--q-line); padding-bottom: 14px; }
+.close-modal { transition: transform .25s, color .25s; }
+.close-modal:hover { transform: rotate(90deg) scale(1.08); }
+.selectable-item { min-height: 84px; }
+
+/* 8) 數字與焦點：統一等寬數字，避免跳動 */
+.quote-item-row input[type="number"], .subtotal-display, .bottom-total-amount, .history-total { font-variant-numeric: tabular-nums; }
+.quote-item-row input[type="number"]::-webkit-inner-spin-button, .quote-item-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.quote-item-row input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+/* 9) 列印 / 特效關閉時維持乾淨版面 */
+html.fx-off .close-modal:hover { transform: none; }
 </style>
 <script>try{if(localStorage.getItem('quoteFx')==='0')document.documentElement.classList.add('fx-off');}catch(e){}</script>
 </head>
@@ -2234,10 +2307,14 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
     // 歷史紀錄容量保護：只序列化一次，之後每移除一筆就扣掉該筆大小（原本每移除一筆都要整份重新序列化）
     function trimHistoryBySize(state, limit) {
         let total = utf8Len(JSON.stringify(state.history));
+        const before = total;
+        let removedCount = 0;
         while (state.history.length > 1 && total > limit) {
             const removed = state.history.pop();
             total -= utf8Len(JSON.stringify(removed)) + 1;
+            removedCount++;
         }
+        return { before, total, removedCount };
     }
     function safeSaveAs(blob, name) {
         if (typeof saveAs === 'function') return saveAs(blob, name);
@@ -2597,6 +2674,7 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
 
         let found = true;
         const r = await safeMutate((state) => {
+            found = true;   // 交易可能重試，每次都要重新判斷
             const it = state.items.find(x => x.id === id);
             if (!it) { found = false; return ABORT; }
             it.name = newName; it.unit = newUnit; it.hasDays = newDays; it.defaultHideUnit = newHide;
@@ -2671,20 +2749,41 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
                 }
             });
             const quoteNo = `${todayNoStr}${String(maxNum + 1).padStart(3, '0')}`;
-            hist.unshift({
+            const newRec = {
                 id: 'R_' + Date.now(), quoteNo, date: dateStr, time: timeStr,
                 client: clientName, clientAddress, clientTaxId, projectName, taxExcluded,
                 total, items: mappedItems
-            });
-            if (hist.length > 1000) state.history = hist.slice(0, 1000);
+            };
+            hist.unshift(newRec);
+            let cutByCount = 0;
+            if (hist.length > 1000) { cutByCount = hist.length - 1000; state.history = hist.slice(0, 1000); }
             // 【修正④】Firestore 單一文件上限 1MiB：依容量再保護一次，超過就移除最舊紀錄，避免寫入失敗
-            trimHistoryBySize(state, 750000);
-            result = { status: 'saved', quoteNo };
+            const trimInfo = trimHistoryBySize(state, 750000);
+            result = {
+                status: 'saved', quoteNo,
+                usedBytes: trimInfo.total,
+                prevBytes: Math.max(0, trimInfo.before - (utf8Len(JSON.stringify(newRec)) + 1)),
+                removedCount: cutByCount + trimInfo.removedCount
+            };
         }, '❌ 報價紀錄無法儲存至雲端。');
         if (!r) return { status: 'error' };
 
-        if (quoteHistory.length >= 995 && quoteHistory.length <= 1000 && result.status === 'saved') {
-            alert(`【系統提醒】歷史報價紀錄即滿額！目前已達 ${quoteHistory.length} 筆，剩餘 ${1000 - quoteHistory.length} 筆空間。\n超過 1000 筆時，最舊的資料將自動刪除，請儘早備份！`);
+        // 歷史紀錄容量提醒（筆數上限 1000 筆、容量上限約 750KB，兩者先到者先生效）；
+        // 延後顯示，避免 alert 卡住主執行緒而拖慢匯出流程 / 觸發 20 秒逾時
+        if (result.status === 'saved') {
+            const CAP = 750000;
+            const band = (b) => { const p = b / CAP * 100; return p >= 90 ? 90 : p >= 80 ? 80 : p >= 70 ? 70 : 0; };
+            let capMsg = '';
+            if (result.removedCount > 0) {
+                capMsg = `【系統提醒】歷史報價紀錄已達上限，已自動刪除最舊的 ${result.removedCount} 筆紀錄！\n請盡快使用「匯出歷史紀錄」備份 Excel。`;
+            } else if (quoteHistory.length >= 995 && quoteHistory.length <= 1000) {
+                capMsg = `【系統提醒】歷史報價紀錄即滿額！目前已達 ${quoteHistory.length} 筆，剩餘 ${1000 - quoteHistory.length} 筆空間。\n超過 1000 筆時，最舊的資料將自動刪除，請儘早備份！`;
+            } else if (band(result.usedBytes) > band(result.prevBytes)) {
+                const avg = result.usedBytes / Math.max(1, quoteHistory.length);
+                const left = Math.max(0, Math.floor((CAP - result.usedBytes) / avg));
+                capMsg = `【系統提醒】歷史報價紀錄容量已使用約 ${Math.round(result.usedBytes / CAP * 100)}%（目前 ${quoteHistory.length} 筆）。\n大約還能再存 ${left} 筆，超過後最舊的紀錄將自動刪除，請儘早匯出備份！`;
+            }
+            if (capMsg) setTimeout(() => alert(capMsg), 800);
         }
 
         updateHistoryFilters('history-year', 'history-month');
@@ -2741,7 +2840,7 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
                 <td style="padding:12px 8px; border: 1px solid #C7C7CC; color:${catColor}; font-weight:900; white-space:nowrap;">${esc(window.histCatName(i))}</td>
                 <td ${amt ? '' : 'colspan="5"'} style="padding:12px 8px; border: 1px solid #C7C7CC; text-align:left; font-weight:900; color:var(--text-main); word-break: break-all; min-width: 110px;">${esc(i.name)}${optTag}</td>
                 ${amt ? `<td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${Number(i.price).toLocaleString()}</td>
-                <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.qty}${unitDisplay}</td>
+                <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${i.qty}${esc(unitDisplay)}</td>
                 <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${daysDisplay}</td>
                 <td style="padding:12px 8px; border: 1px solid #C7C7CC; font-weight:900; color:var(--text-main); white-space:nowrap;">${sub.toLocaleString()}</td>` : ''}
             </tr>`;
@@ -2840,7 +2939,7 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
         }, 0));
     }
 
-    // 歷史明細圖片快取（最多 4 張，離開頁面即釋放）
+    // 歷史明細圖片快取（最多 6 張，超過時釋放最舊的）
     const historyImgCache = new Map();
     function showHistoryImage(host, record, url) {
         {
@@ -2892,7 +2991,7 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
                 let unitDisplay = i.hideUnit || !i.unit ? '' : i.unit;
                 return `
                 <div class="history-item-row ${zi % 2 === 0 ? 'hz-even' : 'hz-odd'}">
-                    <span style="flex:1;">${window.histCatChip(i)}${esc(i.name)} ${amt ? `<span style="color:var(--primary); margin-left:8px;">x${i.qty}${unitDisplay}</span> ${optTag}` : ''}${i.remark ? `<div style="font-size:1rem; color:#6B6B70; margin-top:4px; white-space:pre-wrap;">備註：${esc(i.remark)}</div>` : ''}</span>
+                    <span style="flex:1;">${window.histCatChip(i)}${esc(i.name)} ${amt ? `<span style="color:var(--primary); margin-left:8px;">x${i.qty}${esc(unitDisplay)}</span> ${optTag}` : ''}${i.remark ? `<div style="font-size:1rem; color:#6B6B70; margin-top:4px; white-space:pre-wrap;">備註：${esc(i.remark)}</div>` : ''}</span>
                     ${amt ? `<span>$${sub.toLocaleString()}</span>` : ''}
                 </div>`;
             }).join('');
@@ -3205,7 +3304,9 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
         
         const selectContainer = document.getElementById('new-item-category');
         if(selectContainer) {
+            const prevCat = selectContainer.value;   // 每次雲端同步/新增項目都會重建選項，先記住目前選擇，避免被重設成第一個分類
             selectContainer.innerHTML = systemCategories.map((cat) => `<option value="${esc(cat)}">${esc(cat)}</option>`).join('');
+            if (prevCat && systemCategories.includes(prevCat)) selectContainer.value = prevCat;
         }
 
         const tagsContainer = document.getElementById('admin-category-tags');
@@ -3405,8 +3506,9 @@ html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after { anim
     window.changeQuoteQty = function(qId, field, delta) {
         const target = quoteList.find(q => q.id === qId);
         if (target) {
-            let newVal = roundSmart((Number(target[field]) || 0) + delta);
-            if(field === 'qty' || field === 'days') newVal = Math.max(1, newVal);
+            const curVal = Number(target[field]) || 0;
+            let newVal = roundSmart(curVal + delta);
+            if(field === 'qty' || field === 'days') newVal = Math.max((delta < 0 && curVal > 0) ? Math.min(1, curVal) : 1, newVal);
             else newVal = Math.max(0, newVal);
             target[field] = newVal;
             const inputEl = document.getElementById(`input-${field}-${qId}`);
@@ -4384,7 +4486,8 @@ ${esc(q.remark || '')}</textarea>
             if (tot && window.MutationObserver) {
                 var num = function () { return parseInt((tot.textContent || '0').replace(/[^0-9]/g, ''), 10) || 0; };
                 var shown = num(), rafId = 0;
-                new MutationObserver(function () {
+                var totCfg = { childList: true, characterData: true, subtree: true };
+                var totObs = new MutationObserver(function () {
                     var target = num();
                     if (target === shown) return;
                     var from = shown, t0 = performance.now(), dur = 520;
@@ -4392,11 +4495,15 @@ ${esc(q.remark || '')}</textarea>
                     (function step(now) {
                         var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
                         var v = p >= 1 ? target : Math.round(from + (target - from) * e);
+                        // 自己寫入時先暫停監看，避免「寫入 → 觸發自己 → 再寫入」的循環造成畫面凍結
+                        totObs.disconnect();
                         tot.textContent = v.toLocaleString();
+                        totObs.observe(tot, totCfg);
                         shown = v;
                         if (p < 1) rafId = requestAnimationFrame(step);
                     })(t0);
-                }).observe(tot, { childList: true, characterData: true, subtree: true });
+                });
+                totObs.observe(tot, totCfg);
             }
         } catch (_) {}
 
