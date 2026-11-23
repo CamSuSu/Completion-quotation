@@ -1385,6 +1385,115 @@
 #scrollTopBtn.visible.idle { opacity: .25 !important; }
 #scrollTopBtn.visible:hover { opacity: .95 !important; background: rgba(10,122,255,.85) !important; }
 @media (max-width: 900px) { #scrollTopBtn { bottom: calc(150px + env(safe-area-inset-bottom)) !important; right: 14px !important; } }
+
+/* ===== v10：iOS 27 液態玻璃質感 + 按鈕修正 + 持續特效（僅外觀，不影響功能） ===== */
+:root { --ios-spring: cubic-bezier(.32,1.2,.4,1); --ios-ease: cubic-bezier(.22,1,.36,1); }
+body, button, input, select, textarea { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+
+/* 1) 頂部按鈕：文字與圖示對齊、不換行 */
+.top-action-bar { align-items: stretch; }
+.top-action-btn { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; white-space: nowrap !important; line-height: 1.2 !important; text-align: center; padding: 12px 22px !important; min-height: 48px; }
+.top-action-btn i { width: 1.1em; text-align: center; flex: 0 0 auto; margin: 0 !important; line-height: 1; }
+.btn-clear { color: #fff !important; background: linear-gradient(180deg, rgba(255,84,72,.95), rgba(214,20,32,.95)) !important; border: 1px solid rgba(255,255,255,.55) !important; box-shadow: 0 8px 20px rgba(214,20,32,.28), inset 0 1px 0 rgba(255,255,255,.55) !important; }
+.btn-history { color: #fff !important; background: linear-gradient(180deg, rgba(47,107,196,.95), rgba(14,52,120,.95)) !important; border: 1px solid rgba(255,255,255,.55) !important; box-shadow: 0 8px 20px rgba(14,52,120,.28), inset 0 1px 0 rgba(255,255,255,.55) !important; }
+.btn-clear:hover, .btn-history:hover { filter: brightness(1.08); }
+
+/* 2) 奇偶行跳色（明細清單 + 購物車） */
+.quote-item-row[data-z="0"] { background: linear-gradient(90deg, color-mix(in srgb, var(--catc) 8%, #FFFFFF), #FFFFFF 70%) !important; }
+.quote-item-row[data-z="1"] { background: linear-gradient(90deg, color-mix(in srgb, var(--catc) 26%, #FFFFFF), color-mix(in srgb, var(--catc) 10%, #F3F7FF) 75%) !important; }
+.cart-row[data-z="0"] { background: #FFFFFF !important; }
+.cart-row[data-z="1"] { background: linear-gradient(90deg, #E4EEFC, #F3F8FF) !important; border-color: rgba(27,79,156,.18) !important; }
+
+/* 3) 購物車與 + ：持續流動光環 + 玻璃高光 */
+@property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes ringSpin { to { --ang: 360deg; } }
+@keyframes orbBreath { 0%,100% { box-shadow: 0 6px 18px rgba(14,52,120,.22), 0 0 0 0 rgba(120,170,255,.0); } 50% { box-shadow: 0 8px 24px rgba(14,52,120,.28), 0 0 22px 4px rgba(120,170,255,.35); } }
+@keyframes orbSheen { 0% { transform: translateX(-130%) rotate(25deg); } 55%,100% { transform: translateX(130%) rotate(25deg); } }
+#floating-cart, #floating-add { animation: orbBreath 3.6s ease-in-out infinite !important; overflow: visible; }
+#floating-add { animation-delay: .6s !important; }
+#floating-cart::before, #floating-add::before {
+  content: "" !important; position: absolute !important; inset: -6px !important; border-radius: 50% !important; z-index: -1 !important; opacity: 1 !important;
+  background: conic-gradient(from var(--ang), rgba(255,255,255,0) 0deg, rgba(150,200,255,.95) 60deg, rgba(246,213,139,.95) 120deg, rgba(255,255,255,0) 180deg, rgba(150,200,255,.0) 360deg) !important;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: ringSpin 4s linear infinite !important; filter: blur(.3px);
+}
+#floating-cart.idle::before, #floating-add.idle::before { opacity: .7 !important; }
+#floating-cart::after, #floating-add::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; overflow: hidden; pointer-events: none; z-index: 1;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%); background-size: 100% 100%;
+  -webkit-mask: radial-gradient(circle, #000 0 70%, transparent 71%); mask: radial-gradient(circle, #000 0 70%, transparent 71%);
+  animation: orbSheen 3.8s ease-in-out infinite;
+}
+#floating-cart i, #floating-add i { position: relative; z-index: 2; }
+#floating-add { box-shadow: 0 6px 18px rgba(14,52,120,.22) !important; }
+
+/* 4) 頂部標題：持續流光 + 底部光線 */
+@keyframes titleFlow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+@keyframes titleLine { 0%,100% { transform: scaleX(.35); opacity: .45; } 50% { transform: scaleX(1); opacity: 1; } }
+@keyframes titleFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.brand-section h1 {
+  position: relative; display: inline-block; letter-spacing: 6px;
+  background: linear-gradient(100deg, #FFFFFF 0%, #CFE0FF 18%, #F6D58B 36%, #FFFFFF 54%, #CFE0FF 72%, #F6D58B 90%, #FFFFFF 100%) !important;
+  background-size: 300% 100% !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important;
+  animation: titleFlow 7s linear infinite, titleFloat 5s ease-in-out infinite;
+  filter: drop-shadow(0 2px 10px rgba(120,170,255,.55)) drop-shadow(0 0 1px rgba(255,255,255,.6));
+}
+.brand-section h1::after { content: ""; position: absolute; left: 8%; right: 8%; bottom: -10px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(246,213,139,.95), rgba(180,210,255,.95), transparent); box-shadow: 0 0 12px rgba(246,213,139,.7); transform-origin: center; animation: titleLine 4.5s ease-in-out infinite; }
+
+/* 5) iOS 27 液態玻璃：圓角、高光、柔和多層陰影、彈性動態 */
+.card { border-radius: 32px !important; box-shadow: 0 1px 2px rgba(14,30,70,.06), 0 12px 32px rgba(14,52,120,.12), 0 30px 64px rgba(14,52,120,.10), inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.5) !important; }
+.modal-content { border-radius: 34px !important; background: rgba(250,252,255,.82) !important; -webkit-backdrop-filter: blur(28px) saturate(1.8); backdrop-filter: blur(28px) saturate(1.8); box-shadow: 0 30px 80px rgba(10,30,80,.35), inset 0 1px 0 rgba(255,255,255,.9) !important; }
+.modal-header { background: transparent !important; }
+.nav-tabs { border-radius: 999px !important; -webkit-backdrop-filter: blur(24px) saturate(1.8); backdrop-filter: blur(24px) saturate(1.8); }
+.tab-btn { border-radius: 999px !important; }
+.tab-btn.active { box-shadow: 0 6px 18px rgba(14,52,120,.16), inset 0 1px 0 #fff !important; }
+.bottom-bar-inner { border-radius: 30px !important; -webkit-backdrop-filter: blur(26px) saturate(1.8); backdrop-filter: blur(26px) saturate(1.8); box-shadow: 0 16px 44px rgba(8,24,64,.38), inset 0 1px 0 rgba(255,255,255,.35) !important; }
+.form-group input[type="text"], .form-group input[type="number"], .form-group select, .form-group textarea, .quote-item-row input, .quote-item-row textarea { border-radius: 16px !important; transition: box-shadow .35s var(--ios-ease), border-color .25s, background .25s !important; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { box-shadow: 0 0 0 5px rgba(10,132,255,.18) !important; }
+.cat-btn, .selectable-item, .history-card { border-radius: 24px !important; }
+.quote-item-row { border-radius: 26px !important; }
+.btn-text, .action-circle-btn { transition: transform .4s var(--ios-spring), box-shadow .3s, filter .2s !important; }
+.btn-text:active, .action-circle-btn:active, .top-action-btn:active, .cat-btn:active { transform: scale(.94) !important; }
+.category-header { border-radius: 22px !important; box-shadow: 0 8px 22px rgba(14,52,120,.18), inset 0 1px 0 rgba(255,255,255,.4); }
+.header { border-radius: 36px !important; box-shadow: 0 24px 60px rgba(14,52,120,.32), inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(255,255,255,.12) !important; }
+@media (max-width: 900px) { .card { border-radius: 26px !important; } .modal-content { border-radius: 28px !important; } .brand-section h1 { letter-spacing: 3px; } .top-action-btn { padding: 10px 12px !important; } }
+@media (prefers-reduced-motion: reduce) { .brand-section h1, .brand-section h1::after, #floating-cart::before, #floating-add::before, #floating-cart::after, #floating-add::after, #floating-cart, #floating-add { animation: none !important; } }
+
+/* ===== v11：粗體清晰化 + 浮動按鈕底色加深 ===== */
+body, body *, body *::before, body *::after { -webkit-text-stroke: 0 !important; paint-order: normal; }
+body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+h1, h2, h3, h4, .card-title, .item-name, .category-header, .modal-header h3, .tab-btn, .top-action-btn, .cat-btn span, .btn-text, .action-btn-label, .global-header-row, .history-card-header, .admin-category-header, th, label, .form-group label {
+  font-weight: 900; letter-spacing: .04em; text-shadow: none !important; word-spacing: .05em;
+}
+.category-header, .top-action-btn, .btn-text, .tab-btn { text-shadow: 0 1px 1px rgba(0,0,0,.18) !important; }
+.brand-section h1 { letter-spacing: 6px; }
+.item-name, .quote-item-row, .history-card, .selectable-item, .cat-btn span { letter-spacing: .03em; }
+input, textarea, select { font-weight: 800; letter-spacing: .02em; }
+.subtotal-display, .bottom-total-amount, .history-total { letter-spacing: 0 !important; }
+#floating-cart, #floating-add {
+  background: linear-gradient(180deg, rgba(40,100,196,.88), rgba(10,44,110,.92)) !important;
+  border: 3px solid rgba(255,255,255,.85) !important; opacity: .95 !important;
+  box-shadow: 0 8px 22px rgba(10,44,110,.4) !important;
+}
+#floating-add.idle, #floating-cart.idle { opacity: .72 !important; }
+#floating-cart i, #floating-add i { color: #fff !important; text-shadow: 0 1px 3px rgba(0,0,0,.35) !important; }
+
+/* ===== v12：表單標籤/輸入全面粗體 + 銳利清晰 ===== */
+.form-group label, .form-group > label, label, .form-label, .tax-label, .field-label, .mobile-field::before, [class*="mobile-label"], legend, th, td, .tb-row span, .history-card *, .modal-header *, .cat-btn *, .selectable-item *, .quote-item-row * { font-weight: 900 !important; }
+input, textarea, select, option, button { font-weight: 900 !important; letter-spacing: .03em; }
+input::placeholder, textarea::placeholder { font-weight: 800 !important; opacity: .72; letter-spacing: .03em; }
+.form-group label { color: #0A2250 !important; font-size: 1.08rem; letter-spacing: .06em; }
+.form-group input, .form-group select, .form-group textarea { color: #06142E !important; font-size: 1.1rem; border-width: 1.5px !important; }
+/* 銳利：關閉文字模糊來源、強化對比 */
+html, body { -webkit-font-smoothing: antialiased !important; text-rendering: geometricPrecision; }
+body *, body *::before, body *::after { text-shadow: none; }
+.brand-section h1 { filter: none !important; }
+.category-header, .top-action-btn, .btn-text, .tab-btn { text-shadow: 0 1px 0 rgba(0,0,0,.22) !important; }
+.card, .modal-content, .nav-tabs, .bottom-bar-inner { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.modal-content { background: rgba(250,252,255,.985) !important; }
+.card { background: #FFFFFF !important; }
+.quote-item-row, .history-card, .selectable-item, .cat-btn { backface-visibility: hidden; transform: translateZ(0); -webkit-font-smoothing: antialiased; }
+.quote-item-row:hover, .history-card:hover, .selectable-item:hover { transform: translateY(-2px) !important; }
 </style>
 </head>
 <body>
@@ -2847,13 +2956,13 @@
         if (quoteList.length === 0) {
             listContainer.innerHTML = '<div style="text-align:center; padding: 50px; color:#8E8E93; font-size:1.5rem; font-weight:900;"><i class="fas fa-box-open" style="font-size:4rem; margin-bottom:20px; opacity:0.3; display:block;"></i>目前清單內尚無項目</div>';
         } else {
-            listContainer.innerHTML = quoteList.map(q => {
+            listContainer.innerHTML = quoteList.map((q, zi) => {
                 const dbItem = engineeringDB.find(db => db.id === q.dbId);
                 if(!dbItem) return '';
                 let subtotal = calcSubtotal(q, dbItem);
                 const cu = getItemUnit(q, dbItem);
                 return `
-                <div style="padding: 20px; border: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                <div class="cart-row" data-z="${zi % 2}" style="padding: 20px; border: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
                     <div style="flex:1; padding-right:14px;">
                         <div style="font-weight: 900; font-size: 1.4rem; color: var(--text-main); line-height:1.4;">${dbItem.name}</div>
                         <div style="font-size: 1.15rem; color: var(--primary); font-weight:900; margin-top: 8px;">單價: $${q.price.toLocaleString()} &nbsp;|&nbsp; 數量: ${q.qty}${(!q.hideUnit && cu) ? ' ' + esc(cu) : ''}</div>
@@ -3029,6 +3138,7 @@
 
         // 不在分類清單內的項目（分類被刪除/改名）也要顯示，否則會「計入總額卻看不到」
         const catOrderFront = [...systemCategories, ...Object.keys(groupedList).filter(c => !systemCategories.includes(c))];
+        let zc = 0;
         catOrderFront.forEach((cat) => {
             if(!groupedList[cat]) return;
             const style = getCatStyle(cat);
@@ -3052,6 +3162,7 @@
                 row.style.background = isEven ? style.rowEven : style.rowOdd;
                 row.style.borderLeft = `8px solid ${style.border}`; 
                 row.style.setProperty('--cat', style.border);
+                row.dataset.z = String(zc++ % 2);
                 isEven = !isEven;
                 
                 let daysHtml = db.hasDays ? `
