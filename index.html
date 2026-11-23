@@ -1874,6 +1874,26 @@ html::before { z-index: -1 !important; }
   body { background-size: auto, auto, auto, 150px 150px !important; background-attachment: fixed, fixed, fixed, fixed !important; }
   html::before { inset: 8px !important; border-radius: 22px !important; }
 }
+
+/* =====================================================================
+   v18 手機版明細列：欄位標題移到輸入框上方，輸入框改為滿版寬度，數量 / 金額不再被擠壓遮住
+   ===================================================================== */
+@media (max-width: 900px) {
+  .quote-item-row .mobile-field { flex-direction: column !important; align-items: stretch !important; justify-content: flex-start !important; gap: 6px !important; min-width: 0 !important; }
+  .quote-item-row .mobile-field::before { min-width: 0 !important; display: block; font-size: 1.05rem !important; letter-spacing: .08em; }
+  .quote-item-row .qty-control-group, .quote-item-row .input-wrapper { flex: none !important; width: 100% !important; min-width: 0 !important; height: 52px !important; }
+  .quote-item-row .qty-control-group input, .quote-item-row .input-wrapper input { min-width: 0 !important; font-size: 1.22rem !important; padding: 0 2px !important; }
+  .quote-item-row .qty-btn { width: 34px !important; min-width: 34px !important; margin: 0 2px !important; }
+  .quote-item-row .unit-box { padding-right: 8px !important; gap: 4px !important; }
+  .quote-item-row .unit-box span { font-size: 1.05rem !important; }
+  .quote-item-row .unit-box select { max-width: 76px !important; }
+  .quote-item-row .unit-box button { width: 32px !important; height: 32px !important; }
+}
+@media (max-width: 380px) {
+  .quote-item-row .qty-control-group input { font-size: 1.1rem !important; }
+  .quote-item-row .qty-btn { width: 30px !important; min-width: 30px !important; }
+  .quote-item-row .unit-box select { max-width: 60px !important; }
+}
 </style>
 <script>try{if(localStorage.getItem('quoteFx')==='0')document.documentElement.classList.add('fx-off');}catch(e){}</script>
 </head>
@@ -3057,11 +3077,34 @@ html::before { z-index: -1 !important; }
         {
             {
                 host.innerHTML = `
-                    <div style="padding:16px; text-align:center;">
+                    <div style="padding:16px 16px 0; text-align:center;">
                         <div style="margin-bottom:12px; font-weight:900; font-size:1.05rem; color:var(--primary);"><i class="fas fa-hand-pointer"></i> 長按下方圖片即可儲存／分享</div>
-                        <img id="history-detail-img" src="${url}" alt="報價明細圖片" style="width:100%; height:auto; display:block; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.12); -webkit-touch-callout:default; -webkit-user-select:auto; user-select:auto;">
-                        <button type="button" id="history-detail-dl" class="btn-text" style="margin-top:16px; background:var(--text-main); color:#fff; padding:14px 26px; font-size:1.15rem;"><i class="fas fa-download"></i> 下載圖片（電腦版）</button>
+                        <div id="history-zoom-wrap" style="overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:14px;">
+                            <img id="history-detail-img" src="${url}" alt="報價明細圖片" style="width:100%; max-width:none; height:auto; display:block; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.12); -webkit-touch-callout:default; -webkit-user-select:auto; user-select:auto;">
+                        </div>
+                        <button type="button" id="history-detail-dl" class="btn-text" style="margin:16px 0; background:var(--text-main); color:#fff; padding:14px 26px; font-size:1.15rem;"><i class="fas fa-download"></i> 下載圖片（電腦版）</button>
+                    </div>
+                    <div id="history-zoom-bar" style="position:sticky; bottom:0; z-index:5; display:flex; align-items:center; gap:12px; padding:12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background:rgba(255,255,255,.96); border-top:1px solid rgba(0,0,0,.08); box-shadow:0 -6px 18px rgba(0,0,0,.08);">
+                        <i class="fas fa-search-minus" style="color:#8E8E93;"></i>
+                        <input type="range" id="history-zoom-range" min="100" max="300" step="5" value="100" aria-label="縮放圖片" style="flex:1; min-width:0; accent-color:var(--primary); cursor:pointer;">
+                        <i class="fas fa-search-plus" style="color:#8E8E93;"></i>
+                        <span id="history-zoom-val" style="min-width:3.2em; text-align:right; font-weight:900; font-size:1.05rem; color:var(--primary);">100%</span>
+                        <button type="button" id="history-zoom-reset" style="border:none; border-radius:999px; padding:8px 16px; font-weight:900; font-size:1rem; background:#EBF4FF; color:var(--primary); cursor:pointer; white-space:nowrap;">還原</button>
                     </div>`;
+                const zImg = document.getElementById('history-detail-img');
+                const zRange = document.getElementById('history-zoom-range');
+                const zVal = document.getElementById('history-zoom-val');
+                const zWrap = document.getElementById('history-zoom-wrap');
+                const applyZoom = (v) => {
+                    v = Math.max(100, Math.min(300, Number(v) || 100));
+                    // 以目前可視中心為基準縮放，放大後不會跳到奇怪位置
+                    const ratio = zWrap.scrollWidth ? (zWrap.scrollLeft + zWrap.clientWidth / 2) / zWrap.scrollWidth : 0.5;
+                    zImg.style.width = v + '%';
+                    zRange.value = v; zVal.textContent = v + '%';
+                    zWrap.scrollLeft = Math.max(0, ratio * zWrap.scrollWidth - zWrap.clientWidth / 2);
+                };
+                zRange.addEventListener('input', () => applyZoom(zRange.value));
+                document.getElementById('history-zoom-reset').onclick = () => { applyZoom(100); zWrap.scrollLeft = 0; };
                 const dl = document.getElementById('history-detail-dl');
                 if (dl) dl.onclick = () => {
                     const a = document.createElement('a');
@@ -4162,7 +4205,12 @@ ${esc(q.remark || '')}</textarea>
                 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
                 
                 #result-area { display: none; padding: 20px; text-align: center; flex-direction: column; align-items: center; gap: 24px; }
-                #result-img { max-width: 100%; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+                #result-img { width: 100%; max-width: none; display: block; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+                #zoom-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 24px; }
+                #zoom-bar { position: sticky; bottom: 12px; z-index: 20; width: 100%; max-width: 560px; display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 999px; background: rgba(255,255,255,.96); box-shadow: 0 8px 28px rgba(0,0,0,.35); color: #0A7AFF; }
+                #zoom-bar input[type=range] { flex: 1; min-width: 0; accent-color: #0A7AFF; cursor: pointer; }
+                #zoom-val { min-width: 3.2em; text-align: right; font-size: 1.05rem; }
+                #zoom-reset { border: none; border-radius: 999px; padding: 8px 16px; font-size: 1rem; background: #EBF4FF; color: #0A7AFF; cursor: pointer; white-space: nowrap; }
                 .hint { background: rgba(10, 122, 255, 0.1); border: 2.5px solid rgba(10, 122, 255, 0.3); color: #0A7AFF; padding: 18px 28px; border-radius: 18px; font-weight: 900; font-size: 1.35rem; margin-bottom: 10px; }
                 
                 /* 防止行動裝置截圖時版面被撐破，改用絕對負空間與 z-index 防護 */
@@ -4200,7 +4248,8 @@ ${esc(q.remark || '')}</textarea>
             <div id="loading"><div class="spinner"></div><div>正在產生高清晰圖片...</div></div>
             <div id="result-area">
                 <div class="hint">${isIOS ? '📲 圖片已產生！請<strong>長按下方圖片</strong>並選擇「加入照片」儲存' : '💾 圖片已產生！請點擊下載按鈕或長按圖片儲存'}</div>
-                <img id="result-img" />
+                <div id="zoom-wrap"><img id="result-img" /></div>
+                <div id="zoom-bar"><i class="fa-solid fa-magnifying-glass-minus"></i><input type="range" id="zoom-range" min="100" max="300" step="5" value="100" aria-label="縮放圖片"><i class="fa-solid fa-magnifying-glass-plus"></i><span id="zoom-val">100%</span><button type="button" id="zoom-reset">還原</button></div>
                 ${!isIOS ? '<button class="btn" id="btn-download" style="background:#0A7AFF; color:white; margin-top:10px;"><i class="fa-solid fa-download"></i> 下載圖片</button>' : ''}
                 <button class="btn" onclick="window.close()" style="background:white; color:#1C1C1E;"><i class="fa-solid fa-arrow-left"></i> 返回</button>
             </div>
@@ -4282,6 +4331,18 @@ ${esc(q.remark || '')}</textarea>
                             target.style.display = 'none';
                             document.getElementById('result-area').style.display = 'flex';
                             document.getElementById('result-img').src = imgData;
+                            (function() {
+                                var zi = document.getElementById('result-img'), zr = document.getElementById('zoom-range'),
+                                    zv = document.getElementById('zoom-val'), zw = document.getElementById('zoom-wrap');
+                                function setZoom(v) {
+                                    v = Math.max(100, Math.min(300, Number(v) || 100));
+                                    var ratio = zw.scrollWidth ? (zw.scrollLeft + zw.clientWidth / 2) / zw.scrollWidth : 0.5;
+                                    zi.style.width = v + '%'; zr.value = v; zv.textContent = v + '%';
+                                    zw.scrollLeft = Math.max(0, ratio * zw.scrollWidth - zw.clientWidth / 2);
+                                }
+                                zr.oninput = function() { setZoom(zr.value); };
+                                document.getElementById('zoom-reset').onclick = function() { setZoom(100); zw.scrollLeft = 0; };
+                            })();
                             window.scrollTo(0, 0);
                             var dlBtn = document.getElementById('btn-download');
                             if (dlBtn) {
