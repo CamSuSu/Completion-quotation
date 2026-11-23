@@ -617,7 +617,7 @@
         @media (max-width: 900px) { :root { --blur: blur(16px) saturate(170%); --radius-xl: 26px; --radius-lg: 22px; } .card-title i { width: 36px; height: 36px; font-size: 1rem !important; } }
         @media (hover: none) { .quote-item-row:hover, .cat-btn:hover, .top-action-btn:hover, .selectable-item:hover { transform: none; } }
         @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .card, .modal-content, .nav-tabs { background: rgba(255,255,255,.94); } .bottom-bar-inner, #floating-cart, #scrollTopBtn { background: rgba(21,25,37,.96) !important; } }
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
         /* ================================================================
            UI v4：動態互動層（動畫僅用 transform / opacity，GPU 加速）
            ================================================================ */
@@ -678,7 +678,7 @@
         .bottom-total-amount { transition: transform .25s var(--ease), color .3s; }
         .modal-header { backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
         @media (max-width: 900px) { .header::before { filter: blur(26px); animation-duration: 30s; } .card:hover { transform: none; } }
-        @media (prefers-reduced-motion: reduce) { .header::before, .header::after, .brand-icon { animation: none !important; } #fx-progress { display: none; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
         /* ================================================================
            UI v5：標頭回到深空藍配色 + 光幕特效；前台排版改為「三步驟」流程
            ================================================================ */
@@ -727,7 +727,7 @@
         .top-action-bar { gap: 12px; }
         input[type="number"] { cursor: text; }
         @media (max-width: 900px) { .header::after { animation-duration: 12s; } .info-grid .form-group { margin-bottom: 18px !important; } }
-        @media (prefers-reduced-motion: reduce) { .header::after { animation: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
         /* 備註：多行輸入框（Enter 換行、自動長高） */
         .item-remark textarea { width: 100%; min-height: 52px; max-height: 320px; resize: vertical; overflow-y: auto; padding: 14px 18px; font-family: inherit; font-size: 1.15rem; line-height: 1.55; font-weight: 900; color: var(--text-main);
             background: rgba(255,248,225,.8); border: 1px dashed rgba(232,176,74,.7); border-radius: 16px; box-sizing: border-box; white-space: pre-wrap; word-break: break-word; transition: border-color .2s, box-shadow .2s; }
@@ -816,7 +816,7 @@
         .subtotal-display { background: linear-gradient(180deg, #0E1220, #26304F); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         #floating-cart:hover, #floating-add:hover { box-shadow: 0 16px 34px rgba(10,132,255,.35), inset 0 1px 0 rgba(255,255,255,.3); }
         @media (max-width: 900px) { body::before { animation-duration: 40s; } }
-        @media (prefers-reduced-motion: reduce) { body::before, .card-title i, .header > .fx-dot { animation: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
         /* ================================================================
            UI v7：手機排版修正 + 神秘未來感標頭 + iOS 液態玻璃質感
            ================================================================ */
@@ -898,7 +898,7 @@
         .top-action-btn:active, .btn-text:active, .action-circle-btn:active, .cat-btn:active { transform: scale(.94); }
         .quote-item-row { box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.9); }
         @media (max-width: 900px) { :root { --blur: blur(18px) saturate(180%); } }
-        @media (prefers-reduced-motion: reduce) { .header > .fx-orb, .header > .fx-ring, .header > .fx-scan, .header > .fx-edge::before, .brand-section h1 { animation: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
         /* ================================================================
            UI v8：專業工程報價系統大改版（版面 / 色彩 / 質感 / 動態；功能不變）
            設計語言：深海軍藍 + 鋼藍 + 琥珀金；清楚的資訊層級；手機直立卡片式明細
@@ -1176,7 +1176,7 @@
         .modal-overlay { background: rgba(7,15,30,.62) !important; }
         .modal-header { background: linear-gradient(180deg, #FFFDF6, #F6EEDB) !important; }
 
-        @media (prefers-reduced-motion: reduce) { .header, .header::after, .brand-section h1, .bottom-total-amount, body::after { animation: none !important; } .card, .animate-card { opacity: 1 !important; transform: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
         @media (max-width: 900px) { body { background-attachment: scroll, scroll, scroll, scroll !important; } .card:hover { transform: none; } }
 
         /* ================= 背景質感強化：大理石金紋 × 流動光束 × 金邊框 ================= */
@@ -1199,7 +1199,7 @@
         /* 畫面四周細金框（不擋操作） */
         html::before { content: ""; position: fixed; inset: 8px; z-index: 1; pointer-events: none; border: 1.5px solid rgba(201,162,75,.55); border-radius: 22px; box-shadow: inset 0 0 0 5px rgba(246,221,155,.10), inset 0 0 60px rgba(201,162,75,.10); }
         @media (max-width: 900px) { html::before { inset: 4px; border-radius: 16px; } body { background-size: auto, auto, auto, 600px 600px, 56px 56px !important; background-attachment: scroll, scroll, scroll, scroll, scroll !important; } }
-        @media (prefers-reduced-motion: reduce) { body::before, body::after { animation: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
 
         /* ================= 青花瓷風格：釉白底 × 鈷藍紋飾 ================= */
         @keyframes porcelainSheen { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
@@ -1341,7 +1341,7 @@
             .category-header { font-size: 1.3rem !important; padding: 14px 18px !important; }
             .category-header i { width: 40px; height: 40px; }
         }
-        @media (prefers-reduced-motion: reduce) { .quote-item-row, .selectable-item, .cat-btn { animation: none !important; opacity: 1 !important; transform: none !important; } .category-header::after, #floating-add { animation: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
 
         /* ================= 購物車數字、底部 PNG/Excel、右上角按鈕：白框發光 ================= */
         @keyframes whiteGlow { 0%, 100% { box-shadow: 0 0 0 3px #FFFFFF, 0 0 12px 3px rgba(255,255,255,.85), 0 0 26px 8px rgba(157,200,255,.55), 0 10px 24px rgba(8,28,70,.45); } 50% { box-shadow: 0 0 0 4px #FFFFFF, 0 0 22px 7px rgba(255,255,255,1), 0 0 46px 16px rgba(157,200,255,.85), 0 10px 24px rgba(8,28,70,.45); } }
@@ -1362,7 +1362,7 @@
         #floating-add i, #floating-cart i { color: #FFFFFF !important; text-shadow: 0 0 8px rgba(255,255,255,.9); }
         #floating-add.idle, #floating-cart.idle { opacity: .9 !important; }
 
-        @media (prefers-reduced-motion: reduce) { .action-circle-btn, #floating-add, #floating-cart, #cart-badge { animation: none !important; } }
+        /* (已移除「減少動態效果」限制，特效固定開啟) */
     
 /* ===== 修復版覆寫：浮動按鈕半透明 + 回頂部按鈕上移 ===== */
 #floating-cart, #floating-add {
@@ -1457,7 +1457,7 @@ body, button, input, select, textarea { font-family: -apple-system, BlinkMacSyst
 .category-header { border-radius: 22px !important; box-shadow: 0 8px 22px rgba(14,52,120,.18), inset 0 1px 0 rgba(255,255,255,.4); }
 .header { border-radius: 36px !important; box-shadow: 0 24px 60px rgba(14,52,120,.32), inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(255,255,255,.12) !important; }
 @media (max-width: 900px) { .card { border-radius: 26px !important; } .modal-content { border-radius: 28px !important; } .brand-section h1 { letter-spacing: 3px; } .top-action-btn { padding: 10px 12px !important; } }
-@media (prefers-reduced-motion: reduce) { .brand-section h1, .brand-section h1::after, #floating-cart::before, #floating-add::before, #floating-cart::after, #floating-add::after, #floating-cart, #floating-add { animation: none !important; } }
+/* (已移除「減少動態效果」限制，特效固定開啟) */
 
 /* ===== v11：粗體清晰化 + 浮動按鈕底色加深 ===== */
 body, body *, body *::before, body *::after { -webkit-text-stroke: 0 !important; paint-order: normal; }
@@ -1523,8 +1523,127 @@ body *, body *::before, body *::after { text-shadow: none; }
 }
 #floating-cart i, #floating-add i { color: #fff !important; text-shadow: 0 1px 4px rgba(10,50,140,.55) !important; }
 #floating-add:hover, #floating-cart:hover { opacity: 1 !important; background: linear-gradient(155deg, rgba(170,220,255,.95), rgba(30,140,255,.8) 55%, rgba(90,80,235,.75)) !important; }
-@media (prefers-reduced-motion: reduce) { #floating-cart, #floating-add, #floating-cart::before, #floating-add::before, #floating-cart::after, #floating-add::after { animation: none !important; } }
+/* (已移除「減少動態效果」限制，特效固定開啟) */
+
+/* ===== 按鈕持續光澤掃過 + 標題特效強制開啟 ===== */
+@keyframes btnShine { 0%, 70% { transform: translateX(-160%) skewX(-22deg); } 100% { transform: translateX(520%) skewX(-22deg); } }
+@keyframes btnShineGold { 0%, 70% { transform: translateX(-160%) skewX(-22deg); } 100% { transform: translateX(520%) skewX(-22deg); } }
+.top-action-btn, .btn-text, .cat-btn { position: relative !important; overflow: hidden !important; }
+.top-action-btn::after, .btn-text::after, .cat-btn::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 34%; z-index: 1; pointer-events: none;
+  transform: translateX(-160%) skewX(-22deg); will-change: transform;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.48), transparent);
+  animation: btnShine 6.5s cubic-bezier(.4,0,.2,1) infinite;
+}
+.btn-text::after, .cat-btn::before { background: linear-gradient(100deg, transparent, rgba(240,200,110,.4), transparent); }
+.top-action-btn.btn-clear::after { animation-delay: 1.2s; }
+.btn-text:nth-of-type(2n)::after { animation-delay: .8s; }
+.cat-btn:nth-child(3n+1)::before { animation-delay: .4s; } .cat-btn:nth-child(3n+2)::before { animation-delay: 1.4s; } .cat-btn:nth-child(3n)::before { animation-delay: 2.4s; }
+
+/* =====================================================================
+   v11 質感層：精緻標題動畫、全站質感強化、特效總開關（html.fx-off）
+   ===================================================================== */
+/* ── 標題：移除由上往下的掃描線與光點，改為「香檳金屬質感 + 偶爾掠過的高光」 ── */
+.header > .fx-scan, .header > .fx-dot { display: none !important; }
+@keyframes titleIn   { from { opacity: 0; letter-spacing: 16px; } to { opacity: 1; letter-spacing: 6px; } }
+@keyframes titleGlint{ 0%, 58% { background-position: 160% 0, 0 0; } 100% { background-position: -60% 0, 0 0; } }
+@keyframes titleRule { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+@keyframes ruleGlow  { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+@keyframes iconBreath{ 0%, 100% { box-shadow: 0 0 0 4px rgba(245,179,1,.16), 0 0 22px rgba(245,179,1,.32), 0 10px 26px rgba(245,179,1,.34); }
+                       50%      { box-shadow: 0 0 0 5px rgba(245,179,1,.24), 0 0 40px rgba(245,179,1,.52), 0 12px 30px rgba(245,179,1,.42); } }
+@keyframes headerSheen { 0%, 60% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(600%) skewX(-18deg); } }
+
+.brand-section h1 {
+  background:
+    linear-gradient(105deg, transparent 42%, rgba(255,255,255,.95) 50%, transparent 58%) 160% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, #FFF8DC 0%, #F4DB94 38%, #D9B45E 72%, #B98F35 100%) 0 0 / 100% 100% no-repeat !important;
+  -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 2px 12px rgba(217,180,94,.38)) drop-shadow(0 1px 0 rgba(0,0,0,.35)) !important;
+  animation: titleIn 1.2s cubic-bezier(.22,1,.36,1) both, titleGlint 9s cubic-bezier(.4,0,.2,1) 1.6s infinite !important;
+}
+.brand-section h1::after {
+  left: 6%; right: 6%; bottom: -12px; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(244,219,148,.95) 30%, rgba(255,248,220,1) 50%, rgba(244,219,148,.95) 70%, transparent) !important;
+  box-shadow: 0 0 14px rgba(244,219,148,.55) !important; transform-origin: center;
+  animation: titleRule 1.4s cubic-bezier(.22,1,.36,1) .5s both, ruleGlow 5s ease-in-out 2s infinite !important;
+}
+.brand-icon { animation: iconBreath 5s ease-in-out infinite !important; }
+.header::after {
+  left: -35%; right: auto; width: 28%; top: 0; bottom: 0; -webkit-mask-image: none !important; mask-image: none !important;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.06) 40%, rgba(255,240,200,.13) 50%, rgba(255,255,255,.06) 60%, transparent) !important;
+  transform: translateX(-130%) skewX(-18deg); animation: headerSheen 11s cubic-bezier(.4,0,.2,1) infinite !important;
+}
+.header > .fx-edge::before { animation-duration: 12s !important; opacity: .8; }
+
+/* ── 全站質感 ── */
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+::selection { background: rgba(201,162,75,.32); color: inherit; }
+* { scrollbar-width: thin; scrollbar-color: rgba(120,140,175,.55) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(150,168,200,.7), rgba(110,130,168,.7)); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #C9A24B, #A88231); background-clip: padding-box; border: 2px solid transparent; }
+::-webkit-scrollbar-track { background: transparent; }
+
+input, select, textarea, .bottom-total-amount, .subtotal-display, .history-total, .qty-input-center { font-variant-numeric: tabular-nums; }
+
+.card { box-shadow: 0 1px 2px rgba(11,27,51,.05), 0 8px 20px rgba(11,27,51,.06), 0 28px 60px rgba(30,60,120,.10), inset 0 1px 0 rgba(255,255,255,.95) !important; }
+@media (hover: hover) { .card:hover { transform: translateY(-2px); } }
+
+input[type="text"], input[type="number"], select, textarea { transition: border-color .25s, box-shadow .3s, background .25s, transform .25s !important; }
+input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+  border-color: rgba(201,162,75,.9) !important; background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(201,162,75,.18), 0 6px 18px rgba(11,27,51,.08) !important; outline: none;
+}
+
+.top-action-btn, .btn-text, .action-circle-btn, .tab-btn { transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s cubic-bezier(.22,1,.36,1), filter .25s, background .25s, color .25s !important; }
+@media (hover: hover) {
+  .top-action-btn:hover, .btn-text:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(11,27,51,.18), 0 0 0 1px rgba(201,162,75,.55) !important; }
+  .cat-btn:hover { transform: translateY(-3px); }
+  .action-circle-btn:hover { transform: translateY(-2px) scale(1.05); }
+}
+
+.quote-item-row, .history-card, .selectable-item { box-shadow: 0 1px 2px rgba(11,27,51,.04), 0 8px 22px rgba(11,27,51,.06) !important; }
+@media (hover: hover) { .quote-item-row:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(11,27,51,.05), 0 16px 34px rgba(30,60,120,.14) !important; } }
+
+.modal-overlay { backdrop-filter: blur(14px) saturate(1.3) !important; -webkit-backdrop-filter: blur(14px) saturate(1.3) !important; }
+.modal-content { box-shadow: 0 40px 90px rgba(7,15,30,.38), 0 0 0 1px rgba(255,255,255,.55), inset 0 1px 0 rgba(255,255,255,.9) !important; }
+.bottom-bar-inner { box-shadow: 0 -10px 40px rgba(7,15,30,.28), inset 0 1px 0 rgba(255,255,255,.22) !important; }
+.tab-btn.active { box-shadow: 0 6px 16px rgba(11,27,51,.22), inset 0 1px 0 rgba(255,255,255,.35); }
+
+/* ── 特效總開關：<html class="fx-off"> 時關閉所有動畫、光效與懸浮位移 ── */
+html.fx-off, html.fx-off body { scroll-behavior: auto !important; }
+html.fx-off *, html.fx-off *::before, html.fx-off *::after {
+  animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+  transition-duration: 0s !important; transition-delay: 0s !important;
+}
+html.fx-off .fx-orb, html.fx-off .fx-ring, html.fx-off .fx-scan, html.fx-off .fx-edge, html.fx-off .fx-dot,
+html.fx-off .fx-ripple, html.fx-off #fx-progress,
+html.fx-off .header::before, html.fx-off .header::after, html.fx-off body::before, html.fx-off body::after,
+html.fx-off .top-action-btn::after, html.fx-off .btn-text::after, html.fx-off .cat-btn::before { display: none !important; }
+html.fx-off .card:hover, html.fx-off .cat-btn:hover, html.fx-off .selectable-item:hover, html.fx-off .history-card:hover,
+html.fx-off .quote-item-row:hover, html.fx-off .top-action-btn:hover, html.fx-off .btn-text:hover, html.fx-off .action-circle-btn:hover,
+html.fx-off .btn-png:hover, html.fx-off .btn-excel:hover { transform: none !important; }
+html.fx-off .brand-section h1::after { transform: none !important; opacity: 1 !important; }
+
+/* ===== 底部 PNG / Excel 按鈕：改為與「＋」、購物車同款的環繞光圈（更低調） ===== */
+.action-circle-btn {
+  position: relative; overflow: visible !important;
+  border: 2px solid rgba(255,255,255,.6) !important;
+  animation: none !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.4) !important;
+}
+.action-circle-btn::before {
+  content: ""; position: absolute; inset: -5px; border-radius: inherit; padding: 2px; z-index: 0; pointer-events: none; opacity: .8;
+  background: conic-gradient(from var(--ang), rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(150,205,255,.55) 280deg, rgba(255,255,255,.95) 325deg, rgba(246,213,139,.85) 345deg, rgba(255,255,255,0) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: ringSpin 5s linear infinite;
+}
+.btn-excel.action-circle-btn::before { animation-delay: -2.5s; }
+.action-circle-btn i { position: relative; z-index: 1; }
+html.fx-off .action-circle-btn::before { display: none !important; }
 </style>
+<script>try{if(localStorage.getItem('quoteFx')==='0')document.documentElement.classList.add('fx-off');}catch(e){}</script>
 </head>
 <body>
 
@@ -1655,6 +1774,18 @@ body *, body *::before, body *::after { text-shadow: none; }
                         <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
                             <label class="switch" style="margin: 0;">
                                 <input type="checkbox" id="admin-setting-allow-duplicate" onchange="updateSystemSetting('allowDuplicateItems', this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; background:white; padding: 24px; border-radius: 16px; box-shadow: 0 6px 16px rgba(0,0,0,0.03); margin-top:16px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: clamp(1.15rem, 4vw, 1.4rem); font-weight: 900; color: var(--text-main);"><i class="fas fa-wand-magic-sparkles" style="color:#C9A24B; margin-right:8px;"></i>動態特效總開關</div>
+                            <div style="font-size: 1.1rem; color: #8E8E93; margin-top: 8px; word-break: break-word;">關閉後，標題、按鈕、背景等所有動畫與光效一併停用（僅套用於此裝置，設定會記住）</div>
+                        </div>
+                        <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                            <label class="switch" style="margin: 0;">
+                                <input type="checkbox" id="admin-setting-fx" checked onchange="setFxEnabled(this.checked)">
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -3967,7 +4098,7 @@ ${esc(q.remark || '')}</textarea>
 /* UI 動態裝飾（純視覺：標頭聚光、卡片游標光感、按鈕波紋、捲動進度條；不讀寫任何報價資料） */
 (function () {
     try {
-        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var reduce = false; /* 固定開啟動態特效 */
         // 數字欄位點入時自動全選，免去先刪除預設 0/1 再輸入的步驟（純輸入便利，不改資料）
         document.addEventListener('focusin', function (e) {
             try { var t = e.target; if (t && t.tagName === 'INPUT' && t.type === 'number' && t.closest('.quote-item-row')) setTimeout(function () { try { t.select(); } catch (_) {} }, 0); } catch (_) {}
@@ -4041,7 +4172,7 @@ ${esc(q.remark || '')}</textarea>
             }
         } catch (_) {}
 
-        var rippleSel = '.top-action-btn, .cat-btn, .btn-text, .action-circle-btn, .tab-btn, .qty-btn, .selectable-item';
+        var rippleSel = '.top-action-btn, .cat-btn, .btn-text, .tab-btn, .qty-btn, .selectable-item';
         document.addEventListener('pointerdown', function (e) {
             try {
                 var el = e.target && e.target.closest ? e.target.closest(rippleSel) : null;
@@ -4074,6 +4205,15 @@ ${esc(q.remark || '')}</textarea>
         updateBar();
     } catch (err) { /* 裝飾效果失敗不影響主功能 */ }
 })();
+</script>
+<script>
+/* 特效總開關：切換 <html class="fx-off">，並記住於此裝置 */
+function setFxEnabled(on) {
+    document.documentElement.classList.toggle('fx-off', !on);
+    try { localStorage.setItem('quoteFx', on ? '1' : '0'); } catch (e) {}
+    var cb = document.getElementById('admin-setting-fx'); if (cb) cb.checked = !!on;
+}
+(function () { var cb = document.getElementById('admin-setting-fx'); if (cb) cb.checked = !document.documentElement.classList.contains('fx-off'); })();
 </script>
 </body>
 </html>
