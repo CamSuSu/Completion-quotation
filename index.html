@@ -1762,6 +1762,71 @@ input[type="checkbox"] { cursor: pointer; }
 
 /* 9) 列印 / 特效關閉時維持乾淨版面 */
 html.fx-off .close-modal:hover { transform: none; }
+
+/* =====================================================================
+   v15 清晰化層：前台標題加粗加深、分類按鈕與明細文字去殘影 / 去模糊
+   （僅外觀；不改任何功能 / 資料 / DOM）
+   ===================================================================== */
+
+/* 1) 文字渲染：geometricPrecision 會停用字型微調(hinting)使邊緣發糊 → 改回 optimizeLegibility；
+      深字淺底的區塊改用 auto 平滑（macOS 上比 antialiased 更紮實、不顯細） */
+html, body { text-rendering: optimizeLegibility !important; }
+.item-name, .quote-item-row .item-name, .selectable-item .item-name, .selectable-item > div:first-child,
+.history-item-row > span:first-child, .history-client, .cat-btn span { text-rendering: optimizeLegibility !important; paint-order: normal !important; }
+#view-front .form-group, #view-front .form-group *,
+#view-front .card-title, #view-front .card-title *,
+#view-front .cat-btn, #view-front .cat-btn *,
+#view-front .quote-item-row, #view-front .quote-item-row *,
+.modal-content .cat-btn, .modal-content .cat-btn *,
+.modal-content .selectable-item, .modal-content .selectable-item * {
+  -webkit-font-smoothing: auto !important; -moz-osx-font-smoothing: auto !important;
+}
+
+/* 2) 基本資訊欄位標題（報價單抬頭／客戶名稱／工程名稱／客戶地址／統一編號／稅務設定）：更粗、更深、更大 */
+#view-front .form-group label,
+#view-front .form-group label > span {
+  font-size: 1.34rem !important; font-weight: 900 !important; color: #03123A !important;
+  letter-spacing: .09em !important; line-height: 1.35;
+  -webkit-text-stroke: .6px currentColor !important; paint-order: normal !important;
+}
+#view-front .form-group > label { margin-bottom: 10px !important; }
+/* 「顯示抬頭」勾選文字（巢狀 label）與稅務說明文字：維持較小字級但同樣加粗 */
+#view-front .form-group label label { font-size: 1.14rem !important; letter-spacing: .05em !important; -webkit-text-stroke: .45px currentColor !important; }
+#view-front .form-group label.tax-box { font-size: 1.1rem !important; letter-spacing: .03em !important; line-height: 1.55 !important; color: #061B45 !important; -webkit-text-stroke: .4px currentColor !important; }
+#view-front .form-group input::placeholder { color: #4A6290 !important; opacity: 1 !important; }
+
+/* 區塊標題（基本資訊／選擇項目加入明細清單／報價明細清單）：加粗加深（不動字級與字距，避免手機版換行） */
+#view-front .card-title, #view-front .card-title > div {
+  color: #031640 !important; font-weight: 900 !important;
+  -webkit-text-stroke: .6px currentColor !important; paint-order: normal !important;
+}
+
+/* 3) 分類按鈕（選擇項目加入明細清單）：光澤與白膜移到文字「後面」，不再從文字上方掃過，殘影消失 */
+.cat-btn, .top-action-btn, .btn-text { isolation: isolate; }
+.cat-btn::before, .cat-btn::after, .top-action-btn::after, .btn-text::after { z-index: -1 !important; }
+.cat-btn i { filter: none !important; }                       /* 圖示 drop-shadow 會讓字形邊緣糊掉並留下陰影殘影 */
+body .cat-btn span {
+  color: #030D24 !important; font-weight: 900 !important; letter-spacing: .05em !important;
+  -webkit-text-stroke: .35px currentColor !important; paint-order: normal !important;
+}
+@media (min-width: 901px) { #view-front #category-buttons-container .cat-btn span { font-size: 1.1rem !important; } }
+
+/* 4) 動畫結束後不再保留動畫圖層（fill-mode: both/forwards 會讓元素一直停在合成圖層，文字被點陣化變糊） */
+.cat-btn, .quote-item-row, .selectable-item, .history-card, .card { animation-fill-mode: backwards !important; }
+.animate-card { opacity: 1; animation-fill-mode: backwards; }
+
+/* 5) 卡片滑過不再位移（位移動畫期間文字會被重新取樣而模糊）；四周金/藍裝飾框移到內容後面，不再覆蓋在文字上 */
+@media (hover: hover) { .card:hover { transform: none; } }
+html::before { z-index: -1 !important; }
+
+/* 6) 明細清單文字：筆畫統一、邊緣乾淨 */
+.item-name, .quote-item-row .item-name, .selectable-item .item-name { -webkit-text-stroke: .35px currentColor !important; }
+
+@media (max-width: 900px) {
+  #view-front .form-group label, #view-front .form-group label > span { font-size: 1.22rem !important; letter-spacing: .06em !important; }
+  #view-front .form-group label label { font-size: 1.08rem !important; }
+  #view-front .form-group label.tax-box { font-size: 1.04rem !important; }
+}
 </style>
 <script>try{if(localStorage.getItem('quoteFx')==='0')document.documentElement.classList.add('fx-off');}catch(e){}</script>
 </head>
