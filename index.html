@@ -1494,6 +1494,36 @@ body *, body *::before, body *::after { text-shadow: none; }
 .card { background: #FFFFFF !important; }
 .quote-item-row, .history-card, .selectable-item, .cat-btn { backface-visibility: hidden; transform: translateZ(0); -webkit-font-smoothing: antialiased; }
 .quote-item-row:hover, .history-card:hover, .selectable-item:hover { transform: translateY(-2px) !important; }
+
+/* ===== v13：購物車 / + 改為亮藍半透明漸層（接近回頂部按鈕）+ 華麗繞圈眩光 ===== */
+@keyframes ringSpinRev { to { --ang2: 0deg; } }
+@property --ang2 { syntax: "<angle>"; inherits: false; initial-value: 360deg; }
+@keyframes glowPulse { 0%,100% { box-shadow: 0 6px 20px rgba(10,122,255,.35), 0 0 12px 1px rgba(120,190,255,.45), inset 0 1px 0 rgba(255,255,255,.7); } 50% { box-shadow: 0 8px 26px rgba(10,122,255,.45), 0 0 30px 7px rgba(150,210,255,.65), inset 0 1px 0 rgba(255,255,255,.85); } }
+#floating-cart, #floating-add {
+  background: linear-gradient(155deg, rgba(150,208,255,.85) 0%, rgba(10,122,255,.62) 55%, rgba(70,60,220,.55) 100%) !important;
+  border: 2px solid rgba(255,255,255,.8) !important; opacity: .92 !important;
+  -webkit-backdrop-filter: blur(6px) !important; backdrop-filter: blur(6px) !important;
+  animation: glowPulse 2.8s ease-in-out infinite !important;
+}
+#floating-add { animation-delay: .5s !important; }
+#floating-add.idle, #floating-cart.idle { opacity: .7 !important; }
+/* 外圈：高亮彗星式眩光順時針繞圈 */
+#floating-cart::before, #floating-add::before {
+  inset: -8px !important;
+  background: conic-gradient(from var(--ang), rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 40deg, rgba(120,220,255,.95) 110deg, #fff 150deg, rgba(255,214,120,.95) 175deg, rgba(255,255,255,0) 215deg, rgba(255,255,255,0) 360deg) !important;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  filter: drop-shadow(0 0 5px rgba(160,220,255,.95)) !important; animation: ringSpin 2.6s linear infinite !important;
+}
+/* 內圈：反向旋轉的細光弧 + 玻璃高光 */
+#floating-cart::after, #floating-add::after {
+  inset: 3px; border-radius: 50%; z-index: 1;
+  background: conic-gradient(from var(--ang2), rgba(255,255,255,0) 0deg, rgba(255,255,255,.85) 28deg, rgba(255,255,255,0) 70deg, rgba(255,255,255,0) 360deg), linear-gradient(160deg, rgba(255,255,255,.35), rgba(255,255,255,0) 50%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)), none; mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: ringSpinRev 3.4s linear infinite !important;
+}
+#floating-cart i, #floating-add i { color: #fff !important; text-shadow: 0 1px 4px rgba(10,50,140,.55) !important; }
+#floating-add:hover, #floating-cart:hover { opacity: 1 !important; background: linear-gradient(155deg, rgba(170,220,255,.95), rgba(30,140,255,.8) 55%, rgba(90,80,235,.75)) !important; }
+@media (prefers-reduced-motion: reduce) { #floating-cart, #floating-add, #floating-cart::before, #floating-add::before, #floating-cart::after, #floating-add::after { animation: none !important; } }
 </style>
 </head>
 <body>
