@@ -1642,6 +1642,41 @@ html.fx-off .brand-section h1::after { transform: none !important; opacity: 1 !i
 .btn-excel.action-circle-btn::before { animation-delay: -2.5s; }
 .action-circle-btn i { position: relative; z-index: 1; }
 html.fx-off .action-circle-btn::before { display: none !important; }
+
+/* ===== 購物車 / ＋：縮小一點、靠右一點 ===== */
+#floating-add, #floating-cart { width: 54px !important; height: 54px !important; right: 10px !important; font-size: 1.5rem !important; border-width: 2px !important; }
+#floating-add i, #floating-cart i { font-size: 1.5rem !important; }
+#floating-add { top: calc(max(20px, env(safe-area-inset-top)) + 68px) !important; }
+#floating-cart::before, #floating-add::before {
+  inset: -5px !important;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)) !important;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)) !important;
+  filter: drop-shadow(0 0 3px rgba(160,220,255,.85)) !important;
+}
+#cart-badge { transform: scale(.9); transform-origin: top right; }
+@media (max-width: 900px) {
+  #floating-add, #floating-cart { width: 48px !important; height: 48px !important; right: 8px !important; }
+  #floating-add i, #floating-cart i { font-size: 1.3rem !important; }
+  #floating-add { top: calc(max(75px, calc(15px + env(safe-area-inset-top))) + 60px) !important; }
+}
+
+/* ===== 項目名稱（報價明細 / 歷史紀錄 / 選單）：粗體、深色、銳利 ===== */
+.quote-item-row, .history-card, .selectable-item, .cat-btn { transform: none; backface-visibility: visible; will-change: auto; }
+.item-name, .quote-item-row .item-name, .selectable-item .item-name, .selectable-item > div:first-child,
+.history-item-row > span:first-child, .history-client, .cat-btn span {
+  font-weight: 900 !important; color: #050F26 !important;
+  -webkit-text-stroke: .3px currentColor !important; paint-order: stroke fill;
+  text-rendering: geometricPrecision; -webkit-font-smoothing: antialiased; font-synthesis: weight;
+  letter-spacing: .035em;
+}
+.item-name, .quote-item-row .item-name { font-size: 1.62rem; line-height: 1.45; }
+.history-item-row { color: #050F26 !important; font-weight: 900 !important; border-color: #C9D3E3 !important; }
+.history-item-row > span:first-child { font-size: 1.5rem; }
+.history-client { font-size: 1.9rem !important; }
+@media (max-width: 900px) {
+  .item-name, .quote-item-row .item-name { font-size: 1.35rem !important; }
+  .history-item-row > span:first-child { font-size: 1.15rem; }
+}
 </style>
 <script>try{if(localStorage.getItem('quoteFx')==='0')document.documentElement.classList.add('fx-off');}catch(e){}</script>
 </head>
